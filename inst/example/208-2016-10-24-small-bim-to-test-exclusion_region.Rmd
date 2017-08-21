@@ -1,0 +1,101 @@
+---
+title: "208-2016-10-24-small-bim-to-test-exclusion_region"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 8, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+Last knit was `r Sys.time()`
+
+"2016-10-25 05:07:42 PDT"
+
+# Preparing the data
+```{r}
+library(gritsr3)
+bim_0 = alternative_example$bim
+genotype = alternative_example$genotype
+fam = alternative_example$fam
+target_markers = alternative_example$target_markers[3:5]
+Psi = alternative_example$Psi
+target_markers = target_markers
+set.seed(1)
+sample_these_rows = sort(sample(1:nrow(bim_0), 200))
+bim_1 = bim_0[sample_these_rows, ]
+bim_2 = bim_0[bim_0$snp %in% target_markers, ]
+bim_3 = rbind(bim_1, bim_2)
+bim = bim_3[order(bim_3$chromosome, bim_3$bp), ]
+table(bim$chromosome)
+head(exclusion_region)
+```
+
+
+```{r}
+list(bim_target_markers = bim_2)
+```
+
+# Creating the sampling_set
+```{r}
+set.seed(2)
+sampling_set = gritsr_sampling_set(
+  bim,
+  genotype,
+  target_markers,
+  exclusion_region = NULL,
+  hotspot,
+  epsilon_on_log_scale = 0.02)
+print(sampling_set)
+```
+
+
+```{r}
+ss = sampling_set$sampling_set
+this = ss[[1]]
+dimnames(this)[[2]]
+lapply(ss, function(this){
+  bim[ bim$snp %in% dimnames(this)[[2]], ]
+})
+```
+
+```{r}
+exclusion_region_test = data.frame(chromosome = 1, begin = 30000000, end = 40000000)
+exclusion_region_test
+set.seed(2)
+sampling_set = gritsr_sampling_set(
+  bim,
+  genotype,
+  target_markers,
+  exclusion_region = exclusion_region_test,
+  hotspot,
+  epsilon_on_log_scale = 0.02)
+print(sampling_set)
+```
+
+```{r}
+ss = sampling_set$sampling_set
+this = ss[[1]]
+dimnames(this)[[2]]
+lapply(ss, function(this){
+  bim[ bim$snp %in% dimnames(this)[[2]], ]
+})
+```
+

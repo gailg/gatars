@@ -1,0 +1,45 @@
+---
+title: "141-food-web"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = FALSE, fig.height = 8, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+Last knit was `r Sys.time()`
+
+"2016-07-25 16:23:50 PDT"
+
+# `foodweb`
+
+
+http://www.r-bloggers.com/r-function-of-the-day-foodweb/
+```{r}
+library(mvbutils)
+library(gritsr3)
+```
+
+
+```{r}
+foodweb(where = "package:gritsr3")
+```
+

@@ -1,0 +1,121 @@
+---
+title: "142-run-an-example"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = FALSE, fig.height = 8, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+Last knit was `r Sys.time()`
+
+"2016-07-26 07:01:01 PDT"
+
+# Preparing the data
+```{r}
+library(gritsr3)
+bim = alternative_example$bim
+genotype = alternative_example$genotype
+fam = alternative_example$fam
+target_markers = alternative_example$target_markers[3:5]
+Psi = alternative_example$Psi
+target_markers = target_markers
+
+NNN = nrow(fam)
+first_ten = 1:10
+last_ten = NNN - (9:0)
+matrix_image_fn(Psi[c(first_ten, last_ten), c(first_ten, last_ten)],
+                main = "First and last 10 rows and columns of Psi")
+```
+
+# An example for `matrix_image_fn`
+
+```{r}
+NNN = 30
+epsilon = .8
+x = rnorm(NNN, 0, 1) 
+x1 = x + rnorm(NNN, 0, epsilon)
+x2 = x + rnorm(NNN, 0, epsilon)
+x3 = x + rnorm(NNN, 0, epsilon)
+independent_columns = matrix(rnorm(5 * NNN, 0, 1), ncol = 5)
+data = cbind(x1, x2, x3, independent_columns)
+matrix_image_fn(cor(data), "The correlation of some multivariate normal data")
+```
+
+# Checking the rank of the genotype_target_markers matrix
+
+```{r}
+library(Matrix)
+genotype_target_markers = genotype[, target_markers]
+list(target_markers = target_markers,
+     rank = as.numeric(rankMatrix( genotype_target_markers)))
+```
+
+# Creating the sampling_set
+```{r}
+set.seed(2)
+sampling_set = gritsr_sampling_set(
+  bim, genotype, target_markers, hotspot, 
+  epsilon_on_log_scale = 0.02,
+  use_count_as_weight = FALSE,
+  use_popularity = FALSE,
+  use_expected = FALSE,
+  markers_needing_help = NULL,
+  N_try = 100
+)
+print(sampling_set)
+
+sampling_set = gritsr_sampling_set(
+  bim, genotype, target_markers, hotspot, 
+  epsilon_on_log_scale = 0.02,
+  use_count_as_weight = FALSE,
+  use_popularity = TRUE,
+  use_expected = TRUE,
+  markers_needing_help = c(2, 3),
+  N_try = 100
+)
+print(sampling_set)
+```
+
+
+
+# Calling gritsr with N_sim_reps = 1000 and 2000
+```{r}
+start = Sys.time()
+gritsr(fam, Psi, sampling_set, N_sim_reps = 1000)
+elapsed_time = Sys.time() - start
+paste("1000 sim reps required", 
+      round(elapsed_time, 1), attributes(elapsed_time)$units)
+start = Sys.time()
+gritsr(fam, Psi, sampling_set, N_sim_reps = 2000)
+elapsed_time = Sys.time() - start
+paste("2000 sim reps required", 
+      round(elapsed_time, 1), attributes(elapsed_time)$units)
+```
+
+
+
+
+```
+#' print(sampling_set_for_gritsr_example)
+#' N_sim_reps = 10
+#' gritsr(fam, Psi, sampling_set_for_gritsr_example, N_sim_reps)
+```

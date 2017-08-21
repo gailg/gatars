@@ -1,0 +1,102 @@
+---
+title: "115-gritsr_example-dot-RData"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = FALSE, fig.height = 8, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+Last knit was `r Sys.time()`
+
+"2016-06-21 19:53:08 PDT"
+
+# `alternative_example`
+
+```{r}
+library(gritsr3)
+set.seed(1)
+genotype_bim_original = genotype_bim_original[1:5, ]
+params_example = params_example_fn(
+  bim_original, genotype_bim_original, hotspot,
+  NNN = 200,
+  p_subset_genotype = .2,
+  beta_causal_snps = .85,
+  causal_snps = 3:5)
+alternative_example = example_fn(params_example)
+alternative_example$params_example = params_example
+save(alternative_example, file = "alternative_example.RData")
+```
+
+
+```{r}
+bim = alternative_example$bim
+genotype = alternative_example$genotype
+fam = alternative_example$fam
+target_markers = alternative_example$target_markers
+Psi = alternative_example$Psi
+```
+
+```{r echo = TRUE}
+str(bim)
+str(genotype)
+str(fam)
+str(target_markers)
+str(Psi)
+```
+
+# `null_example`
+
+```{r}
+library(larry)
+library(toolsr)
+library(CompQuadForm)
+library(Matrix)
+set.seed(1)
+genotype_bim_original = genotype_bim_original[1:5, ]
+params_example = params_example_fn(
+  bim_original, genotype_bim_original, hotspot,
+  NNN = 200,
+  p_subset_genotype = .2,
+  beta_causal_snps = 0,
+  causal_snps = 3:5)
+null_example = example_fn(params_example)
+null_example$params_example = params_example
+save(null_example, file = "null_example.RData")
+```
+
+
+```{r}
+bim = null_example$bim
+genotype = null_example$genotype
+fam = null_example$fam
+target_markers = null_example$target_markers
+Psi = null_example$Psi
+```
+
+```{r echo = TRUE}
+str(bim)
+str(genotype)
+str(fam)
+str(target_markers)
+str(Psi)
+```
+

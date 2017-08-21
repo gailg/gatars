@@ -1,0 +1,254 @@
+---
+title: "203-what-was-before"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = FALSE, fig.height = 8, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+Last knit was `r Sys.time()`
+
+"2016-09-03 09:48:19 PDT"
+
+# Preparing the data
+```{r}
+library(gritsr3)
+library(gurobi)
+library(Matrix)
+bim = alternative_example$bim
+genotype = alternative_example$genotype
+fam = alternative_example$fam
+target_markers = alternative_example$target_markers[3:5]
+Psi = alternative_example$Psi
+target_markers = target_markers
+
+NNN = nrow(fam)
+first_ten = 1:10
+last_ten = NNN - (9:0)
+matrix_image_fn(Psi[c(first_ten, last_ten), c(first_ten, last_ten)],
+                main = "First and last 10 rows and columns of Psi")
+```
+
+# An example for `matrix_image_fn`
+
+```{r}
+NNN = 30
+epsilon = .8
+x = rnorm(NNN, 0, 1) 
+x1 = x + rnorm(NNN, 0, epsilon)
+x2 = x + rnorm(NNN, 0, epsilon)
+x3 = x + rnorm(NNN, 0, epsilon)
+independent_columns = matrix(rnorm(5 * NNN, 0, 1), ncol = 5)
+data = cbind(x1, x2, x3, independent_columns)
+matrix_image_fn(cor(data), "The correlation of some multivariate normal data")
+```
+
+# Checking the rank of the genotype_target_markers matrix
+
+```{r}
+library(Matrix)
+genotype_target_markers = genotype[, target_markers]
+list(target_markers = target_markers,
+     rank = as.numeric(rankMatrix( genotype_target_markers)))
+```
+
+# This part contains my scribbling with gurobi
+
+A call of `gritsr_sampling_set` consists of calling the following tow functions
+```
+  params_sampling_set = params_sampling_set_fn(
+    bim,
+    genotype,
+    target_markers,
+    hotspot,
+    epsilon_on_log_scale,
+    use_count_as_weight,
+    use_popularity,
+    use_expected,
+    markers_needing_help,
+    N_try)
+  answer = sampling_set_fn(params_sampling_set)
+```
+
+```{r}
+params_sampling_set = params_sampling_set_fn(
+  bim,
+  genotype,
+  target_markers,
+  hotspot,
+  epsilon_on_log_scale = 0.02,
+  use_count_as_weight = FALSE,
+  use_popularity = FALSE,
+  use_expected = FALSE,
+  markers_needing_help = NULL,
+  N_try = 100)
+```
+```
+`sampling_set_fn` is defined
+```
+
+sampling_set_fn = function(params_sampling_set){
+```{r}
+  genotype = params_sampling_set$genotype
+  params_sampling_set$independent_segment = independent_segment =
+    if(is.null(params_sampling_set$independent_segment)){
+      independent_segment_fn(params_sampling_set)
+    } else {
+      params_sampling_set$independent_segment
+    }
+  if(is.null(params_sampling_set$assignment_probability) || is.null(params_sampling_set$the_matrix)) {
+    aaa = assignment_probability_fn(params_sampling_set)
+    params_sampling_set$assignment_probability = aaa$assignment_probability
+    params_sampling_set$the_matrix = aaa$the_matrix
+  }
+  N_try = params_sampling_set$N_try
+  p_target = params_sampling_set$p_target
+  MMM = params_sampling_set$MMM
+  epsilon_on_log_scale = params_sampling_set$epsilon_on_log_scale
+
+  try = lapply(1:N_try, function(seed){
+    params_sampling_set$seed = seed
+    assign_segment_to_box_fn(params_sampling_set)
+  })
+  box = try[[which.max(sapply(try, function(this){
+    min(this$sampling_set_size)
+  }))]]$box
+
+  sampling_set = lapply(1:MMM, function(mmm){
+    this_box = sort(box[[mmm]])
+    this_genotype = genotype[, do.call(rbind, independent_segment[this_box])$snp]
+    p_sim = unname(colMeans(this_genotype)/2)
+    p_this = p_target[mmm]
+    lower = p_this * (1 - epsilon_on_log_scale)
+    upper = p_this * (1 + epsilon_on_log_scale)
+    good_ones_q = (lower < p_sim & p_sim < upper)
+    answer =  this_genotype[, good_ones_q, drop = FALSE]
+    answer
+  })
+  report = do.call(rbind, lapply(1:MMM, function(mmm){
+    this_genotype = sampling_set[[mmm]]
+    p_sim = unname(colMeans(this_genotype)/2)
+    data.frame(min = round(min(p_sim), 5),
+               p_target = round(p_target[mmm], 5),
+               max = round(max(p_sim), 5),
+               set_size = ncol(this_genotype))
+  }))
+  rownames(report) = NULL
+  list(
+    params_sampling_set = params_sampling_set,
+    report = report,
+    sampling_set = sampling_set)
+```
+}
+```
+```{r}
+genotype = params_sampling_set$genotype
+independent_segment_0 = independent_segment_fn(params_sampling_set)
+aaa = assignment_probability_fn(params_sampling_set)
+names(aaa)
+the_matrix_0 = t(aaa$the_matrix)
+keep = apply(the_matrix_0, 1, function(row){
+  !all(row == 0)
+})
+the_matrix = the_matrix_0[keep, ]
+independent_segment = independent_segment_0[keep]
+list(dim_the_matrix = dim(the_matrix),
+     length_independent_segment = length(independent_segment))
+```
+
+
+```{r}
+if(FALSE){
+keeper = apply(the_matrix, 1, function(row){
+  sum(row != 0) >= 2
+})
+the_matrix = head(the_matrix[keeper, ], 7)
+the_matrix
+}
+```
+
+```{r}
+source("MSparse-2016-09-02.R")
+selection_matrix_fn = function(the_matrix){
+  x_opt = MSparse(the_matrix)
+  chosen = x_opt[1:(nrow(the_matrix) * ncol(the_matrix))]
+  matrix(chosen, ncol = ncol(the_matrix), byrow = TRUE)
+}
+selection_matrix_fn(the_matrix)
+```
+
+
+
+
+
+
+
+# Creating the sampling_set
+```{r}
+set.seed(2)
+sampling_set = gritsr_sampling_set(
+  bim, genotype, target_markers, hotspot, 
+  epsilon_on_log_scale = 0.02,
+  use_count_as_weight = FALSE,
+  use_popularity = FALSE,
+  use_expected = FALSE,
+  markers_needing_help = NULL,
+  N_try = 100
+)
+print(sampling_set)
+
+sampling_set = gritsr_sampling_set(
+  bim, genotype, target_markers, hotspot, 
+  epsilon_on_log_scale = 0.02,
+  use_count_as_weight = FALSE,
+  use_popularity = TRUE,
+  use_expected = TRUE,
+  markers_needing_help = c(2, 3),
+  N_try = 100
+)
+print(sampling_set)
+```
+
+
+
+# Calling gritsr with N_sim_reps = 1000 and 2000
+```{r}
+start = Sys.time()
+gritsr(fam, Psi, sampling_set, N_sim_reps = 1000)
+elapsed_time = Sys.time() - start
+paste("1000 sim reps required", 
+      round(elapsed_time, 1), attributes(elapsed_time)$units)
+start = Sys.time()
+gritsr(fam, Psi, sampling_set, N_sim_reps = 2000)
+elapsed_time = Sys.time() - start
+paste("2000 sim reps required", 
+      round(elapsed_time, 1), attributes(elapsed_time)$units)
+```
+
+
+
+
+```
+#' print(sampling_set_for_gritsr_example)
+#' N_sim_reps = 10
+#' gritsr(fam, Psi, sampling_set_for_gritsr_example, N_sim_reps)
+```

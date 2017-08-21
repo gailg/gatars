@@ -1,0 +1,603 @@
+---
+title: "01-2016-06-20-chronicle"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = FALSE, fig.height = 8, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+Last knit was `r Sys.time()`
+
+"2016-06-20 08:17:34 PDT"
+
+# "2016-06-20 08:17:34 PDT"
+
+## `params_sampling_set_fn.R`
+
+
+Change `genotype` to `g_target`.     
+Change `e_genotype_1` to `e_g_target_1`.     
+Change `e_genotype` to `e_g_target`. 
+
+```
+@@ -15,11 +15,11 @@ params_sampling_set_fn = function(
+   genotype_dosage = dosage[, target_markers]
+   columns = if(is.null(columns)) 1:ncol(genotype_dosage) else columns
+   MMM = length(columns)
+-  genotype = genotype_dosage[, columns]
+-  NNN = nrow(genotype)
+-  e_genotype_1 = colMeans(genotype)
+-  p_target = e_genotype_1/2
+-  e_genotype = matrix(rep(e_genotype_1, nrow(genotype)), nrow = nrow(genotype), byrow = TRUE)
++  g_target = genotype_dosage[, columns]
++  NNN = nrow(g_target)
++  e_g_target_1 = colMeans(g_target)
++  p_target = e_g_target_1/2
++  e_g_target = matrix(rep(e_g_target_1, nrow(g_target)), nrow = nrow(g_target), byrow = TRUE)
+   weights = if(is.null(weights)) rep(1, MMM) else weights
+   WWW = diag(weights, MMM, MMM)
+   www = rep(weights, MMM)
+@@ -27,9 +27,9 @@ params_sampling_set_fn = function(
+     assignment_probability = assignment_probability,
+     bim = bim,
+     dosage = dosage,
+-    e_genotype = e_genotype,
++    e_g_target = e_g_target,
+     epsilon_on_log_scale = epsilon_on_log_scale,
+-    genotype = genotype,
++    g_target = g_target,
+     hotspot = hotspot,
+     independent_segment = independent_segment,
+     MMM = MMM,
+```
+## `one_experiment_fn.R`
+
+Change `genotype` to `g_target`.  
+Change `davies_lu_depends_on_genotype_fn` to `davies_lu_depends_on_g_target_fn`.     
+Change `genotype_sim` to `g_target_sim`.    
+```
+@@ -4,7 +4,7 @@ one_experiment_fn = function(
+   calculate_fancy = TRUE
+ ){
+   theta_init = params$theta_init
+-  genotype = params$genotype
++  g_target = params$g_target
+   MMM = params$MMM
+   WWW = params$WWW
+   www = params$www
+@@ -12,11 +12,11 @@ one_experiment_fn = function(
+   y_2 = params$e_y
+   rho_uni = params$rho_uni
+   Phi = params$Phi
+-  answer = if (rankMatrix(genotype) < MMM) {
+-    list(message = "error--genotype not full rank")
++  answer = if (rankMatrix(g_target) < MMM) {
++    list(message = "error--g_target not full rank")
+   } else {
+-    xxx = davies_lu_depends_on_genotype_fn(
+-      genotype, MMM, rho_uni, Phi, theta_init, WWW, www, y_1, y_2)
++    xxx = davies_lu_depends_on_g_target_fn(
++      g_target, MMM, rho_uni, Phi, theta_init, WWW, www, y_1, y_2)
+     theta_lu = xxx$lu_theta
+     counts_lu = xxx$counts_lu
+     p_value_straight = xxx$p_value
+@@ -45,7 +45,7 @@ one_experiment_fn = function(
+         p_value = p_value,
+         theta_lu = theta_lu)
+     } else {
+-      list(message = "could not obtain full-rank genotype_sim matrices")
++      list(message = "could not obtain full-rank g_target_sim matrices")
+     }
+   }
+ }
+```
+## `davies_lu_depends_on_g_target_fn.R`
+
+Change `genotype` to `g_target`.     
+Change `e_genotype_1` to `e_g_target_1`
+
+I had to go and get the deleted file
+```
+git checkout -- davies_lu_depends_on_genotype_fn.R
+```
+so I could do a diff
+
+```
+2,3c2,3
+< davies_lu_depends_on_genotype_fn = function(
+<   genotype,
+---
+> davies_lu_depends_on_g_target_fn = function(
+>   g_target,
+17,18c17,18
+<   z_1 = as.vector(WWW %*% t(genotype) %*% y_1)
+<   z_2 = as.vector(WWW %*% t(genotype) %*% y_2)
+---
+>   z_1 = as.vector(WWW %*% t(g_target) %*% y_1)
+>   z_2 = as.vector(WWW %*% t(g_target) %*% y_2)
+20,24c20,24
+<   e_genotype_1 = colMeans(genotype)
+<   p_target = e_genotype_1/2
+<   e_genotype = matrix(rep(e_genotype_1, nrow(genotype)), nrow = nrow(genotype), byrow = TRUE)
+<   e_z_1 = matrix(as.vector(WWW %*% t(e_genotype) %*% y_1), ncol = 1)
+<   e_z_2 = matrix(as.vector(WWW %*% t(e_genotype) %*% y_2), ncol = 1)
+---
+>   e_g_target_1 = colMeans(g_target)
+>   p_target = e_g_target_1/2
+>   e_g_target = matrix(rep(e_g_target_1, nrow(g_target)), nrow = nrow(g_target), byrow = TRUE)
+>   e_z_1 = matrix(as.vector(WWW %*% t(e_g_target) %*% y_1), ncol = 1)
+>   e_z_2 = matrix(as.vector(WWW %*% t(e_g_target) %*% y_2), ncol = 1)
+26c26
+<   V_G = cov(genotype)
+---
+>   V_G = cov(g_target)
+
+```
+## `simulated_fn.R`
+
+Change `davies_lu_depends_on_genotype_fn` to `davies_lu_depends_on_g_target_fn`.
+
+
+```
+@@ -38,7 +38,7 @@ simulated_fn = function(params,
+       }
+     }
+     if(good_genotype_sim){
+-      xxx = davies_lu_depends_on_genotype_fn(
++      xxx = davies_lu_depends_on_g_target_fn(
+         genotype_sim, MMM, rho_uni, Phi, theta_lu, WWW, www, y_1, y_2)
+       one_row_in_simulated = xxx$qqq[, fancy_names]
+       simulated[n_sim, ] = one_row_in_simulated
+```
+
+## `example_dosage_etc_fn.R`
+
+
+The only change is I added the comment
+
+```
+# I am using the old terminology dosage (old) = genotype (new)
+# genotype_bim and genotype_dosage (old) will get replaced with target_snps
+# The change happens in example_fn
+```
+
+
+
+```
+@@ -31,3 +31,7 @@ example_dosage_etc_fn = function(params_example){
+        genotype_bim = genotype_bim,
+        genotype_dosage = genotype_dosage)
+ }
++
++# I am using the old terminology dosage (old) = genotype (new)
++# genotype_bim and genotype_dosage (old) will get replaced with target_snps
++# The change happens in example_fn
+```
+
+# "2016-06-20 10:54:48 PDT"
+
+## `params_sampling_set_fn`
+
+I want to change `dosage` to `genotype` in the arguments of this function.
+
+The only place the string "genotype" shows up this function is the the first four lines.
+
+`genotype_dosage` should be changed to `g_target_0`
+```
+  genotype_dosage = dosage[, target_markers]
+  columns = if(is.null(columns)) 1:ncol(genotype_dosage) else columns
+  MMM = length(columns)
+  g_target = genotype_dosage[, columns]
+```
+
+And then "genotype" no longer shows up and I can change `dosage` to `genotype`
+
+```
+params_sampling_set_fn = function(
+  bim,
+  dosage,
+  
+  
+  g_target_0 = dosage[, target_markers]
+  
+  list(
+    assignment_probability = assignment_probability,
+    bim = bim,
+    dosage = dosage,
+```
+
+## `sampling_set_fn`
+
+I want to change `dosage` to `genotype`
+
+```
+dosage = params_sampling_set$dosage
+
+  sampling_set = lapply(1:MMM, function(mmm){
+    this_box = sort(box[[mmm]])
+    this_dosage = dosage[, do.call(rbind, independent_segment[this_box])$snp]
+    p_sim = unname(colMeans(this_dosage)/2)
+    
+    answer =  this_dosage[, good_ones_q, drop = FALSE]
+    
+    
+    
+  report = do.call(rbind, lapply(1:MMM, function(mmm){
+    this_dosage = sampling_set[[mmm]]
+    p_sim = unname(colMeans(this_dosage)/2)
+    data.frame(min = round(min(p_sim), 5),
+               p_target = round(p_target[mmm], 5),
+               max = round(max(p_sim), 5),
+               set_size = ncol(this_dosage))
+  }))
+```
+
+## `assignment_probability_fn`
+
+Ditto
+
+# "2016-06-20 21:03:45 PDT"
+
+## `params_example_fn`
+
+Change `p_subset_dosage` to `p_subset_genotype`
+
+
+```
+@@ -2,7 +2,7 @@
+ params_example_fn = function(
+   bim_original, genotype_bim_original, hotspot,
+   NNN = 1000,
+-  p_subset_dosage = 1,
++  p_subset_genotype = 1,
+   beta_causal_snps = 0,
+   causal_snps = 3:5
+ ){
+@@ -27,7 +27,7 @@ params_example_fn = function(
+     N_hap_rows = N_hap_rows,
+     N_smaller = length(dimnames_dosage_2),
+     p_sampling_set_generator = p_sampling_set_generator,
+-    p_subset_dosage = p_subset_dosage,
++    p_subset_genotype = p_subset_genotype,
+ 
+     age_generator = age_generator,
+     beta_nongenetic = beta_nongenetic,
+```
+
+## `example_genotype_etc_fn
+
+Change `dimnames_genotype_dosage_2` to `target_markers`.     
+Change `dosage` to `genotype`
+Remove `genotype_dosage` and `genotype_bim` and replace with `target_markers`.
+
+## `example_fam_fn`
+
+Change `genotype_dosage` to `g_target`
+
+## `example_fn`
+
+Change `genotype-dosage` to `g_target`.     
+
+# "2016-06-22 09:50:02 PDT"
+
+## `alternative_example.RData` and `null_example.RData`
+
+These were created by `inst/example/115-gritsr_example-dot-RData.Rmd`
+
+## `independent_segment_fn`
+
+`genotype_bim` changed to `target_bim`.
+
+# "2016-06-23 17:47:22 PDT"
+
+## `assignment_probability_fn`
+
+```
+diff --git a/R/assignment_probability_fn.R b/R/assignment_probability_fn.R
+index 939d980..cdccfcf 100644
+--- a/R/assignment_probability_fn.R
++++ b/R/assignment_probability_fn.R
+@@ -1,3 +1,4 @@
++#' @export
+ assignment_probability_fn = function(params_sampling_set){
+   genotype = params_sampling_set$genotype
+   independent_segment = if(is.null(params_sampling_set$independent_segment)){
+@@ -26,27 +27,55 @@ assignment_probability_fn = function(params_sampling_set){
+       ncol(target_snp)
+     })
+   }))
+-  popularity = rowSums(the_matrix)
+-
++  weight_mode = params_sampling_set$weight_mode
++  popularity_mode = params_sampling_set$popularity_mode
++  expected_mode = params_sampling_set$expected_mode
++  special = params_sampling_set$special
++  popularity = if(popularity_mode ==  1) 1 else rowSums(the_matrix)
+   ppp_0 = divide_each_segment_by_popularity_and_then_normalize =
+     do.call(cbind, lapply(1:ncol(the_matrix), function(segment){
+-      almost = the_matrix[, segment] / popularity
++      weight_0 = the_matrix[, segment]
++      weight = if(weight_mode == 1){
++        as.numeric(weight_0 > 0)
++      } else {
++        weight_0
++      }
++      almost = weight / popularity
+       if(sum(almost) == 0){
+         almost
+       } else {
+         almost / sum(almost)
+       }
+     }))
+-  expected = rowSums(ppp_0 * the_matrix)
+-  names(expected) = 1:length(expected)
+-  ppp = do.call(cbind, lapply(1:ncol(ppp_0), function(segment){
+-    almost = ppp_0[, segment] / expected
+-    if(sum(almost) == 0){
+-      almost
+-    } else {
+-      almost / sum(almost)
+-    }
+-  }))
++  ppp_1 = if(expected_mode == 1){
++    ppp_0
++  } else {
++    expected = rowSums(ppp_0 * the_matrix)
++    names(expected) = 1:length(expected)
++    do.call(cbind, lapply(1:ncol(ppp_0), function(segment){
++      almost = ppp_0[, segment] / expected
++      if(sum(almost) == 0){
++        almost
++      } else {
++        almost / sum(almost)
++      }
++    }))
++  }
++  ppp = if(is.null(special)){
++    ppp_1
++  } else {
++    do.call(cbind, lapply(1:ncol(ppp_1), function(segment){
++      column = ppp_1[, segment]
++      if(  all(column[special] == 0)  ){
++        column
++      } else {
++        column[setdiff(1:length(column), special)]  = 0
++        column / sum(column)
++      }
++    }))
++  }
++  ppp
++
+   list(the_matrix = the_matrix,
+        assignment_probability = ppp)
+ }
+(END)
+```
+
+# "2016-06-23 17:53:47 PDT"
+
+## `params_sampling_set_fn`
+
+Add the arguments 
+```
+  use_popularity = TRUE,
+  use_expected = TRUE,
+  markers_needing_help = NULL,
+```
+## `assignment_probability_fn`
+
+Cleaned up I hope.
+
+```
+@@ -22,34 +22,27 @@ assignment_probability_fn = function(params_sampling_set){
+       answer
+     })
+   })
++
+   the_matrix = do.call(cbind, lapply(segments_target_snps, function(segment){
+     sapply(segment, function(target_snp){
+       ncol(target_snp)
+     })
+   }))
+-  weight_mode = params_sampling_set$weight_mode
+-  popularity_mode = params_sampling_set$popularity_mode
+-  expected_mode = params_sampling_set$expected_mode
+-  special = params_sampling_set$special
+-  popularity = if(popularity_mode ==  1) 1 else rowSums(the_matrix)
++
++  use_popularity = params_sampling_set$use_popularity
++  use_expected = params_sampling_set$use_expected
++  markers_needing_help = params_sampling_set$markers_needing_help
++  popularity = if(use_popularity) rowSums(the_matrix) else 1
+   ppp_0 = divide_each_segment_by_popularity_and_then_normalize =
+     do.call(cbind, lapply(1:ncol(the_matrix), function(segment){
+-      weight_0 = the_matrix[, segment]
+-      weight = if(weight_mode == 1){
+-        as.numeric(weight_0 > 0)
+-      } else {
+-        weight_0
+-      }
+-      almost = weight / popularity
++      almost = as.numeric(the_matrix[, segment] > 0) / popularity
+       if(sum(almost) == 0){
+         almost
+       } else {
+         almost / sum(almost)
+       }
+     }))
+-  ppp_1 = if(expected_mode == 1){
+-    ppp_0
+-  } else {
++  ppp_1 = if(use_expected){
+     expected = rowSums(ppp_0 * the_matrix)
+     names(expected) = 1:length(expected)
+     do.call(cbind, lapply(1:ncol(ppp_0), function(segment){
+@@ -60,22 +53,22 @@ assignment_probability_fn = function(params_sampling_set){
+         almost / sum(almost)
+       }
+     }))
++  } else {
++    ppp_0
+   }
+-  ppp = if(is.null(special)){
++  assignment_probability = if(is.null(markers_needing_help)){
+     ppp_1
+   } else {
+     do.call(cbind, lapply(1:ncol(ppp_1), function(segment){
+       column = ppp_1[, segment]
+-      if(  all(column[special] == 0)  ){
++      if(  all(column[markers_needing_help] == 0)  ){
+         column
+       } else {
+-        column[setdiff(1:length(column), special)]  = 0
++        column[setdiff(1:length(column), markers_needing_help)] = 0
+         column / sum(column)
+       }
+     }))
+   }
+-  ppp
+-
+   list(the_matrix = the_matrix,
+-       assignment_probability = ppp)
++       assignment_probability = assignment_probability)
+ }
+(END)
+ 
+```
+
+# "2016-06-27 07:49:25 PDT"
+
+## `135-how-larry-creates-sampling_set.Rmd`
+
+Refer back to `120-explain-sampling_set.html`
+
+# "2016-06-28 15:14:58 PDT"
+
+```
+git clone larry gritsr3
+```
+
+In github create gritsr3 and no readme or anything
+
+```
+git remote add origin git@github.com:gailg/gritsr3.git
+fatal: remote origin already exists.
+```
+
+```
+get remote -v
+git remote rm origin
+git remote add origin git@github.com:gailg/gritsr3.git
+git push -u origin master
+```
+
+# "2016-07-25 14:55:32 PDT"
+
+I want to delete everything I no longer need.  The final cleanup.
+
+## `115-gritsr_example-dot-RData.Rmd`  
+
+Produces the example data.
+
+Needs `data/genotype_bim_original`
+
+Needs 
+```
+params_example_fn
+example_fn
+```
+
+Produces
+
+```
+alternative_example.RData
+null_example.RData
+```
+
+## `inst/stanford-dot-edu-ggong/index.Rmd`
+
+Requires 
+
+```
+alternative_example
+matrix_image_fn
+gritsr_sampling_set
+gritsr
+```
+
+## Delete these
+
+### `R`
+
+```
+example_dosage_etc_fn
+another_gritsr_sampling_set
+```
+
+### `example`
+
+Everything except `115-gritsr_example-dot-RData.Rmd`
+
+### `holding`
+
+What is in there already
+```
+params_real_data_fn.R
+```
+And I will add the following
+```
+example_dosage_etc_fn
+another_gritsr_sampling_set
+stanford-dot-edu-ggong/scribble.Rmd
+stanford-dot-edu-ggong/scribble.html
+```
+Rebuild `gritsr3`.  
+Rerun the code in `index.Rmd`
+
+### `holding-example`
+
+Put everything in `example` except `115-gritsr_example-dot-RData.Rmd`,
+And from data put in
+```
+alternative_example.RData
+null_example.RData
+alpha_lu_fn.R
+larry-package.R
+```
+Rerun  `115-gritsr_example-dot-RData.Rmd`
+I see I need to change `larry` to `gritsr3`.
+```
+library(toolsr)
+library(CompQuadForm)
+library(Matrix)
+```
+I need `split_fn`     
+Rebuild `gritsr3`   
+Rerun  `115-gritsr_example-dot-RData.Rmd`
+
+This will produce `alternative_example.RData` and `null_example.RData` which I will slide into `data`
+
+Rebuild `gritsr3`  
+
+Rerun `index.Rmd` and the code inside.
+
+Run `141-food-web.Rmd`

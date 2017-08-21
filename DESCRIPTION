@@ -1,0 +1,12 @@
+Package: gatrs
+Type: Package
+Title: Estimate Test Size by Resampling SNPs Elsewhere in the Genome
+Version: 0.2.0
+Date: 2017-08-21
+Authors@R: as.person(c(
+    "Gail Gong <gailgongster@gmail.com> [aut, cre]"))
+Description: Calculates the p-values of a family of statistics that test the association between specified genetic markers, called target markers, and a binary trait. The family includes the burden statistic, the linear kernel, statistic, a new case-based kernel statistic, and optimal ensembles formed by taking linear combinations of these three statistics. Allows imputed genotypes. New in this version: Uses one-segment-assign-many to create sampling sets.
+License: GPL-3
+LazyData: TRUE
+RoxygenNote: 6.0.1
+Imports: CompQuadForm, ggplot2, Matrix

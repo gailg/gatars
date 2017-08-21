@@ -1,0 +1,285 @@
+---
+title: "143-the-skat-statistic"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 8, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+Last knit was `r Sys.time()`
+
+"2016-07-27 14:54:24 PDT"
+
+# `teeny_alternative_example`
+
+```{r}
+library(gritsr3)
+set.seed(1)
+genotype_bim_original = genotype_bim_original[1:5, ]
+params_example = params_example_fn(
+  bim_original, genotype_bim_original, hotspot,
+  NNN = 100,
+  p_subset_genotype = .2,
+  beta_causal_snps = .85,
+  causal_snps = 3:5)
+teeny_alternative_example = example_fn(params_example)
+teeny_alternative_example$params_example = params_example
+save(teeny_alternative_example, file = "teeny_alternative_example.RData")
+
+bim = teeny_alternative_example$bim
+genotype = teeny_alternative_example$genotype
+fam = teeny_alternative_example$fam
+target_markers = teeny_alternative_example$target_markers[1:2]
+Psi = teeny_alternative_example$Psi
+
+str(bim)
+str(genotype)
+str(fam)
+str(target_markers)
+str(Psi)
+```
+
+# Checking the rank of the genotype_target_markers matrix
+
+```{r}
+library(Matrix)
+genotype_target_markers = genotype[, target_markers]
+list(target_markers = target_markers,
+     rank = as.numeric(rankMatrix( genotype_target_markers)))
+```
+
+# Creating the sampling_set
+
+```{r}
+set.seed(2)
+sampling_set = gritsr_sampling_set(
+  bim, genotype, target_markers, hotspot, 
+  epsilon_on_log_scale = 0.02,
+  use_count_as_weight = FALSE,
+  use_popularity = FALSE,
+  use_expected = FALSE,
+  markers_needing_help = NULL,
+  N_try = 100
+)
+print(sampling_set)
+save(sampling_set, file = "teeny_alternative_example_sample_set.RData")
+```
+
+# Calling gritsr with N_sim_reps = 1000 and 2000
+```{r}
+start = Sys.time()
+gritsr(fam, Psi, sampling_set, N_sim_reps = 100)
+elapsed_time = Sys.time() - start
+paste("1000 sim reps required", 
+      round(elapsed_time, 1), attributes(elapsed_time)$units)
+```
+
+# Drilling down to skat
+
+## `gritsr`
+```{r}
+params_sampling_set = sampling_set$params_sampling_set
+sampling_set = sampling_set$sampling_set
+N_sim_reps = 100
+params = params_fn(params_sampling_set, fam, Psi, sampling_set, N_sim_reps)
+```
+
+
+## `ooo = one_experiment_fn(params, calculate_fancy = TRUE)`
+
+```{r}
+calculate_fancy = FALSE
+theta_init = params$theta_init
+g_target = params$g_target
+MMM = params$MMM
+WWW = params$WWW
+www = params$www
+y_1 = params$yyy
+y_2 = params$e_y
+rho_uni = params$rho_uni
+Phi = params$Phi
+rankMatrix(g_target)
+```
+
+
+##  `davies_lu_depends_on_g_target_fn`
+
+```
+xxx = davies_lu_depends_on_g_target_fn(
+  g_target, MMM, rho_uni, Phi, theta_init, WWW, www, y_1, y_2)
+theta_lu = xxx$lu_theta
+counts_lu = xxx$counts_lu
+p_value_straight = xxx$p_value
+```  
+  
+```{r}
+theta = theta_init
+JJJ = matrix(rep(1, MMM * MMM), nrow = MMM)
+III = diag(rep(1, MMM))
+zero_M = matrix(rep(0, MMM * MMM), nrow = MMM)
+zero_M_2M = matrix(rep(0, MMM * 2 * MMM), nrow = MMM)
+z_1 = as.vector(WWW %*% t(g_target) %*% y_1)
+z_2 = as.vector(WWW %*% t(g_target) %*% y_2)
+zzz = c(z_1, z_2)
+e_g_target_1 = colMeans(g_target)
+e_g_target = matrix(rep(e_g_target_1, nrow(g_target)), nrow = nrow(g_target), byrow = TRUE)
+e_z_1 = matrix(as.vector(WWW %*% t(e_g_target) %*% y_1), ncol = 1)
+e_z_2 = matrix(as.vector(WWW %*% t(e_g_target) %*% y_2), ncol = 1)
+mu_z = rbind(e_z_1, e_z_2)
+V_G = cov(g_target)
+W_VG_W = WWW %*% V_G %*% WWW
+V_z = kronecker(Phi, W_VG_W)
+# ----------------------------------------------- straight, fancy_grid
+alpha_uni_zero = expand.grid(a1 = rho_uni, a2 = rho_uni, a3 = rho_uni)
+alpha_uni = alpha_uni_zero[apply(alpha_uni_zero, 1, sum) <= 1, ]
+answer_0 = do.call(rbind, lapply(1:nrow(alpha_uni), function(jjj){
+  alpha = alpha_uni[jjj, ]
+  a4 = (1 - sum(as.vector(alpha)))
+  A_1 = alpha[, 1] * JJJ + alpha[,2] * III
+  A_2 = alpha[, 3] * JJJ + a4 * III
+  AAA =  rbind(cbind(A_1 + A_2, -A_1),
+               cbind(-A_1, A_1 - A_2))
+  davies_answer = davies_fn(zzz, mu_z, V_z, AAA)
+  cbind(alpha, a4, davies_answer)
+}))
+a1 = answer_0$a1
+a2 = answer_0$a2
+a3 = answer_0$a3
+a4 = answer_0$a4
+standard_lee_0 = answer_0[a1 + a2 == 1, ]
+optim_skat_0   = answer_0[a2 + a4 == 1, ]
+odd_0          = answer_0[a1 + a4 == 1, ]
+#--------------------------------------------------------------------- pause for straight
+straight = rbind(standard_burden = answer_0[a1 == 1, ],
+                 standard_skat   = answer_0[a2 == 1, ],
+                 altern_skat     = answer_0[a4 == 1, ])
+q_straight = straight$q
+names(q_straight) = rownames(straight)
+p_value = data.frame(t(straight$p_value))
+names(p_value) = rownames(straight)
+#--------------------------------------------------------------------- pause for straight
+list(p_value = p_value,
+     q_straight = q_straight)
+```
+
+
+# Get the exact formula for `standard_skat`
+```
+z_1 = as.vector(WWW %*% t(g_target) %*% y_1)
+z_2 = as.vector(WWW %*% t(g_target) %*% y_2)
+```
+
+```{r}
+alpha = alpha_uni[alpha_uni[, "a2"] == 1, ]
+a4 = (1 - sum(as.vector(alpha)))
+A_1 = alpha[, 1] * JJJ + alpha[,2] * III
+A_2 = alpha[, 3] * JJJ + a4 * III
+AAA =  rbind(cbind(A_1 + A_2, -A_1),
+             cbind(-A_1, A_1 - A_2))
+davies_answer = davies_fn(zzz, mu_z, V_z, AAA)
+list(cbind_alpha_a4_davies_answer = cbind(alpha, a4, davies_answer))
+```
+
+```{r}
+list(zzz = zzz,
+     mu_z = mu_z,
+     V_z = V_z,
+     AAA = AAA)
+```
+# The simpler way to look at SKAT
+
+"05-2015-10-18-unified-kernel-statistcs-add-other-optimizations.pdf"
+
+## $Q = Z^T Z$ where $Z =$ `z_standard` to distinguish from the `zzz` above.
+
+But here I will redefine everything so I can use `davies_fn`
+
+```{r echo = TRUE}
+eee = y_1 - y_2
+zzz =  t(g_target) %*% eee
+AAA = diag(rep(1, 2))
+mu_z = t(t(rep(0, 2)))
+Gamma = cov(g_target)
+V_z = as.vector(t(eee) %*% Psi %*% eee) * WWW %*% Gamma %*% WWW
+list(zzz = zzz,
+     AAA = AAA,
+     mu_z = mu_z,
+     Gamma = Gamma,
+     Phi = Phi,
+     V_z = V_z)
+```
+
+
+
+# Inside `davies_fn`
+
+```{r}
+library(CompQuadForm)
+qqq = as.vector(t(zzz) %*% AAA %*% zzz)
+sss = square_root_matrix_fn(V_z)
+V_z_one_half = sss$A_one_half
+V_z_minus_one_half = sss$A_minus_one_half
+z_tilde = V_z_minus_one_half %*% zzz
+mu_z_tilde =  V_z_minus_one_half %*% mu_z
+V_z_tilde = V_z_minus_one_half %*% V_z %*% V_z_minus_one_half
+A_tilde = V_z_one_half %*% AAA %*% V_z_one_half
+# ------------------------------------------------- breve, lambda, delta
+eigen_A_tilde = eigen(A_tilde)
+UUU = t(eigen_A_tilde$vectors)
+lambda = eigen_A_tilde$values
+Lambda = diag(lambda)
+z_breve = UUU %*% z_tilde
+mu_z_breve = UUU %*% mu_z_tilde
+delta = mu_z_breve^2
+q_spectral_decomp = sum(lambda * z_breve^2)
+# ----------------------------------------------- p_value
+p_value = davies(q = qqq, lambda = lambda, delta = delta)$Qq
+list(qqq = qqq,
+     lambda = lambda,
+     delta = delta,
+     p_value = p_value)
+```
+According to `help(davies)`, I am calculating the linear combination of chi_sq(1) random variable and `lambda` are the coefficients of the linear combination.
+```{r}
+
+```
+
+# Wang's skat statistic
+
+The statistic SKAT is the same as our `qqq`.
+
+```{r}
+t(y_1 - y_2) %*% g_target %*% t(g_target) %*% (y_1 - y_2)
+```
+
+What is $P$?
+
+```{r}
+
+```
+
+Wang seems to think the covariance of G is closely tied to the eigenvalues above
+
+```{r}
+eigen(cov(g_target))
+```
+
