@@ -21,5 +21,5 @@
 #' October 2005.
 #' 
 #' @docType package
-#' @name gatrs3
+#' @name gatrs
 NULL

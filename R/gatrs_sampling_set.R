@@ -72,7 +72,7 @@
 #' @param target_markers A character vector of length \code{MMM} that is a subset 
 #' of the column \code{bim$snp}. This vector names the target markers.
 #' 
-#' @param hotspot The \pkg{gatrs3} package provides this data set for your 
+#' @param hotspot The \pkg{gatrs} package provides this data set for your 
 #' convenience.  This data.frame contains (at least) the columns \code{chromosome}
 #' and \code{center}; \code{chromosome} describes the number of the chromosome 
 #' (\code{1:22}), and \code{center} describes the location of hotspots.
