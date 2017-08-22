@@ -5,7 +5,7 @@
 #' statistics--the squared burden statistic \eqn{Q_B}, the linear kernel (SKAT) statistic
 #' \eqn{Q_S}, a new case-based kernel statistic \eqn{Q_C}--as well as an ensemble of four
 #' statistics \eqn{Q_BS}, \eqn{Q_BC}, \eqn{Q_SC}, \eqn{Q_BSC} that optimize linear combinations
-#' of the three basic statistics.  See \url{http://stanford.edu/~ggong/gritsr3/} for more details.
+#' of the three basic statistics.  See \url{http://stanford.edu/~ggong/gatrs/} for more details.
 #' 
 #' @param fam A data.frame containing \code{NNN} rows and at least the two columns
 #' \code{y} and \code{e_y}, where \code{y[nnn]} is an indicator for the \code{nnn}-th person
@@ -23,21 +23,21 @@
 #' elements are all unity and two people known to be non-identical-twin full sibs and who
 #' have parents known to be completely unrelated have correlation 0.5.
 #' 
-#' @param sampling_set An object of class \code{gritsr_sampling_set} produced by 
-#' \code{gritsr_sampling_set}. (See \code{\link{gritsr_sampling_set}}.)  The object \code{sampling_set} is list containing the objects
+#' @param sampling_set An object of class \code{gatrs_sampling_set} produced by 
+#' \code{gatrs_sampling_set}. (See \code{\link{gatrs_sampling_set}}.)  The object \code{sampling_set} is list containing the objects
 #' \code{params_sampling_set}, \code{report}, and \code{sampling_set}.  The important object
 #' is \code{sampling_set$sampling_set}, a list containing \code{MMM} matrices. When it is time 
-#' for genome resampling, \code{gritsr} creates "simulated genotype matrices" by sampling
+#' for genome resampling, \code{gatrs} creates "simulated genotype matrices" by sampling
 #' and cbinding together one column from each of the \code{MMM} matrices.  
 #' 
 #' @param N_sim_reps An integer equal to the number of "simulated genotype matrices to generate
 #' when calculating the test sizes of the optimal statistics.
 
 
-#' @template gritsr_examples
+#' @template gatrs_examples
 #' 
 #' @export
-gritsr = function(fam, Psi, sampling_set, N_sim_reps, weights = NULL){
+gatrs = function(fam, Psi, sampling_set, N_sim_reps, weights = NULL){
   params_sampling_set = sampling_set$params_sampling_set
   sampling_set = sampling_set$sampling_set
   params = params_fn(params_sampling_set, fam, Psi, sampling_set, N_sim_reps, weights)
