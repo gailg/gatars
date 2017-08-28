@@ -39,6 +39,7 @@ when calculating the test sizes of the optimal statistics.}
 \description{
 Calculate the p-values of a family of statistics that test the association between a specifed set of genetic markers and a binary trait.
 
+(Genetic Association Tests for arbitrarily Related Subjects) 
 Calculate the p-values of a family of statistics that test the association between
 a specified set of \code{MMM} makrders and a binary trait.  These statistics include three 
 statistics--the squared burden statistic \eqn{Q_B}, the linear kernel (SKAT) statistic

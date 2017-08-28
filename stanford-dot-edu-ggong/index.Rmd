@@ -29,12 +29,14 @@ opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 8, tidy=FAL
 
 For comments or questions, please contact Gail Gong at gailgongster@gmail.com
 
-`gatrs` is an acronym for "Genetic Association Tests for Related Subjects"
+`gatrs` is an acronym for "Genetic Association Tests for (Arbitrarily) Related Subjects"
 
-`gatrs` calculates the p-values of a family of statistics that test the association between a specified set of $M$ genetic markers, called target markers, and a  binary or quantitative trait.  These statistics include three "basic" statistics--the squared burden statistic $Q_B$, the linear kernel  (SKAT) statistic $Q_S$, and a new case-based kernel statistic $Q_T$--as well as an ensemble of four statistics  $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$ that optimize linear combinations of the three basic statistics.  All seven statistics are summarized in Table 1 of the manuscript.  
+`gatrs` calculates the p-values of a family of statistics that test the association between a specified set of $M$ genetic markers, called target markers, and a  binary or quantitative trait.  These statistics include three "basic" statistics--the squared burden statistic $Q_B$, the sequence kernel association test  (SKAT) statistic $Q_S$, and a new trait-based kernel statistic $Q_T$--as well as an ensemble of four statistics  $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$ that optimize linear combinations of the three basic statistics.  All seven statistics are summarized in Table 1 of the manuscript.  
 
 The test statistics use observations on a number $N$ of people, or subjects, who are sampled based on their unaffected/affected status of a binary trait such as prostate cancer, 
-$y_n = 1(n\text{-th subject is affected} )$. Also the calculations require a user-specified trait probability  $(\text{e_y})_n$ (for example the predicted value of $y_n$ from a logistic regression on nongenetic covariates and principle components of ancestry), and a row vector of genotypes (either the dosage or carriage of the minor allele) $g_n = (g_{n1}, \cdots, g_{nM})$ at the $M$ target markers. Define the genotype matrix of target markers, or more briefly, the "genotype matrix" $G$  to be the $N \times M$ matrix whose $(n,m)$-th component is the genotype of the $n$-th subject at the $m$-th target marker)
+$y_n = 1(n\text{-th subject is affected} )$, or on a quantitative trait.
+
+Also the calculations require a user-specified trait expectation  $(\text{e_y})_n$ (for example the predicted value of $y_n$ from a logistic regression on nongenetic covariates and principle components of ancestry), and a row vector of genotypes (either the dosage or carriage of the minor allele) $g_n = (g_{n1}, \cdots, g_{nM})$ at the $M$ target markers. Define the genotype matrix of target markers, or more briefly, the "genotype matrix" $G$  to be the $N \times M$ matrix whose $(n,m)$-th component is the genotype of the $n$-th subject at the $m$-th target marker)
 
 The test statistics take into account covariances of the elements in $G$. For pairwise covariances among the $M$ markers (summarized by $\Gamma$ in the manuscript) our calculations use the empirical covariance matrix of $G$.  To account for pairwise covariances among the subjects, we require the user to provide a $\Psi$ matrix consisting of interpersonal genotype correlation coefficients (described in the manuscript by the same notation). 
 

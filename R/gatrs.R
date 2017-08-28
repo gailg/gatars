@@ -1,6 +1,7 @@
-#' @title Test the association between genetic markers and disease
+#' @title Test the association between genetic markers and disease. 
 #' 
-#' @description Calculate the p-values of a family of statistics that test the association between
+#' @description (Genetic Association Tests for arbitrarily Related Subjects) 
+#' Calculate the p-values of a family of statistics that test the association between
 #' a specified set of \code{MMM} makrders and a binary trait.  These statistics include three 
 #' statistics--the squared burden statistic \eqn{Q_B}, the linear kernel (SKAT) statistic
 #' \eqn{Q_S}, a new case-based kernel statistic \eqn{Q_C}--as well as an ensemble of four
