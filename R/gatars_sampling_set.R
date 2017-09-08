@@ -72,7 +72,7 @@
 #' @param target_markers A character vector of length \code{MMM} that is a subset 
 #' of the column \code{bim$snp}. This vector names the target markers.
 #' 
-#' @param hotspot The \pkg{gatrs} package provides this data set for your 
+#' @param hotspot The \pkg{gatars} package provides this data set for your 
 #' convenience.  This data.frame contains (at least) the columns \code{chromosome}
 #' and \code{center}; \code{chromosome} describes the number of the chromosome 
 #' (\code{1:22}), and \code{center} describes the location of hotspots.
@@ -83,9 +83,9 @@
 #' in the interval \code{pi[mmm] * [1 - epsilon_on_log_scale, 1 + epsilon_on_log_scale]}
 #' can be included in the sampling set.
 #' 
-#' @template gatrs_sampling_set_examples
+#' @template gatars_sampling_set_examples
 #' @export
-gatrs_sampling_set = function(
+gatars_sampling_set = function(
   bim,
   genotype,
   target_markers,
@@ -101,6 +101,6 @@ gatrs_sampling_set = function(
     hotspot,
     epsilon_on_log_scale)
   answer = sampling_set_fn(params_sampling_set)
-  class(answer) = c("gatrs_sampling_set", class(answer))
+  class(answer) = c("gatars_sampling_set", class(answer))
   answer
 }

@@ -1,6 +1,6 @@
 
 ---
-title: "gatrs version 0.2.0"
+title: "gatars version 0.2.0"
 author: ''
 output:
   html_document:
@@ -23,43 +23,43 @@ require(knitr)
 opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 8, tidy=FALSE)
 ```
 
-"2017-08-22 09:02:40 PDT"
+"2017-08-30 14:01:21 PDT"
 
 # Introduction {#intro}
 
 For comments or questions, please contact Gail Gong at gailgongster@gmail.com
 
-`gatrs` is an acronym for "Genetic Association Tests for (Arbitrarily) Related Subjects"
+`gatars` is an acronym for "Genetic Association Tests for Arbitrarily Related Subjects"
 
-`gatrs` calculates the p-values of a family of statistics that test the association between a specified set of $M$ genetic markers, called target markers, and a  binary or quantitative trait.  These statistics include three "basic" statistics--the squared burden statistic $Q_B$, the sequence kernel association test  (SKAT) statistic $Q_S$, and a new trait-based kernel statistic $Q_T$--as well as an ensemble of four statistics  $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$ that optimize linear combinations of the three basic statistics.  All seven statistics are summarized in Table 1 of the manuscript.  
+`gatars` tests the association between a specified set of $M$ genetic markers, called target markers, and a  binary or quantitative trait on subjects with any genealogical relationship.  We condition on trait phenotypes and treat genotypes as random.   Test statistics include three "basic" statistics--the squared burden statistic $Q_B$, the sequence kernel association test  (SKAT) statistic $Q_S$, and a new trait-based kernel statistic $Q_T$--as well as an ensemble of four statistics  $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$ that optimize linear combinations of the three basic statistics.  All seven statistics are summarized in Table 1 of the manuscript.  
 
-The test statistics use observations on a number $N$ of people, or subjects, who are sampled based on their unaffected/affected status of a binary trait such as prostate cancer, 
+The test statistics use observations on a number $N$ of people, or subjects, who are sampled based on their unaffected/affected status of a binary trait, 
 $y_n = 1(n\text{-th subject is affected} )$, or on a quantitative trait.
 
-Also the calculations require a user-specified trait expectation  $(\text{e_y})_n$ (for example the predicted value of $y_n$ from a logistic regression on nongenetic covariates and principle components of ancestry), and a row vector of genotypes (either the dosage or carriage of the minor allele) $g_n = (g_{n1}, \cdots, g_{nM})$ at the $M$ target markers. Define the genotype matrix of target markers, or more briefly, the "genotype matrix" $G$  to be the $N \times M$ matrix whose $(n,m)$-th component is the genotype of the $n$-th subject at the $m$-th target marker)
+Also the calculations require a user-specified trait expectation  $(\text{e_y})_n$ (for example the predicted value of $y_n$ from a logistic or linear regression on nongenetic covariates and principle components of ancestry), and a row vector of genotypes (either the dosage or carriage of the minor allele) $g_n = (g_{n1}, \cdots, g_{nM})$ at the $M$ target markers. Define the genotype matrix of target markers, or more briefly, the "genotype matrix" $G$  to be the $N \times M$ matrix whose $(n,m)$-th component is the genotype of the $n$-th subject at the $m$-th target marker)
 
 The test statistics take into account covariances of the elements in $G$. For pairwise covariances among the $M$ markers (summarized by $\Gamma$ in the manuscript) our calculations use the empirical covariance matrix of $G$.  To account for pairwise covariances among the subjects, we require the user to provide a $\Psi$ matrix consisting of interpersonal genotype correlation coefficients (described in the manuscript by the same notation). 
 
-Obtaining the p-values of the optimized statistics further requires resampling from sets of markers located throughout the human genome. We require $M$ sampling sets, one for each target marker. The sampling set for the $m$-th target marker requires markers whose minor allele frequencies match closely with that of its target marker.  Also the sampling sets should be independent of the target markers as well as markers known to be associated with the binary trait. The gatrs package can create these sampling sets provided the user supplies the following two items: (1) A data set containing genotypes of the $N$ subjects at a large number of markers or snps (in addition to the target markers) throughout the human genome. (In the analysis of the prostate data in the manuscript, we obtained `126702` snps which we feel is a large enough number.) (2) A data set containing the locations of markers associated with the binary trait.
+Obtaining the p-values of the optimized statistics further requires resampling from sets of markers located throughout the human genome. We require $M$ sampling sets, one for each target marker. The sampling set for the $m$-th target marker requires markers whose minor allele frequencies match closely with that of its target marker.  Also the sampling sets should be independent of the target markers as well as markers known to be associated with the binary trait. The gatars package can create these sampling sets provided the user supplies the following two items: (1) A data set containing genotypes of the $N$ subjects at a large number of markers or snps (in addition to the target markers) throughout the human genome. (In the analysis of the prostate data in the manuscript, we obtained `126702` snps which we feel is a large enough number.) (2) A data set containing the locations of markers associated with the binary trait.
 
-The creation of the sampling sets also uses hotspots from "A Fine-Scale Map of Recombination Rates and Hotspots Across the Human Genome", Myers, Simon;Bottolo, Leonardo;Freeman, Colin;McVean, Gil;Donnelly, Peter Science; Oct 14, 2005; 310, 5746; ProQuest Research Library, pg. 321.  `gatrs` has translated the base-pair positions of the hotspots from this reference to Build hg38/GRCh38 
+The creation of the sampling sets also uses hotspots from "A Fine-Scale Map of Recombination Rates and Hotspots Across the Human Genome", Myers, Simon;Bottolo, Leonardo;Freeman, Colin;McVean, Gil;Donnelly, Peter Science; Oct 14, 2005; 310, 5746; ProQuest Research Library, pg. 321.  `gatars` has translated the base-pair positions of the hotspots from this reference to Build hg38/GRCh38 
 
 [TOP](#top)
 
-# Installing `gatrs` {#install-gatrs}
+# Installing `gatars` {#install-gatars}
 
 If you have not yet installed R, download the latest version (at least 3.2.4) for your operating system at:
 
 http://www.r-project.org
 
-Run the R application. To install the `gatrs` package, enter the following lines of code to the R prompt:
+Run the R application. To install the `gatars` package, enter the following lines of code to the R prompt:
 
 ```
 install.packages("devtools")
 library(devtools)
-install_github("gailg/gatrs")
-if("gatrs" %in% rownames(installed.packages())){
-  print("gatrs installed successfully--you are good to go!")
+install_github("gailg/gatars")
+if("gatars" %in% rownames(installed.packages())){
+  print("gatars installed successfully--you are good to go!")
 } else {
   print("something went wrong--ask for help")
 }
@@ -67,19 +67,19 @@ if("gatrs" %in% rownames(installed.packages())){
 If your installation was successful, you should see the message
 
 ```
-[1] "gatrs installed successfully--you are good to go!"
+[1] "gatars installed successfully--you are good to go!"
 ```
 
 [TOP](#top)
 
 # Data required {#data-required}
 
-The function `gatrs` requires quite large data, and typically, you would organize your data in Plink.(http://pngu.mgh.harvard.edu/~purcell/plink/).  We assume that you can bring your data into R and create the following data sets.
+The function `gatars` requires quite large data, and typically, you would organize your data in Plink.(http://pngu.mgh.harvard.edu/~purcell/plink/).  We assume that you can bring your data into R and create the following data sets.
 
 ## `bim`
 
 A `data.frame` containing (at least) the three columns `chromosome`, `snp`, `bp` and $L$ rows corresponding to a very large number of $L$ markers. These markers include the target markers and those used to build the sampling sets.  The `l`-th row of `bim` summarizes the `l`-th marker and corresponds to the `l`-th column of `genotype`.
-For each row, `chromosome` is an integer between `1` and `22` (other integers may be included, but only chromosomes `1` through `22` will be used), `snp` is a character naming the marker, and `bp` is the position (bp) of the marker.  (Because the `gatrs` data set `hotspot` is in Build hg38/GRCh38, `bp` must also be expressed in Build hg38/GRCh38.) 
+For each row, `chromosome` is an integer between `1` and `22` (other integers may be included, but only chromosomes `1` through `22` will be used), `snp` is a character naming the marker, and `bp` is the position (bp) of the marker.  (Because the `gatars` data set `hotspot` is in Build hg38/GRCh38, `bp` must also be expressed in Build hg38/GRCh38.) 
 
 ## `genotype`
 
@@ -102,12 +102,12 @@ subjects’ genotypes at markers independent of those in the target set. The dia
 
 ## `exclusion_region`
 
-A `data.frame` with one or several rows of the three columns `chromosome`, `begin`, and `end`.  Each row of this `data.frame` reflects one contiguous genomic region known to be associated with the binary trait and therefore a region used by `gatrs` when creating the sampling sets. The column `chromosome` is an integer between `1` and `22` naming which chromosome the region lies, and `begin` and `end` describe its beginning and ending positions (bp).  If the region consists of a single marker, then `begin` and `end` are both equal to the position of this marker.  `begin` and `end` must to be expressed in Build hg38/GRCh38 for the same reason the column `bp` in `bim` must be expressed in Build hg38/GRCh38.
+A `data.frame` with one or several rows of the three columns `chromosome`, `begin`, and `end`.  Each row of this `data.frame` reflects one contiguous genomic region known to be associated with the binary trait and therefore a region used by `gatars` when creating the sampling sets. The column `chromosome` is an integer between `1` and `22` naming which chromosome the region lies, and `begin` and `end` describe its beginning and ending positions (bp).  If the region consists of a single marker, then `begin` and `end` are both equal to the position of this marker.  `begin` and `end` must to be expressed in Build hg38/GRCh38 for the same reason the column `bp` in `bim` must be expressed in Build hg38/GRCh38.
 
 
 ## `hotspot`
 
-The `gatrs` package provides this data set for your convenience.  This file contains (at least) the columns `chromosome` and `center`; `chromosome` describes the number of the chromosome (`1:22`), and  `center` describes the location of hotspots.
+The `gatars` package provides this data set for your convenience.  This file contains (at least) the columns `chromosome` and `center`; `chromosome` describes the number of the chromosome (`1:22`), and  `center` describes the location of hotspots.
 
 
 [TOP](#top)
@@ -115,10 +115,10 @@ The `gatrs` package provides this data set for your convenience.  This file cont
 
 # An example data set {#example-data-set}
 
-The package `gatrs` provides an example data set which I will use to illustrate how to use the package.
+The package `gatars` provides an example data set which I will use to illustrate how to use the package.
 You can access this example data with the following commands.
 ```{r}
-library(gatrs)
+library(gatars)
 bim = alternative_example$bim
 exclusion_region = alternative_example$exclusion_region
 fam = alternative_example$fam
@@ -188,7 +188,7 @@ matrix_image_fn(Psi[c(first_ten, last_ten), c(first_ten, last_ten)],
 str(exclusion_region)
 ```
 
-## `hotspot` is available as soon as you enter `gatrs`:
+## `hotspot` is available as soon as you enter `gatars`:
 
 ```{r}
 str(hotspot)
@@ -206,26 +206,26 @@ list(target_markers = target_markers,
      rank = as.numeric(rankMatrix( genotype_target_markers)))
 ```
 
-# gatrs-sampling-set {#gatrs-sampling-set}
+# gatars-sampling-set {#gatars-sampling-set}
 
-Once you have your data in R, and you have checked that your genotype matrix has full rank, use the function `gatrs_sampling_set`  to create your sampling sets. 
+Once you have your data in R, and you have checked that your genotype matrix has full rank, use the function `gatars_sampling_set`  to create your sampling sets. 
 
-## A description of how `gatrs_sampling_set` builds the sampling sets
+## A description of how `gatars_sampling_set` builds the sampling sets
 
 Each column in `genotype` corresponds to a row in `bim`, and both correspond to a marker or snp. After removing the target markers, we want to form, from the remaining snps, $M$ sampling sets, one for each of the target markers.  Recall that the two conditions we require of the sampling sets are **_the matching requirement_**: the snps in the sampling set for a target marker has minor allele frequencies that match closely with that of the target marker and **_the independence requirement_**: Any snp from any sampling set is statistically independent of the target markers and any marker known to be associated with the binary trait.
 
 We assume that hotspots from Myers et.al. cut the genome into independent segments, and so snps residing within two consecutive hotspots are independent of snps residing within another two consecutive hotspots. Defining a segment to be a set of snps that all lie within two consecutive hotspots, we obtain a (large) set of independent segments.  To satisfy the **_the independence requirement_** we need only remove any segments that contain any target markers or any markers defined by the `exclusion_region` data set.
 
 Of the markers residing in the remaining segments, we calculate their empirical minor allele frequencies and say that a marker's frequency matches the minor allele frequency $p_m$ of the $m$-th target marker if it is within 
-$p_m \times \big[1 -$ `epsilon_on_log_scale` $, 1 +$ `epsilon_on_log_scale` $\big]$.  If the number of markers satisfying the matching requirement exceeds `1000`, `gatrs` randomly chooses `1000`.
+$p_m \times \big[1 -$ `epsilon_on_log_scale` $, 1 +$ `epsilon_on_log_scale` $\big]$.  If the number of markers satisfying the matching requirement exceeds `1000`, `gatars` randomly chooses `1000`.
 
 
-## The arguments of `gatrs_sampling_set`
+## The arguments of `gatars_sampling_set`
 
-The following is the function header of `gatrs_sampling_set` showing which arguments are needed and in which order.
+The following is the function header of `gatars_sampling_set` showing which arguments are needed and in which order.
 
 ```
-gatrs_sampling_set(
+gatars_sampling_set(
   bim,
   genotype,
   target_markers,
@@ -246,11 +246,11 @@ When creating the $m$-th sampling set for target marker with minor allele freque
 $\pi_m \times \big[1 -$ `epsilon_on_log_scale` $, 1 +$ `epsilon_on_log_scale` $\big]$ 
 can be included in the sampling set.
 
-## Example calls to `gatrs_sampling_set` 
+## Example calls to `gatars_sampling_set` 
 
 ```{r eval = TRUE}
 set.seed(2)
-sampling_set = gatrs_sampling_set(
+sampling_set = gatars_sampling_set(
   bim,
   genotype,
   target_markers,
@@ -264,7 +264,7 @@ print(sampling_set)
 set.seed(2)
 head(exclusion_region)
 exclusion_region[exclusion_region$chromosome == 19, ]
-sampling_set = gatrs_sampling_set(
+sampling_set = gatars_sampling_set(
   bim,
   genotype,
   target_markers,
@@ -276,11 +276,11 @@ print(sampling_set)
 
 [TOP](#top)
 
-# `gatrs`
+# `gatars`
 
-## A description of `gatrs`
+## A description of `gatars`
 
-`gatrs` calculates the p-values of the following seven statistics: the squared burden $Q_B$, the SKAT $Q_S$, the case based $Q_T$, and optimal linear combinations $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$. 
+`gatars` calculates the p-values of the following seven statistics: the squared burden $Q_B$, the SKAT $Q_S$, the case based $Q_T$, and optimal linear combinations $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$. 
 The p-value of any linear combination of the basic statistics $Q_B$, $Q_S$, and $Q_T$  can be calculated using the `davies` function from the `CompQuadForm` package, but the theory no longer applies when a statistic is an optimal one in a universe of linear combinations. We obtain the null distribution of these optimal statistics by resorting to an innovative kind of simulation, which we call _Genome Resampling_. 
 
 Recall our notation:  $G$ is the $N \times M$ genotype matrix of target markers,  $y$ is the $N$-vector indicator for disease, and  $\text{e_y}$ is an $N$-vector of trait probabilities.
@@ -289,14 +289,14 @@ Any linear combination of the basic statistics can be written as a quadratic for
 To run a simulation to get the null distribution of an optimal statistic $Q_{\text{optimal}}$, we need to obtain simulated observations of a large number $S$ of replications of the genotype matrix $\Big\{\tilde{G}^{(1)}, \cdots, \tilde{G}^{(S)}\Big\}$. On the $s$-th simulated genotype matrix $\tilde{G}_s$, we calculate $Q(\alpha)$ over the set of values of $\alpha$ and obtain the optimal one $Q^{(s)}_{\text{optimal}}$. The p-value of $Q_{\text{optimal}}$ is the proportion of $\Big\{ Q^{(1)}_{\text{optimal}}, \cdots, Q^{(S)}_{\text{optimal}} \Big\}$ that exceed $Q_{\text{optimal}}$.
 
 The question becomes how to generate each $\tilde{G}^{(s)}$ so that it has the same distribution as the observed genotype matrix $G$ conditional on its following the null model? We propose _Genome Resampling_: Form $\tilde{G}^{(s)}$ by sampling one column from each sampling set created according to Section 
-[gatrs-sampling-set](#gatrs-sampling-set).  We report in the manuscript simulation studies that show that under different family designs and different degrees of correlations of the target markers, it is not necessary to match column covariances of $\tilde{G}^{(s)}$ to those of the oberved genotype matrix of target markers for this approach to still give good test sizes. We believe it is possible to have some nonzero correlations between the sampled markers, but since there can be such a wide variety of possible correlations if we allowed them, we chose to limit our simulation studies and therefore our prescription to independent sampling sets. We do however insist on matching column means.
+[gatars-sampling-set](#gatars-sampling-set).  We report in the manuscript simulation studies that show that under different family designs and different degrees of correlations of the target markers, it is not necessary to match column covariances of $\tilde{G}^{(s)}$ to those of the oberved genotype matrix of target markers for this approach to still give good test sizes. We believe it is possible to have some nonzero correlations between the sampled markers, but since there can be such a wide variety of possible correlations if we allowed them, we chose to limit our simulation studies and therefore our prescription to independent sampling sets. We do however insist on matching column means.
 
-## The arguments of `gatrs`
+## The arguments of `gatars`
 
-The following is the function header of `gatrs` showing which arguments are needed and in which order.
+The following is the function header of `gatars` showing which arguments are needed and in which order.
 
 ```
-gatrs(fam, Psi, sampling_set, N_sim_reps, weights)
+gatars(fam, Psi, sampling_set, N_sim_reps, weights)
 ```
 
 ### `fam` and `Psi` 
@@ -305,7 +305,7 @@ These objects have already been discussed in [An example data set](#example-data
 
 ### `sampling_set` 
 
-This object is the result of `gatrs_sampling_set` and you may follow the example from [gatrs-sampling-set](#gatrs-sampling-set)
+This object is the result of `gatars_sampling_set` and you may follow the example from [gatars-sampling-set](#gatars-sampling-set)
 
 ### `N_sim_reps
 
@@ -318,14 +318,14 @@ A vector of length `MMM = 3.  The entries in the vector are non-negative real nu
 
 [TOP](#top)
 
-## Example calls to `gatrs`
+## Example calls to `gatars`
 
 These take some time to run. If you have larger numbers $N$ of people or larger numbers $M$ of target markers, run times will increase.  
 
 ```{r eval = FALSE}
 start = Sys.time()
 set.seed(1)
-gatrs(fam, Psi, sampling_set, N_sim_reps = 1000, weights = c(5, 3, 2))
+gatars(fam, Psi, sampling_set, N_sim_reps = 1000, weights = c(5, 3, 2))
 elapsed_time = Sys.time() - start
 paste("1000 sim reps required", 
       round(elapsed_time, 1), attributes(elapsed_time)$units)
@@ -335,7 +335,7 @@ paste("1000 sim reps required",
 ```{r eval = FALSE}
 start = Sys.time()
 set.seed(1)
-gatrs(fam, Psi, sampling_set, N_sim_reps = 2000)
+gatars(fam, Psi, sampling_set, N_sim_reps = 2000)
 elapsed_time = Sys.time() - start
 paste("2000 sim reps required", 
       round(elapsed_time, 1), attributes(elapsed_time)$units)
@@ -344,7 +344,7 @@ paste("2000 sim reps required",
 # All the code in one place
 
 ```{r eval = FALSE}
-library(gatrs)
+library(gatars)
 
 # Preparing the data
 bim = alternative_example$bim
@@ -367,7 +367,7 @@ list(target_markers = target_markers,
 
 # Creating the sampling_set
 set.seed(2)
-sampling_set = gatrs_sampling_set(
+sampling_set = gatars_sampling_set(
   bim,
   genotype,
   target_markers,
@@ -377,7 +377,7 @@ sampling_set = gatrs_sampling_set(
 print(sampling_set)
 
 set.seed(2)
-sampling_set = gatrs_sampling_set(
+sampling_set = gatars_sampling_set(
   bim,
   genotype,
   target_markers,
@@ -386,14 +386,14 @@ sampling_set = gatrs_sampling_set(
   epsilon_on_log_scale = 0.02)
 print(sampling_set)
 
-# Calling gatrs with N_sim_reps = 1000 and 2000
+# Calling gatars with N_sim_reps = 1000 and 2000
 start = Sys.time()
-gatrs(fam, Psi, sampling_set, N_sim_reps = 1000)
+gatars(fam, Psi, sampling_set, N_sim_reps = 1000)
 elapsed_time = Sys.time() - start
 paste("1000 sim reps required", 
       round(elapsed_time, 1), attributes(elapsed_time)$units)
 start = Sys.time()
-gatrs(fam, Psi, sampling_set, N_sim_reps = 2000)
+gatars(fam, Psi, sampling_set, N_sim_reps = 2000)
 elapsed_time = Sys.time() - start
 paste("2000 sim reps required", 
       round(elapsed_time, 1), attributes(elapsed_time)$units)

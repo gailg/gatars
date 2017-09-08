@@ -19,7 +19,7 @@
 #'      rank = as.numeric(rankMatrix( genotype_target_markers)))
 #'      
 #' set.seed(2)
-#' sampling_set = gatrs_sampling_set(
+#' sampling_set = gatars_sampling_set(
 #'   bim, genotype, target_markers, exclusion_region, hotspot, 
 #'   epsilon_on_log_scale = 0.02
 #' )
