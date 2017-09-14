@@ -80,7 +80,7 @@ For each row, `chromosome` is an integer between `1` and `22` (other integers ma
 
 ## `genotype`
 
-A matrix with $N$ rows and $L$ columns, whose $(n,l)$-th element records either the number ($0$, $1$ or $2$) of minor alleles of snp $l$ found in the $n$-th subject or an indicator ($0$ or $1$) for the $n$-th person carrying at least one minor allele at snp $l$. The $l$-th column of `genotype` corresponds to the `l`-th row of `bim`. The matrix `genotype` could be gotten by reading in the `.bed` file from plink after massaging genotype information into either dosage or carriage. (Distinguish `genotype` here the matrix containing target markers AND sampling set markers with the "genotype matrix" $G$, the matrix containing just the target markers.)
+A matrix with $N$ rows and $L$ columns, whose $(n,l)$-th element records either the number ($0$, $1$ or $2$) of minor alleles of snp $l$ found in the $n$-th subject or an indicator ($0$ or $1$) for the $n$-th person carrying at least one minor allele at snp $l$. The $l$-th column of `genotype` corresponds to the `l`-th row of `bim`. The object `genotype` could be gotten by reading in the `.bed` file from plink after massaging genotype information into either dosage or carriage. (Distinguish `genotype` here the matrix containing target markers AND sampling set markers from the "genotype matrix" dentoed by $G$ in the manuscript, the matrix containing just the target markers.)
 
 ## `target_markers`
 

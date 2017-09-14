@@ -1,17 +1,119 @@
+#' @title The parameters that run the innards of gatars_sampling_set
+#' 
+#' @description Most of the parameters used in gatars_sampling_set are 
+#' inputs that are passed through.  \code{g_target}, \code{p_target},
+#' \code{e_g_target}, \code{MMM}, and \code{NNN} are calculated from
+#' the inputs. 
+#' 
+#' @param bim A data.frame containing (at least) the three columns \code{chromosome},
+#' \code{snp}, and \code{bp}, and \code{LLL} rows corresponding to a very large number
+#' of \code{LLL} markers.  These markers include the target markers and those used to 
+#' build the sampling sets.  The \code{lll}-th row of \code{bim} summarizes the 
+#' \code{lll}-th marker or snp and corresponds to the \code{lll}-th column of 
+#' \code{genotype}.  The object \code{bim} could be the .bim file from plink. Because
+#' the \code{gatars} data set \code{hotspot} is in Build hg38/GRCh38, \code{bp} 
+#' must also be expressed in Build hg38/GRCh38.
+#'
+#' @param exclusion_region A \code{data.frame} with one or several rows of the three
+#' columns \code{chromosome}, \code{begin}, and \code{end}.  Each row of this
+#' \code{data.frame} reflects one contiguous genomic region known to be associated
+#' with the binary trait and therefore a region used by \code{gatars} when creating
+#' sampling sets.  The column \code{chormosome} is an integer between
+#' \code{1} and \code{22} naming which chromosome the region lies, and \code{begin}
+#' and \code{end} describe its beginnind and ending positions (bp).
+#' If the region consists of a single marker, then \code{begin} and \code{end} are
+#' both equal to the position of this marker.  \code{begin} and \code{end} must be 
+#' expressed in Build hg38/GRCh38 for the same reason the column \code{bp} in
+#' \code{bim} must be expressed in Build hg38/GRCh38.
+#' 
+#' @param epsilon_on_log_scale A positive real number used to parametrize the matching.
+#' When creating the \code{mmm}-th sampling set for a target marker with minor allele
+#' frequency \code{pi[mmm]}, only those markers whose minor allele frequencies falling
+#' in the interval \code{pi[mmm] * [1 - epsilon_on_log_scale, 1 + epsilon_on_log_scale]}
+#' can be included in the sampling set. In our simulations we set
+#' \code{epsilon_on_log_scale} equal to 0.02.
+#' 
+#' @param genotype A matrix with \code{NNN} rows and \code{LLL} columns, whose 
+#' \code{(nnn, lll)}-th element records either the number (0, 1 or 2) of minor alleles 
+#' of snp \code{lll} found in the \code{nnn}-th subject or an indicator (0 or 1) 
+#' for the \code{nnn}-th person carrying at least one minor allele at snp \code{lll}. 
+#' The \code{lll}-th column of \code{genotype} corresponds to the \code{lll}-th row of 
+#' \code{bim}. The object \code{genotype} could be gotten by reading in the .bed file 
+#' from plink after massaging genotype information into either dosage or carriage. 
+#' (Distinguish the object \code{genotype} here, containing target markers AND 
+#' sampling set snps from the “genotype matrix” denoted \eqn{G} in the manuscript, 
+#' the matrix containing just the target markers.)
+#' 
+#' @param hotspot The \pkg{gatars} package provides this data set for your 
+#' convenience.  This data.frame contains (at least) the columns \code{chromosome}
+#' and \code{center}; \code{chromosome} describes the chromosome number
+#' (\code{1:22}), and \code{center} describes the location of hotspots 
+#' (using build hg38/GRCH38).
+#' 
+#' @param target_markers A character vector of length \code{MMM} that is a subset 
+#' of the column \code{bim$snp}. This vector names the target markers.
+#' 
+#' @return A list containing the following 11 objects
+#' \itemize{
+#' \item{\code{bim}: } {
+#' The same as the input \code{bim}.
+#' }
+#' \item{\code{genotype}: } {
+#' The same as the input \code{genotype}.
+#' }
+#' \item{\code{e_g_target}: }{
+#' A matrix with `NNN` rows and `MMM` columns.  All rows are the same.  
+#' The \code{mmm}-th column contains the mean of the \code{mmm}-th
+#' column of \code{g_target}.
+#' }
+#' \item{\code{epsilon_on_log_scale}: } {
+#' The same as the input \code{epsilon_on_log_scale}.
+#' }
+#' \item{\code{exclusion_region}: } {
+#' The same as the input \code{exclusion region}.
+#' }
+#' \item{\code{g_target}: } {
+#' A submatrix of \code{genotype} containing just the columns
+#' specified by \code{target_markers}.
+#' }
+#' \item{\code{hotspot}: } {
+#' The same as the input \code{hotspot}.
+#' }
+#' \item{\code{MMM}: } {
+#' The length of \code{target_markers} and the number of columns of 
+#' \code{g_target}
+#' }
+#' \item{\code{NNN}: } {
+#' The number of rows of \code{genotype} and
+#' \code{g_target}
+#' }
+#' \item{\code{p_target}: } {
+#' A vector of length \code{MMM} whose \code{mmm}-th
+#' element is the mean of the \code{mmm}-th column column of
+#' \code{g_target} divided by two.
+#' }
+#' \item{\code{target_markers}: } {
+#' The same as the input \code{target_markers}.
+#' }
+#' }
+#' 
+#' @template params_sampling_set_examples
+#' @examples
+#' params_sampling_set = params_sampling_set_fn(
+#'   bim, epsilon_on_log_scale, exclusion_region,
+#'   genotype, hotspot, target_markers)
+#' names(params_sampling_set)
 #' @export
 params_sampling_set_fn = function(
   bim,
-  genotype,
-  target_markers,
-  exclusion_region,
-  hotspot,
   epsilon_on_log_scale,
-  columns = NULL
+  exclusion_region,
+  genotype,
+  hotspot,
+  target_markers
 ){
-  g_target_0 = genotype[, target_markers]
-  columns = if(is.null(columns)) 1:ncol(g_target_0) else columns
-  MMM = length(columns)
-  g_target = g_target_0[, columns]
+  g_target = genotype[, target_markers]
+  MMM = ncol(g_target)
   NNN = nrow(g_target)
   e_g_target_1 = colMeans(g_target)
   p_target = e_g_target_1/2
