@@ -33,15 +33,22 @@
 #' }
 #' }
 #' 
-#' @template gatars_sampling_set_examples
+#' @template params_sampling_set_examples
+#' @examples
+#' sampling_set = gatars_sampling_set(
+#'     bim, epsilon_on_log_scale, exclusion_region,
+#'     genotype, hotspot, target_markers)
+#' print(sampling_set)
+#' names(sampling_set)
+#' str(sampling_set$sampling_set)
 #' @export
 gatars_sampling_set = function(
   bim,
-  genotype,
-  target_markers,
+  epsilon_on_log_scale,
   exclusion_region,
+  genotype,
   hotspot,
-  epsilon_on_log_scale = 0.02
+  target_markers
 ){
   params_sampling_set = params_sampling_set_fn(
     bim,

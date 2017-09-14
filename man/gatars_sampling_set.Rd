@@ -4,8 +4,8 @@
 \alias{gatars_sampling_set}
 \title{Create sampling sets for genome resampling}
 \usage{
-gatars_sampling_set(bim, genotype, target_markers, exclusion_region, hotspot,
-  epsilon_on_log_scale = 0.02)
+gatars_sampling_set(bim, epsilon_on_log_scale, exclusion_region, genotype,
+  hotspot, target_markers)
 }
 \arguments{
 \item{bim}{A data.frame containing (at least) the three columns \code{chromosome},
@@ -17,19 +17,12 @@ build the sampling sets.  The \code{lll}-th row of \code{bim} summarizes the
 the \code{gatars} data set \code{hotspot} is in Build hg38/GRCh38, \code{bp} 
 must also be expressed in Build hg38/GRCh38.}
 
-\item{genotype}{A matrix with \code{NNN} rows and \code{LLL} columns, whose 
-\code{(nnn, lll)}-th element records either the number (0, 1 or 2) of minor alleles 
-of snp \code{lll} found in the \code{nnn}-th subject or an indicator (0 or 1) 
-for the \code{nnn}-th person carrying at least one minor allele at snp \code{lll}. 
-The \code{lll}-th column of \code{genotype} corresponds to the \code{lll}-th row of 
-\code{bim}. The object \code{genotype} could be gotten by reading in the .bed file 
-from plink after massaging genotype information into either dosage or carriage. 
-(Distinguish the object \code{genotype} here, containing target markers AND 
-sampling set snps from the “genotype matrix” denoted \eqn{G} in the manuscript, 
-the matrix containing just the target markers.)}
-
-\item{target_markers}{A character vector of length \code{MMM} that is a subset 
-of the column \code{bim$snp}. This vector names the target markers.}
+\item{epsilon_on_log_scale}{A positive real number used to parametrize the matching.
+When creating the \code{mmm}-th sampling set for a target marker with minor allele
+frequency \code{pi[mmm]}, only those markers whose minor allele frequencies falling
+in the interval \code{pi[mmm] * [1 - epsilon_on_log_scale, 1 + epsilon_on_log_scale]}
+can be included in the sampling set. In our simulations we set
+\code{epsilon_on_log_scale} equal to 0.02.}
 
 \item{exclusion_region}{A \code{data.frame} with one or several rows of the three
 columns \code{chromosome}, \code{begin}, and \code{end}.  Each row of this
@@ -43,18 +36,25 @@ both equal to the position of this marker.  \code{begin} and \code{end} must be
 expressed in Build hg38/GRCh38 for the same reason the column \code{bp} in
 \code{bim} must be expressed in Build hg38/GRCh38.}
 
+\item{genotype}{A matrix with \code{NNN} rows and \code{LLL} columns, whose 
+\code{(nnn, lll)}-th element records either the number (0, 1 or 2) of minor alleles 
+of snp \code{lll} found in the \code{nnn}-th subject or an indicator (0 or 1) 
+for the \code{nnn}-th person carrying at least one minor allele at snp \code{lll}. 
+The \code{lll}-th column of \code{genotype} corresponds to the \code{lll}-th row of 
+\code{bim}. The object \code{genotype} could be gotten by reading in the .bed file 
+from plink after massaging genotype information into either dosage or carriage. 
+(Distinguish the object \code{genotype} here, containing target markers AND 
+sampling set snps from the “genotype matrix” denoted \eqn{G} in the manuscript, 
+the matrix containing just the target markers.)}
+
 \item{hotspot}{The \pkg{gatars} package provides this data set for your 
 convenience.  This data.frame contains (at least) the columns \code{chromosome}
 and \code{center}; \code{chromosome} describes the chromosome number
 (\code{1:22}), and \code{center} describes the location of hotspots 
 (using build hg38/GRCH38).}
 
-\item{epsilon_on_log_scale}{A positive real number used to parametrize the matching.
-When creating the \code{mmm}-th sampling set for a target marker with minor allele
-frequency \code{pi[mmm]}, only those markers whose minor allele frequencies falling
-in the interval \code{pi[mmm] * [1 - epsilon_on_log_scale, 1 + epsilon_on_log_scale]}
-can be included in the sampling set. In our simulations we set
-\code{epsilon_on_log_scale} equal to 0.02.}
+\item{target_markers}{A character vector of length \code{MMM} that is a subset 
+of the column \code{bim$snp}. This vector names the target markers.}
 }
 \value{
 A list containing the following 11 objects
@@ -92,29 +92,13 @@ contain target markers or any defined by the \code{exclusion region}.
 }
 \examples{
 bim = alternative_example$bim
-genotype = alternative_example$genotype
-fam = alternative_example$fam
-target_markers = alternative_example$target_markers[3:5]
+epsilon_on_log_scale = 0.02
 exclusion_region = data.frame(chromosome = integer(), begin = integer(), end = integer())
-Psi = alternative_example$Psi
-target_markers = target_markers
-
-NNN = nrow(fam)
-first_ten = 1:10
-last_ten = NNN - (9:0)
-matrix_image_fn(Psi[c(first_ten, last_ten), c(first_ten, last_ten)],
-                main = "First and last 10 rows and columns of Psi")
-                
-genotype_target_markers = genotype[, target_markers]
-library(Matrix)
-list(target_markers = target_markers,
-     rank = as.numeric(rankMatrix( genotype_target_markers)))
-     
-set.seed(2)
+genotype = alternative_example$genotype
+target_markers = alternative_example$target_markers[3:5]
 sampling_set = gatars_sampling_set(
-  bim, genotype, target_markers, exclusion_region, hotspot, 
-  epsilon_on_log_scale = 0.02
-)
+    bim, epsilon_on_log_scale, exclusion_region,
+    genotype, hotspot, target_markers)
 print(sampling_set)
 names(sampling_set)
 str(sampling_set$sampling_set)
