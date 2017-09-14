@@ -12,9 +12,9 @@
 #' last_ten = NNN - (9:0)
 #' matrix_image_fn(Psi[c(first_ten, last_ten), c(first_ten, last_ten)],
 #'                 main = "First and last 10 rows and columns of Psi")
-#'                 library(Matrix)
 #'                 
 #' genotype_target_markers = genotype[, target_markers]
+#' library(Matrix)
 #' list(target_markers = target_markers,
 #'      rank = as.numeric(rankMatrix( genotype_target_markers)))
 #'      

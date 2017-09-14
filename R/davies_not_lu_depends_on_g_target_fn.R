@@ -1,3 +1,4 @@
+#' @export
 davies_not_lu_depends_on_g_target_fn = function(
   g_target,
   MMM,

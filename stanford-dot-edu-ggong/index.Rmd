@@ -23,7 +23,7 @@ require(knitr)
 opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 8, tidy=FALSE)
 ```
 
-"2017-08-30 14:01:21 PDT"
+"2017-09-12 14:17:17 PDT"
 
 # Introduction {#intro}
 
@@ -341,7 +341,7 @@ paste("2000 sim reps required",
 
 # All the code in one place
 
-```{r eval = TRUE}
+```{r eval = FALSE}
 library(gatars)
 
 # Preparing the data
