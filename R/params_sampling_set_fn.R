@@ -53,7 +53,8 @@
 #' @param target_markers A character vector of length \code{MMM} that is a subset 
 #' of the column \code{bim$snp}. This vector names the target markers.
 #' 
-#' @return A list containing the following 11 objects
+#' @return A list containing the following 11 objects which are used in the innards of 
+#' \code{gatars_sampling_set}
 #' \itemize{
 #' \item{\code{bim}: } {
 #' The same as the input \code{bim}.

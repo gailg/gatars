@@ -1,5 +1,5 @@
 ---
-title: "04-sampling_set_fn"
+title: "06-independent_segment_0_fn"
 author: ""
 output:
   html_document:
@@ -32,6 +32,15 @@ Last knit was `r Sys.time()`
 ```{r}
 library(gatars)
 bim = alternative_example$bim
+chromosome = 21
+independent_segment_fn_answer = independent_segment_0_fn(chromosome, bim, hotspot)
+length(independent_segment_fn_answer)
+head(independent_segment_fn_answer)
+head(bim)
+```
+
+independent_segment_fn = function(bim, chromosome, hotspot)
+
 epsilon_on_log_scale = 0.02
 exclusion_region = data.frame(chromosome = integer(), begin = integer(), end = integer())
 genotype = alternative_example$genotype
@@ -39,43 +48,62 @@ target_markers = alternative_example$target_markers[3:5]
 params_sampling_set = params_sampling_set_fn(
   bim, epsilon_on_log_scale, exclusion_region,
   genotype, hotspot, target_markers)
-names(params_sampling_set)
+```
+
+Which chromsome is the shortest?
+
+```{r}
+table(bim$chromosome)
 ```
 
 
-```{r}
-bim_with_target_regions_removed = bim_with_target_regions_removed_fn(params_sampling_set)
-str(bim_with_target_regions_removed)
-```
+
+# Inside `independent_segment_0_fn`
+
+This function cuts the chromosome with chromosome number `chromosome` into independent segments.
+
 
 ```{r}
-#' @export
-bim_with_target_regions_removed_fn = function(params_sampling_set){
-  bim = params_sampling_set$bim
-  hotspot = params_sampling_set$hotspot
-  target_markers = params_sampling_set$target_markers
-  target_bim = bim[bim$snp %in% target_markers, ]
-  target_part = with(target_bim, data.frame(chromosome, begin = bp, end = bp))
-  exclusion_region = rbind(params_sampling_set$exclusion_region, target_part)
-  exclusion_chromosome = unique(exclusion_region$chromosome)
-  chromosomes_with_target_and_exlusion_regions_removed = lapply(1:22, function(chromosome){  
-    answer = if(chromosome %in% exclusion_chromosome){
-      segments_0 = independent_segment_0_fn(chromosome, bim, hotspot)
-      eee = exclusion_region[exclusion_region$chromosome == chromosome, ]
-      intersect_with_genotype_q = sapply(segments_0, function(this){
-        any(unlist(lapply(1:nrow(eee), function(kkk){
-          any(eee[kkk, ]$begin : eee[kkk, ]$end %in% this$bp)
-        })))
-      })
-      do.call(rbind, segments_0[!intersect_with_genotype_q])
-    } else {
-      bim[bim$chromosome == chromosome, ]
-    }
-    answer
-  })
-  do.call(rbind, chromosomes_with_target_and_exlusion_regions_removed)
-}
-
-# "2016-10-19 12:35:20 PDT" handles exclusion_region
+chromosome = 21
+bim_this_chromosome = bim[bim$chromosome == chromosome, ]
+str(bim_this_chromosome)
+hot = hotspot_this_chromosome = hotspot[hotspot$chromosome == chromosome, ]
+str(hot)
+# bim_just_these removes snps that are inside hotspots
+bim_just_these = bim_this_chromosome[!sapply(bim_this_chromosome$bp, function(this){
+  any(hot$start <= this & this <= hot$end)
+}), ]
+str(bim_just_these)
+bp = bim_just_these$bp
+# hot_just_these removes head and tail rows that do no cutting
+hot_just_these = hot[bp[1] <= hot$center & hot$center <= bp[length(bp)], ]
+str(hot_just_these)
+center = hot_just_these$center
+# bp_index is the index of the last snp left of this hot$center
+# Saying it with more details, for each center of a hotspot, 
+# give me the index of the bp immediately to the center's left.
+# Repeats indicate that there were no bp's between hotspots.
+bp_index = sapply(center, function(this){
+  max(which(bp < this))
+})
+str(bp_index)
+# breaks will be used to separate the bp index numbers
+# segments is the answer
+breaks = unique(bp_index)
+breaks
+numbers = 1:length(bp)
+breaks_with_ends = unique(c(0, breaks, max(numbers)))
+left = breaks_with_ends[-length(breaks_with_ends)]
+right = breaks_with_ends[-1]
+segment_numbers = lapply(1:length(left), function(kkk){
+  numbers[left[kkk] < numbers & numbers <= right[kkk]]
+})
+head(segment_numbers)
+segments = lapply(segment_numbers, function(this){
+  bim_just_these[this, ]
+})
+head(segments)
+head(center, 40)
+independent_segment_0_fn_answer = segments
 ```
 

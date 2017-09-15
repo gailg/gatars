@@ -9,7 +9,7 @@ bim_with_target_regions_removed_fn = function(params_sampling_set){
   exclusion_chromosome = unique(exclusion_region$chromosome)
   chromosomes_with_target_and_exlusion_regions_removed = lapply(1:22, function(chromosome){  
     answer = if(chromosome %in% exclusion_chromosome){
-      segments_0 = independent_segment_0_fn(chromosome, bim, hotspot)
+      segments_0 = independent_segment_fn(bim, chromosome, hotspot)
       eee = exclusion_region[exclusion_region$chromosome == chromosome, ]
       intersect_with_genotype_q = sapply(segments_0, function(this){
         any(unlist(lapply(1:nrow(eee), function(kkk){

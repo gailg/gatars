@@ -57,7 +57,8 @@ and \code{center}; \code{chromosome} describes the chromosome number
 of the column \code{bim$snp}. This vector names the target markers.}
 }
 \value{
-A list containing the following 11 objects
+A list containing the following 11 objects which are used in the innards of 
+\code{gatars_sampling_set}
 \itemize{
 \item{\code{bim}: } {
 The same as the input \code{bim}.
