@@ -1,0 +1,64 @@
+---
+title: "03-params_sampling_set_fn"
+author: ""
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 6, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-09-14 08:12:36 PDT"
+
+Last knit was `r Sys.time()`
+
+```{r}
+library(gatars)
+bim = alternative_example$bim
+epsilon_on_log_scale = 0.02
+exclusion_region = data.frame(chromosome = integer(), begin = integer(), end = integer())
+genotype = alternative_example$genotype
+target_markers = alternative_example$target_markers[3:5]
+params_sampling_set = params_sampling_set_fn(
+  bim, epsilon_on_log_scale, exclusion_region,
+  genotype, hotspot, target_markers)
+names(params_sampling_set)
+```
+
+```{r}
+names(params_sampling_set)
+```
+
+The following just come through as is:
+
+`bim`, `genotype`, `target_markers`, `exclusion_region`, `hotspot`, `epsilon_on_log_scale`
+
+`g_target` is a submatrix of `genotype` containing just the columns specified by `target_markers`.
+
+`p_target` is a vector of length `MMM` whose `mmm`-th element is the mean of the `mmm`-th column of `g_target` divided by `2`.
+
+`e_g_target` is a matrix with `NNN` rows and `MMM` columns.  All rows are the same.  The `mmm`-th column contains the mean of `g_target` at that column.
+
+`MMM` is the length of `target_markers` and the number of columns of `g_target`.
+
+`NNN` is the number of rows of `genotype` and `g_target`.
+
+
+
