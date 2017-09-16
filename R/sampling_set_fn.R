@@ -1,10 +1,10 @@
 #' @export
 sampling_set_fn = function(params_sampling_set){
-  bim_with_target_regions_removed = bim_with_target_regions_removed_fn(params_sampling_set)
+  bim_with_target_and_exclusion_regions_removed = bim_with_target_and_exclusion_regions_removed_fn(params_sampling_set)
   p_target = params_sampling_set$p_target
   MMM = params_sampling_set$MMM
   epsilon_on_log_scale = params_sampling_set$epsilon_on_log_scale
-  big_genotype = genotype[, bim_with_target_regions_removed$snp]
+  big_genotype = genotype[, bim_with_target_and_exclusion_regions_removed$snp]
   p_sim = unname(colMeans(big_genotype)/2)
   sampling_set = lapply(1:MMM, function(mmm){
     p_this = p_target[mmm]

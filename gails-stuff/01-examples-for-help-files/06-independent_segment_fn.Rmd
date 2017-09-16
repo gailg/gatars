@@ -1,5 +1,5 @@
 ---
-title: "06-independent_segment_0_fn"
+title: "06-independent_segment_fn"
 author: ""
 output:
   html_document:
@@ -33,34 +33,11 @@ Last knit was `r Sys.time()`
 library(gatars)
 bim = alternative_example$bim
 chromosome = 21
-independent_segment_fn_answer = independent_segment_0_fn(chromosome, bim, hotspot)
+independent_segment_fn_answer = independent_segment_fn(bim, chromosome, hotspot)
 length(independent_segment_fn_answer)
 head(independent_segment_fn_answer)
 head(bim)
 ```
-
-independent_segment_fn = function(bim, chromosome, hotspot)
-
-epsilon_on_log_scale = 0.02
-exclusion_region = data.frame(chromosome = integer(), begin = integer(), end = integer())
-genotype = alternative_example$genotype
-target_markers = alternative_example$target_markers[3:5]
-params_sampling_set = params_sampling_set_fn(
-  bim, epsilon_on_log_scale, exclusion_region,
-  genotype, hotspot, target_markers)
-```
-
-Which chromsome is the shortest?
-
-```{r}
-table(bim$chromosome)
-```
-
-
-
-# Inside `independent_segment_0_fn`
-
-This function cuts the chromosome with chromosome number `chromosome` into independent segments.
 
 
 ```{r}

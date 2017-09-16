@@ -34,7 +34,7 @@ For comments or questions, please contact Gail Gong at gailgongster@gmail.com
 `gatars` tests the association between a specified set of $M$ genetic markers, called target markers, and a binary or quantitative trait on subjects with any genealogical relationship.  We condition on trait phenotypes and treat genotypes as random.   Test statistics include three "basic" statistics--the squared burden statistic $Q_B$, the sequence kernel association test  (SKAT) statistic $Q_S$, and a new trait-based kernel statistic $Q_T$--as well as an ensemble of four statistics  $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$ that optimize linear combinations of the three basic statistics.  All seven statistics are summarized in Table 1 of the manuscript.  
 
 The test statistics use observations on a number $N$ of people, or subjects, who are sampled based on a binary or quantitative trait $y_n$. 
-Also the calculations require a user-specified trait expectation  $(\text{e_y})_n$ (for example the predicted value of $y_n$ from a logistic or linear regression on nongenetic covariates and on principle components of ancestry), and a vector of genotypes (either the dosage or carriage of the minor allele) $g_n = (g_{n1}, \cdots, g_{nM})$ at $M$ target markers. Define the genotype matrix of target markers, or more briefly, the "genotype matrix" $G$  to be the $N \times M$ matrix whose $(n,m)$-th component is the genotype of the $n$-th subject at the $m$-th target marker)
+Also the calculations require a user-specified trait expectation  $({ey})_n$ (for example the predicted value of $y_n$ from a logistic or linear regression on nongenetic covariates and on principle components of ancestry), and a vector of genotypes (either the dosage or carriage of the minor allele) $g_n = (g_{n1}, \cdots, g_{nM})$ at $M$ target markers. Define the genotype matrix of target markers, or more briefly, the "genotype matrix" $G$  to be the $N \times M$ matrix whose $(n,m)$-th component is the genotype of the $n$-th subject at the $m$-th target marker)
 
 The test statistics take into account covariances of the elements in $G$. For pairwise covariances among the $M$ markers (summarized by $\Gamma$ in the manuscript) our calculations use the empirical covariance matrix of $G$.  To account for pairwise covariances among the subjects, we require the user to provide a $\Psi$ matrix consisting of interpersonal genotype correlation coefficients (described in the manuscript by the same notation). 
 
@@ -88,8 +88,8 @@ A vector that is a subset of the column `bim$snp`.  This vector names the target
 
 ## `fam`
 
-A `data.frame` containing $N$ rows and at least the two columns $y$ and $\text{e_y}$ where 
-$y_n = 1(n \text{-th person is affected} )$ or a quantitative phenotype, and $\text{e_y}_n$  is a trait prediction, the predicted value of $y_n$ based on nongenetic covariates and possibly principal components of ancestry.  After we saw that principal conponents of ancestry were insignificant, we performed a logistic regression of $y$ on (1) age, (2) membership in family or case/control data, and (3) their interaction, and used $\text{e_y}$ to be the fitted values of the logistic regression.
+A `data.frame` containing $N$ rows and at least the two columns $y$ and ${ey}$ where 
+$y_n = 1(n \text{-th person is affected} )$ or a quantitative phenotype, and ${ey}_n$  is a trait prediction, the predicted value of $y_n$ based on nongenetic covariates and possibly principal components of ancestry.  After we saw that principal conponents of ancestry were insignificant, we performed a logistic regression of $y$ on (1) age, (2) membership in family or case/control data, and (3) their interaction, and used ${ey}$ to be the fitted values of the logistic regression.
 
 ## `Psi` = $\Psi$
 
@@ -156,7 +156,7 @@ The elements in `target_markers` must be included in `bim$snp`
 all(target_markers %in% bim$snp)
 ```
 
-## `fam` has `r nrow(fam)` rows and includes the columns `y` and `e_y`
+## `fam` has `r nrow(fam)` rows and includes the columns `y` and `ey`
 
 ```{r}
 str(fam)
@@ -286,7 +286,7 @@ print(sampling_set)
 `gatars` calculates the p-values of the following seven statistics: the squared burden $Q_B$, the SKAT $Q_S$, the case based $Q_T$, and optimal linear combinations $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$. 
 The p-value of any linear combination of the basic statistics $Q_B$, $Q_S$, and $Q_T$  can be calculated using the `davies` function from the `CompQuadForm` package, but this theory no longer applies when a statistic is an optimal one in a universe of linear combinations. We obtain the null distribution of these optimal statistics by resorting to an innovative kind of simulation, which we call _Genome Resampling_. 
 
-Recall our notation:  $G$ is the $N \times M$ genotype matrix of target markers,  $y$ is the $N$-vector indicator for disease or a quantative measurement, and  $\text{e_y}$ is an $N$-vector of trait predictions.
+Recall our notation:  $G$ is the $N \times M$ genotype matrix of target markers,  $y$ is the $N$-vector indicator for disease or a quantative measurement, and  ${ey}$ is an $N$-vector of trait predictions.
 Any linear combination of the basic statistics can be written as a quadratic form $Q(\alpha) = Z^T A(\alpha) Z$ where $Z$ is a linear function of the two vectors $W G y$ and $W G p$, $W$ is a diagonal matrix whose nonzero elements weight the target markers, $A(\alpha)$ is a square matrix that does not depend on $G$, and $\alpha$ are the coeffients of the linear combination of basic statistics.  $Z$ is a multivariate normal vector when $N$ is large, with mean $\mu$ and covariance matrix $\Sigma$ which depend on the first two moments of $G$. For a fixed value of $\alpha$, the `davies` function can calculate the p-value for $Q(\alpha)$. Each optimal statistic $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$ is a monotonoic (decreasing) function, $-\text{log}_{10}$, of the smallest p-value of $Q(\alpha)$ over a set of values of $\alpha$. 
 
 To run a simulation to get the null distribution of an optimal statistic $Q_{\text{optimal}}$, we need to obtain simulated observations of a large number $S$ of replications of the genotype matrix $\Big\{\tilde{G}^{(1)}, \cdots, \tilde{G}^{(S)}\Big\}$. On the $s$-th simulated genotype matrix $\tilde{G}_s$, we calculate $Q(\alpha)$ over the set of values of $\alpha$ and obtain the optimal one $Q^{(s)}_{\text{optimal}}$. The p-value of $Q_{\text{optimal}}$ is the proportion of $\Big\{ Q^{(1)}_{\text{optimal}}, \cdots, Q^{(S)}_{\text{optimal}} \Big\}$ that exceed $Q_{\text{optimal}}$.
