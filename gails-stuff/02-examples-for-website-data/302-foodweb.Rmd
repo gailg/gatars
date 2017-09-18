@@ -1,0 +1,37 @@
+---
+title: "300-2017-09-17-example-containing-start-instead-of-begin"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 10, tidy=FALSE)
+```
+
+`r getwd()`  
+
+Last knit was `r Sys.time()`
+
+
+
+```{r}
+library(mvbutils)
+library(gritsr2)
+foodweb(where = "package:gritsr2", color.lines = FALSE)
+```
+
