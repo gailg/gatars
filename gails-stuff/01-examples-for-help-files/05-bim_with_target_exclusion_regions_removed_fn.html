@@ -129,10 +129,11 @@ $(document).ready(function () {
 <p><A NAME="top"> </A></p>
 <p>/Volumes/lacie/aaa/packages/gatars/gails-stuff/01-examples-for-help-files</p>
 <p>“2017-09-16 07:35:24 PDT”</p>
-<p>Last knit was 2017-09-16 11:28:15</p>
+<p>Last knit was 2017-09-16 16:34:29</p>
 <div id="exclusion_region-null" class="section level1">
 <h1><span class="header-section-number">1</span> <code>exclusion_region = NULL</code></h1>
 <pre class="r"><code>library(gatars)
+#--------------- Get ready to call the function
 bim = alternative_example$bim
 epsilon_on_log_scale = 0.02
 table(bim$chromosome)</code></pre>
@@ -164,11 +165,11 @@ head(bim_for_chromosome_21, 20)</code></pre>
 ## 120297         21    exm1563174 19685292
 ## 120300         21    exm1563203 19704422
 ## 120302         21    exm1563219 19715911</code></pre>
-<pre class="r"><code>target_markers = c(&quot;exm-rs1006899&quot;,  &quot;exm-rs6517050&quot;)
+<pre class="r"><code>target_markers = c(&quot;exm-rs1006899&quot;,  &quot;exm1564039&quot;)
 bim[bim$snp %in% target_markers, ]</code></pre>
 <pre><code>##        chromosome           snp       bp
 ## 120231         21 exm-rs1006899 15845052
-## 120236         21 exm-rs6517050 16211191</code></pre>
+## 120406         21    exm1564039 30250573</code></pre>
 <pre class="r"><code>exclusion_region = NULL
 genotype = alternative_example$genotype
 params_sampling_set = params_sampling_set_fn(
@@ -179,10 +180,12 @@ names(params_sampling_set)</code></pre>
 ##  [4] &quot;epsilon_on_log_scale&quot; &quot;exclusion_region&quot;     &quot;g_target&quot;            
 ##  [7] &quot;hotspot&quot;              &quot;MMM&quot;                  &quot;NNN&quot;                 
 ## [10] &quot;p_target&quot;             &quot;target_markers&quot;</code></pre>
-<pre class="r"><code>bim_with_target_and_exclusion_regions_removed = 
+<pre class="r"><code>#--------------- Call the function
+bim_with_target_and_exclusion_regions_removed = 
   bim_with_target_and_exclusion_regions_removed_fn(params_sampling_set)
+#--------------- Notice that some lines have been removed
 str(bim_with_target_and_exclusion_regions_removed)</code></pre>
-<pre><code>## 'data.frame':    24472 obs. of  3 variables:
+<pre><code>## 'data.frame':    24467 obs. of  3 variables:
 ##  $ chromosome: int  1 1 1 1 1 1 1 1 1 1 ...
 ##  $ snp       : chr  &quot;exm53&quot; &quot;exm94&quot; &quot;exm222&quot; &quot;exm269&quot; ...
 ##  $ bp        : int  865665 874501 880160 881918 891393 899789 902088 908944 909253 909309 ...</code></pre>
@@ -191,9 +194,7 @@ str(bim_with_target_and_exclusion_regions_removed)</code></pre>
 ##  $ chromosome: int  1 1 1 1 1 1 1 1 1 1 ...
 ##  $ snp       : chr  &quot;exm53&quot; &quot;exm94&quot; &quot;exm222&quot; &quot;exm269&quot; ...
 ##  $ bp        : int  865665 874501 880160 881918 891393 899789 902088 908944 909253 909309 ...</code></pre>
-<pre class="r"><code># some lines from bim have been removed
-
-# just focus on chromosome 21
+<pre class="r"><code>#--------------- Focus on chromosome 21 because it contains the fewest snps
 before = bim_for_chromosome_21 = bim[bim$chromosome == 21, ]
 str(before)</code></pre>
 <pre><code>## 'data.frame':    301 obs. of  3 variables:
@@ -201,36 +202,34 @@ str(before)</code></pre>
 ##  $ snp       : chr  &quot;exm1562123&quot; &quot;exm1562153&quot; &quot;exm1562295&quot; &quot;exm2268380&quot; ...
 ##  $ bp        : int  10908883 10916412 10970025 15384814 15561435 15599354 15845052 16211191 16338958 16339193 ...</code></pre>
 <pre class="r"><code>after = bim_with_target_and_exclusion_regions_removed_for_chromosome_21 = 
-  bim_with_target_and_exclusion_regions_removed[bim_with_target_and_exclusion_regions_removed$chromosome == 21, ]
+  bim_with_target_and_exclusion_regions_removed[
+    bim_with_target_and_exclusion_regions_removed$chromosome == 21, ]
 str(after)</code></pre>
-<pre><code>## 'data.frame':    264 obs. of  3 variables:
+<pre><code>## 'data.frame':    259 obs. of  3 variables:
 ##  $ chromosome: int  21 21 21 21 21 21 21 21 21 21 ...
 ##  $ snp       : chr  &quot;exm1562123&quot; &quot;exm1562153&quot; &quot;exm1562295&quot; &quot;exm2268380&quot; ...
-##  $ bp        : int  10908883 10916412 10970025 15384814 15599354 16338958 16339193 16340408 16438793 16537728 ...</code></pre>
-<pre class="r"><code>setdiff(before$bp, after$bp)</code></pre>
-<pre><code>##  [1] 15561435 15845052 16211191 19685292 19715911 19715947 20251287
-##  [8] 20536649 30380359 33371295 34640788 34968105 35468605 35469209
-## [15] 36088664 38438006 38528987 40173528 42754483 43707101 44270229
-## [22] 44299536 44317065 44317156 44324372 44949729 45222239 45502844
-## [29] 45503139 45538679 45540962 45971335 45987884 46021234 46077919
-## [36] 46078056 46131381</code></pre>
-<pre class="r"><code># compare with target_markers which was used for the exclusion
+##  $ bp        : int  10908883 10916412 10970025 15384814 15599354 16211191 16338958 16339193 16340408 16438793 ...</code></pre>
+<pre class="r"><code>#--------------- These are the bp that have been removed
+setdiff(before$bp, after$bp)</code></pre>
+<pre><code>##  [1] 15561435 15845052 19685292 19715911 19715947 20251287 20536649
+##  [8] 30250573 30308902 30331935 30332911 30339234 30343003 30380359
+## [15] 33371295 34640788 34968105 35468605 35469209 36088664 38438006
+## [22] 38528987 40173528 42754483 43707101 44270229 44299536 44317065
+## [29] 44317156 44324372 44949729 45222239 45502844 45503139 45538679
+## [36] 45540962 45971335 45987884 46021234 46077919 46078056 46131381</code></pre>
+<pre class="r"><code>#--------------- Does this make sense?
+hhh = hotspot_for_chromosome_21 = hotspot[hotspot$chromosome == 21, ]
 bim[bim$snp %in% target_markers, ]</code></pre>
 <pre><code>##        chromosome           snp       bp
 ## 120231         21 exm-rs1006899 15845052
-## 120236         21 exm-rs6517050 16211191</code></pre>
-<pre class="r"><code>hhh = hotspot_for_chromosome_21 = hotspot[hotspot$chromosome == 21, ]
-hhh[15600000 &lt; hhh$center &amp; hhh$center &lt; 16300000, ]</code></pre>
+## 120406         21    exm1564039 30250573</code></pre>
+<pre class="r"><code>hhh[15600000 &lt; hhh$center &amp; hhh$center &lt; 16000000, ]</code></pre>
 <pre><code>##       chromosome   center    start      end
 ## 24878         21 15624421 15618921 15629921
 ## 24879         21 15640921 15637921 15643921
 ## 24880         21 15689421 15686921 15691921
 ## 24881         21 15934920 15929920 15939920
-## 24882         21 15972420 15970920 15973920
-## 24883         21 16042920 16032920 16052920
-## 24884         21 16173420 16156920 16189920
-## 24885         21 16277419 16271919 16282919
-## 24886         21 16297419 16294919 16299919</code></pre>
+## 24882         21 15972420 15970920 15973920</code></pre>
 <pre class="r"><code>bim_for_target_markers = bim[bim$snp %in% target_markers, ]
 to_the_left = hhh[hhh$end &lt; bim_for_target_markers[1, ]$bp, ]
 to_the_left[nrow(to_the_left), ]</code></pre>
@@ -243,70 +242,58 @@ to_the_right[1, ]</code></pre>
 <pre class="r"><code>bim[bim$snp %in% target_markers, ]</code></pre>
 <pre><code>##        chromosome           snp       bp
 ## 120231         21 exm-rs1006899 15845052
-## 120236         21 exm-rs6517050 16211191</code></pre>
-<pre class="r"><code>bim_remove_due_to_first_target_marker = bim_for_chromosome_21[to_the_left[nrow(to_the_left), ]$end &lt;= bim_for_chromosome_21$bp &amp;
+## 120406         21    exm1564039 30250573</code></pre>
+<pre class="r"><code>bim_remove_due_to_first_target_marker = bim_for_chromosome_21[
+  to_the_left[nrow(to_the_left), ]$end &lt;= bim_for_chromosome_21$bp &amp;
   bim_for_chromosome_21$bp &lt;= to_the_right[1, ]$start, ]
+#--------------- The part of bim that are removed due to the 
+#----------------first target marker
 bim_remove_due_to_first_target_marker  </code></pre>
 <pre><code>##        chromosome           snp       bp
 ## 120231         21 exm-rs1006899 15845052</code></pre>
-<pre class="r"><code>to_the_left = hhh[hhh$end &lt; bim_for_target_markers[2, ]$bp, ]
+<pre class="r"><code>#--------------- Repeat the above for the second_target_marker.
+#--------------- This shows that sometimes not just the target
+#--------------- marker is removed.
+to_the_left = hhh[hhh$end &lt; bim_for_target_markers[2, ]$bp, ]
 to_the_left[nrow(to_the_left), ]</code></pre>
 <pre><code>##       chromosome   center    start      end
-## 24884         21 16173420 16156920 16189920</code></pre>
+## 25096         21 30214846 30212346 30217346</code></pre>
 <pre class="r"><code>to_the_right = hhh[bim_for_target_markers[2, ]$bp &lt; hhh$start, ]
 to_the_right[1, ]</code></pre>
 <pre><code>##       chromosome   center    start      end
-## 24885         21 16277419 16271919 16282919</code></pre>
-<pre class="r"><code>bim[bim$snp %in% target_markers, ]</code></pre>
-<pre><code>##        chromosome           snp       bp
-## 120231         21 exm-rs1006899 15845052
-## 120236         21 exm-rs6517050 16211191</code></pre>
-<pre class="r"><code>bim_remove_due_to_second_target_marker = bim_for_chromosome_21[to_the_left[nrow(to_the_left), ]$end &lt;= bim_for_chromosome_21$bp &amp;
+## 25097         21 30378846 30373346 30384346</code></pre>
+<pre class="r"><code>bim_remove_due_to_second_target_marker = bim_for_chromosome_21[
+  to_the_left[nrow(to_the_left), ]$end &lt;= bim_for_chromosome_21$bp &amp;
   bim_for_chromosome_21$bp &lt;= to_the_right[1, ]$start, ]
 bim_remove_due_to_second_target_marker  </code></pre>
-<pre><code>##        chromosome           snp       bp
-## 120236         21 exm-rs6517050 16211191</code></pre>
-<pre class="r"><code>bim_removed_because_they_are_in_hotspots = bim_for_chromosome_21[sapply(bim_for_chromosome_21$bp, function(this){
+<pre><code>##        chromosome        snp       bp
+## 120406         21 exm1564039 30250573
+## 120408         21 exm1564090 30308902
+## 120411         21 exm1564154 30331935
+## 120412         21 exm1564158 30332911
+## 120414         21 exm1564189 30339234
+## 120419         21 exm1564218 30343003</code></pre>
+<pre class="r"><code>#--------------- The function also removes the parts of bim
+#--------------- that fall inside the hotspots
+bim_removed_because_they_are_in_hotspots = bim_for_chromosome_21[
+  sapply(bim_for_chromosome_21$bp, function(this){
   any(hhh$start &lt;= this &amp; this &lt;= hhh$end)
 }), ]
-
-bim_removed_because_they_are_in_hotspots</code></pre>
-<pre><code>##        chromosome           snp       bp
-## 120217         21    exm1562489 15561435
-## 120297         21    exm1563174 19685292
-## 120302         21    exm1563219 19715911
-## 120303         21    exm1563222 19715947
-## 120313         21    exm2268360 20251287
-## 120315         21 exm-rs2825388 20536649
-## 120423         21    exm1564287 30380359
-## 120585         21    exm1566041 33371295
-## 120661         21    exm1567138 34640788
-## 120719         21    exm1568004 34968105
-## 120733         21    exm1568349 35468605
-## 120734         21    exm1568370 35469209
-## 120752         21    exm1568629 36088664
-## 120860         21    exm1569798 38438006
-## 120868         21    exm1569975 38528987
-## 120913         21 exm-rs1209950 40173528
-## 121019         21    exm1571839 42754483
-## 121131         21  exm-rs425215 43707101
-## 121191         21    exm1574340 44270229
-## 121195         21    exm1574463 44299536
-## 121199         21    exm1574491 44317065
-## 121200         21    exm1574496 44317156
-## 121205         21    exm1574556 44324372
-## 121237         21    exm1575100 44949729
-## 121258         21    exm1575528 45222239
-## 121269         21    exm1575730 45502844
-## 121273         21    exm1575744 45503139
-## 121286         21    exm1575949 45538679
-## 121289         21    exm1575996 45540962
-## 121393         21    exm1577581 45971335
-## 121395         21    exm1577687 45987884
-## 121400         21    exm1578049 46021234
-## 121411         21    exm1578434 46077919
-## 121413         21    exm1578444 46078056
-## 121423         21    exm1578576 46131381</code></pre>
+bim_removed_because_they_are_in_hotspots$bp</code></pre>
+<pre><code>##  [1] 15561435 19685292 19715911 19715947 20251287 20536649 30380359
+##  [8] 33371295 34640788 34968105 35468605 35469209 36088664 38438006
+## [15] 38528987 40173528 42754483 43707101 44270229 44299536 44317065
+## [22] 44317156 44324372 44949729 45222239 45502844 45503139 45538679
+## [29] 45540962 45971335 45987884 46021234 46077919 46078056 46131381</code></pre>
+<pre class="r"><code>#--------------- Check to see if the parts removed because of the 
+#--------------- target markers and those removed because they fall
+#--------------- within hotspots match those removed in the 
+#--------------- original function call
+all.equal(sort(c(bim_remove_due_to_first_target_marker$bp,
+                 bim_remove_due_to_second_target_marker$bp,
+                 bim_removed_because_they_are_in_hotspots$bp)),
+          setdiff(before$bp, after$bp))</code></pre>
+<pre><code>## [1] TRUE</code></pre>
 </div>
 
 
