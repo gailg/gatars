@@ -58,7 +58,10 @@ gatars_sampling_set = function(
     hotspot,
     target_markers
     )
-  answer = sampling_set_fn(params_sampling_set)
+  sss = sampling_set_fn(params_sampling_set)
+  answer = list(params_sampling_set = params_sampling_set,
+                report = sss$report,
+                sampling_set = sss$sampling_set)
   class(answer) = c("gatars_sampling_set", class(answer))
   answer
 }
