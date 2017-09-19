@@ -25,14 +25,14 @@ can be included in the sampling set. In our simulations we set
 \code{epsilon_on_log_scale} equal to 0.02.}
 
 \item{exclusion_region}{A \code{data.frame} with one or several rows of the three
-columns \code{chromosome}, \code{begin}, and \code{end}.  Each row of this
+columns \code{chromosome}, \code{start}, and \code{end}.  Each row of this
 \code{data.frame} reflects one contiguous genomic region known to be associated
 with the binary trait and therefore a region used by \code{gatars} when creating
 sampling sets.  The column \code{chormosome} is an integer between
-\code{1} and \code{22} naming which chromosome the region lies, and \code{begin}
-and \code{end} describe its beginnind and ending positions (bp).
-If the region consists of a single marker, then \code{begin} and \code{end} are
-both equal to the position of this marker.  \code{begin} and \code{end} must be 
+\code{1} and \code{22} naming which chromosome the region lies, and \code{start}
+and \code{end} describe its starting and ending positions (bp).
+If the region consists of a single marker, then \code{start} and \code{end} are
+both equal to the position of this marker.  \code{start} and \code{end} must be 
 expressed in Build hg38/GRCh38 for the same reason the column \code{bp} in
 \code{bim} must be expressed in Build hg38/GRCh38.}
 

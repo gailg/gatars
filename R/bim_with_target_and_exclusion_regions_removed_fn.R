@@ -95,7 +95,7 @@ bim_with_target_and_exclusion_regions_removed_fn = function(params_sampling_set)
   hotspot = params_sampling_set$hotspot
   target_markers = params_sampling_set$target_markers
   target_bim = bim[bim$snp %in% target_markers, ]
-  target_part = with(target_bim, data.frame(chromosome, begin = bp, end = bp))
+  target_part = with(target_bim, data.frame(chromosome, start = bp, end = bp))
   exclusion_region = rbind(params_sampling_set$exclusion_region, target_part)
   exclusion_chromosome = unique(exclusion_region$chromosome)
   chromosomes_with_target_and_exlusion_regions_removed = lapply(1:22, function(chromosome){  
@@ -104,7 +104,7 @@ bim_with_target_and_exclusion_regions_removed_fn = function(params_sampling_set)
       eee = exclusion_region[exclusion_region$chromosome == chromosome, ]
       intersect_with_genotype_q = sapply(segments_0, function(this){
         any(unlist(lapply(1:nrow(eee), function(kkk){
-          any(eee[kkk, ]$begin : eee[kkk, ]$end %in% this$bp)
+          any(eee[kkk, ]$start : eee[kkk, ]$end %in% this$bp)
         })))
       })
       do.call(rbind, segments_0[!intersect_with_genotype_q])
