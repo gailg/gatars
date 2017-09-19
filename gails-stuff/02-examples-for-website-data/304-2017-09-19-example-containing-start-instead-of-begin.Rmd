@@ -1,0 +1,146 @@
+---
+title: "304-2017-09-19-example-containing-start-instead-of-begin"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 8, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+Last knit was `r Sys.time()`
+
+Copied from "209-2017-09-12-example-containing-exclusion_region.Rmd"
+
+
+# A little history
+
+The two data sets in `gatars`:
+
+`alternative_example` and `null_example` I will be creating here.  
+
+There is some history.  From `lacie/aaa/packages/gritsr2/gails-stuff/a-chronicle/04-v-0.1.4.html` I see that gritsr2 contains the following four data sets
+```
+bim_original.RData
+exclusion_region.RData
+genotype_bim_original.RData
+hotspot.RData
+```
+which I moved from `d-2016-04-20/06-adding-valeries-data/gritsr_packages_RData`
+
+These files were created by “107-2016-10-24-description-adding-valeries-data.Rmd”
+
+The code below, I copied from "lacie/aaa/packages/gritsr2/gails-stuff/b-examples/03-v-0.1.4/a-build-hg38/201-gritsr-example-dot-RData"
+
+
+
+```{r}
+library(gritsr2)
+set.seed(1)
+source_0 = getwd()
+source_1 = strsplit(source_0, "/")[[1]]
+source = paste0(paste(source_1[(length(source_1) - 2):length(source_1)], collapse = "/"),
+      "/304-2017-09-19-example-containing-start-instead-of-begin.Rmd")
+
+
+genotype_bim_original = genotype_bim_original[1:5, ]
+params_example = params_example_fn(
+  bim_original, genotype_bim_original, hotspot,
+  NNN = 200,
+  p_subset_genotype = .2,
+  beta_causal_snps = .85,
+  causal_snps = 3:5)
+alternative_example = example_fn(params_example)
+names(alternative_example)
+str(alternative_example$bim)
+str(alternative_example$genotype)
+str(alternative_example$exclusion_region)
+str(alternative_example$fam)
+alternative_example$target_markers
+str(alternative_example$Psi)
+alternative_example$Psi[1:10, 1:10]
+alternative_example$params_example = params_example
+RData_file = "alternative_example.RData"
+additional_attributes = list(
+  RData_file = RData_file,
+  when_created = Sys.time(),
+  source = source
+)
+attributes(alternative_example) = c(attributes(alternative_example),
+                                    additional_attributes)
+                                               
+save(alternative_example, file = RData_file)
+```
+
+
+```{r}
+bim = alternative_example$bim
+genotype = alternative_example$genotype
+fam = alternative_example$fam
+target_markers = alternative_example$target_markers
+Psi = alternative_example$Psi
+```
+
+```{r echo = TRUE}
+str(bim)
+str(genotype)
+str(fam)
+str(target_markers)
+str(Psi)
+```
+
+# `null_example`
+
+```{r}
+set.seed(1)
+genotype_bim_original = genotype_bim_original[1:5, ]
+params_example = params_example_fn(
+  bim_original, genotype_bim_original, hotspot,
+  NNN = 200,
+  p_subset_genotype = .2,
+  beta_causal_snps = 0,
+  causal_snps = 3:5)
+null_example = example_fn(params_example)
+null_example$params_example = params_example
+RData_file = "null_example.RData"
+additional_attributes = list(
+  RData_file = RData_file,
+  when_created = Sys.time(),
+  source = source
+)
+save(null_example, file = RData_file)
+```
+
+
+```{r}
+bim = null_example$bim
+genotype = null_example$genotype
+fam = null_example$fam
+target_markers = null_example$target_markers
+Psi = null_example$Psi
+```
+
+```{r echo = TRUE}
+str(bim)
+str(genotype)
+str(fam)
+str(target_markers)
+str(Psi)
+```
