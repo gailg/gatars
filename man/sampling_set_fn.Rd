@@ -42,7 +42,6 @@ that match the maf of its
 corresponding target snp.
 }
 \examples{
-library(gatars)
 bim = alternative_example$bim
 epsilon_on_log_scale = 0.02
 exclusion_region = alternative_example$exclusion_region
@@ -53,7 +52,8 @@ params_sampling_set = params_sampling_set_fn(
   bim, epsilon_on_log_scale, exclusion_region,
   genotype, hotspot, target_markers)
 names(params_sampling_set)
-sampling_set_fn_answer = sampling_set_fn(params_sampling_set)
-names(sampling_set_fn_answer)
+sampling_set = sampling_set_fn(params_sampling_set)
+names(sampling_set)
+sampling_set$report
 
 }

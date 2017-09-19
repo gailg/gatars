@@ -36,17 +36,20 @@ epsilon_on_log_scale = 0.02
 exclusion_region = alternative_example$exclusion_region
 genotype = alternative_example$genotype
 target_markers = alternative_example$target_markers[3:5]
+set.seed(1)
 params_sampling_set = params_sampling_set_fn(
   bim, epsilon_on_log_scale, exclusion_region,
   genotype, hotspot, target_markers)
 names(params_sampling_set)
-sampling_set = sampling_set_fn(params_sampling_set)
+sampling_set_fn_answer = sampling_set_fn(params_sampling_set)
+names(sampling_set_fn_answer)
 ```
 
 
 # Inside `sampling_set_fn`
 
 ```{r}
+set.seed(1)
 MMM = params_sampling_set$MMM
 epsilon_on_log_scale = params_sampling_set$epsilon_on_log_scale
 # p_target are the mafs of the target snps and the mafs we want to match
@@ -88,9 +91,26 @@ report = do.call(rbind, lapply(1:MMM, function(mmm){
 }))
 rownames(report) = NULL
 report
-list(
+answer = list(
   params_sampling_set = params_sampling_set,
   report = report,
   sampling_set = sampling_set)
+names(answer)
+all.equal(answer, sampling_set_fn_answer)
 ```
+
+
+```{r}
+str(sampling_set_fn_answer$sampling_set)
+str(sampling_set_fn_answer$report)
+```
+
+`sampling_set`
+A list of `M` matrices, one matrix for each target snp.  The matrix for the `mmm`-th target snp is the sampling set for the `mmm`-th target snp and  has `NNN` rows and up to 1000 columns each column containing a column from `genotype` with maf that matches the maf of the `mmm`-th target snp.
+
+
+`report`
+A data.frame containing `MMM` rows and the columns `min`, `p_target`, `max`, and `set_size`.  `min`/`max` contains the smallest/largest maf among the `mmm`-th sampling set`, `p_target` the maf of the `mmm`-th target marker, and `set_size` contains the number of columns of the `mmm`-th sampling set.
+
+`params_sampling_set` is a 
 

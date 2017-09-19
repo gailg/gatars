@@ -43,8 +43,9 @@
 #'   bim, epsilon_on_log_scale, exclusion_region,
 #'   genotype, hotspot, target_markers)
 #' names(params_sampling_set)
-#' sampling_set_fn_answer = sampling_set_fn(params_sampling_set)
-#' names(sampling_set_fn_answer)
+#' sampling_set = sampling_set_fn(params_sampling_set)
+#' names(sampling_set)
+#' sampling_set$report
 #' 
 #' @export
 sampling_set_fn = function(params_sampling_set){

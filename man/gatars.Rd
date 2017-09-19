@@ -72,7 +72,7 @@ genotype = alternative_example$genotype
 fam = alternative_example$fam
 target_markers = alternative_example$target_markers[3:5]
 Psi = alternative_example$Psi
-exclusion_region = data.frame(chromosome = integer(), begin = integer(), end = integer())
+exclusion_region = alternative_example$exclusion_region
 
 NNN = nrow(fam)
 first_ten = 1:10
