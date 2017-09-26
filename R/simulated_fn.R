@@ -5,7 +5,6 @@ simulated_fn = function(params,
   MMM,
   Phi,
   rho_uni,
-  theta_lu,
   WWW,
   www,
   y_1,
@@ -40,7 +39,7 @@ simulated_fn = function(params,
     }
     if(good_genotype_sim){
       xxx = davies_not_lu_depends_on_g_target_fn(
-        genotype_sim, MMM, rho_uni, Phi, theta_lu, WWW, www, y_1, y_2)
+        genotype_sim, MMM, rho_uni, Phi, WWW, www, y_1, y_2)
       one_row_in_simulated = xxx$qqq[, fancy_names]
       simulated[n_sim, ] = one_row_in_simulated
       n_sim = n_sim + 1

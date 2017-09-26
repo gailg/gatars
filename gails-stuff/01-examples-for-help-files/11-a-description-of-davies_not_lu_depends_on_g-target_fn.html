@@ -127,13 +127,16 @@ $(document).ready(function () {
 <li><a href="#the-phenotype-matrix"><span class="toc-section-number">3</span> The phenotype matrix</a></li>
 <li><a href="#the-genotype-matrix"><span class="toc-section-number">4</span> The genotype matrix</a></li>
 <li><a href="#the-statistics-we-consider-are-quadratic-forms-zt-a-z"><span class="toc-section-number">5</span> The statistics we consider are quadratic forms <span class="math inline">\(Z^T A Z\)</span></a></li>
+<li><a href="#a-closer-look-at-a-and-q-for-the-three-basic-statistics"><span class="toc-section-number">6</span> A closer look at A and Q for the three basic statistics</a><ul>
+<li><a href="#burden"><span class="toc-section-number">6.1</span> Burden</a></li>
+</ul></li>
 </ul>
 </div>
 
 <p><A NAME="top"> </A></p>
 <p>/Volumes/lacie/aaa/packages/gatars/gails-stuff/01-examples-for-help-files</p>
 <p>“2017-09-25 19:09:11 PDT”</p>
-<p>Last knit was 2017-09-26 08:38:12</p>
+<p>Last knit was 2017-09-26 10:30:50</p>
 <div id="to-get-the-distribution-of-the-quadratic-forms-we-will-use-davies-and-therefore-we-need-mu_z-and-v_z" class="section level1">
 <h1><span class="header-section-number">1</span> To get the distribution of the quadratic forms, we will use Davies, and therefore we need <span class="math inline">\(\mu_Z\)</span> and <span class="math inline">\(V_Z\)</span></h1>
 </div>
@@ -167,7 +170,7 @@ $(document).ready(function () {
 </div>
 <div id="the-statistics-we-consider-are-quadratic-forms-zt-a-z" class="section level1">
 <h1><span class="header-section-number">5</span> The statistics we consider are quadratic forms <span class="math inline">\(Z^T A Z\)</span></h1>
-<p><span class="math inline">\(Z = \begin{pmatrix} Z_1 \\ Z_2 \end{pmatrix} = \begin{pmatrix} W G Y \\ W G \mu \end{pmatrix}\)</span></p>
+<p><span class="math inline">\(Z = \begin{pmatrix} Z_1 \\ Z_2 \end{pmatrix} = \begin{pmatrix} W G^T Y \\ W G^T \mu \end{pmatrix}\)</span></p>
 <p><span class="math inline">\(Z_k = 1(k \le M) \sum_{n = 1}^N w_k g_{k n} y_n + 1(k &gt; M) \sum_{n = 1}^N w_{k-M+1} g_{k-M+1} \mu_n\)</span></p>
 <p>Each term <span class="math inline">\(\text{cov}(Z_{k_1}, Z_{k_2})\)</span> is of the form (in the following expression I need to replace <span class="math inline">\(k_1\)</span> with <span class="math inline">\(k_1\text{mod}K\)</span> and <span class="math inline">\(k_2\)</span> with <span class="math inline">\(k_2\text{mod}K\)</span>) <span class="math inline">\(\text{cov}\Big( \sum_{n_1 = 1}^N w_{k_1} g_{k_1 n_1} a_{n_1}, \sum_{n_2 = 1}^N w_{k_2} g_{k_2 n_2} b_{n_2} \Big)\)</span></p>
 <p>Where <span class="math inline">\(a_{n_1}\)</span> and <span class="math inline">\(b_{n_2}\)</span> are either <span class="math inline">\(y_{n_1}\)</span> or <span class="math inline">\(\mu_{n_2}\)</span> depending upon whether each of <span class="math inline">\(k_1\)</span> and <span class="math inline">\(k_2\)</span> do not or do exceed <span class="math inline">\(M\)</span>.</p>
@@ -197,6 +200,13 @@ list(a = a,
 <p>And so I believe I want to write</p>
 <p><span class="math inline">\(\text{cov} = \text{kronecker} \Big( \begin{pmatrix}  y^T \Psi y &amp; y^T \Psi \mu \\  \mu^T \Psi y &amp; \mu^T \Psi \mu \end{pmatrix} \otimes W \Gamma W \Big) = \text{kronecker} \begin{pmatrix} y^T \\ \mu^T \end{pmatrix} \Psi \begin{pmatrix} y &amp; \mu \end{pmatrix} \otimes W \Gamma W\)</span></p>
 <p>The first argument in the the <code>kronecker</code> function <span class="math inline">\(\begin{pmatrix} y^T \\ \mu^T \end{pmatrix} \Psi \begin{pmatrix} y &amp; \mu \end{pmatrix}\)</span> is a <span class="math inline">\(2 \times 2\)</span> matrix. The second argument <span class="math inline">\(W \Gamma W\)</span> is an <span class="math inline">\(M \times M\)</span> matrix, and so the <code>kronecker</code> of the two is a <span class="math inline">\(2M \times 2M\)</span> matrix.</p>
+</div>
+<div id="a-closer-look-at-a-and-q-for-the-three-basic-statistics" class="section level1">
+<h1><span class="header-section-number">6</span> A closer look at A and Q for the three basic statistics</h1>
+<div id="burden" class="section level2">
+<h2><span class="header-section-number">6.1</span> Burden</h2>
+<p><span class="math inline">\(A = \begin{pmatrix} I_{M \times M} &amp; -I \\ -I &amp; I \end{pmatrix}\)</span></p>
+</div>
 </div>
 
 

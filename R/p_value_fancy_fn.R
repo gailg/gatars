@@ -6,7 +6,6 @@ p_value_fancy_fn = function(params,
   observed_fancy,
   Phi,
   rho_uni,
-  theta_lu,
   WWW,
   www,
   y_1,
@@ -19,7 +18,7 @@ p_value_fancy_fn = function(params,
     still_looking = TRUE
     while(still_looking){
       sss = simulated_fn(params,
-                         fancy_names, MMM, Phi, rho_uni, theta_lu, WWW, www, y_1, y_2)
+                         fancy_names, MMM, Phi, rho_uni, WWW, www, y_1, y_2)
       simulated = sss$simulated
       so_far_so_good = sss$so_far_so_good
       uuu = update_successes_fn(params,

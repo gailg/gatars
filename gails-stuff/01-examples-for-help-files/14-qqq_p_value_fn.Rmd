@@ -1,5 +1,5 @@
 ---
-title: "10-even-smaller"
+title: "14-qqq_p_value_fn"
 author: ""
 output:
   html_document:
@@ -25,7 +25,7 @@ opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FA
 
 `r getwd()`  
 
-"2017-09-14 08:12:36 PDT"
+"2017-09-26 11:06:13 PDT"
 
 Last knit was `r Sys.time()`
 
@@ -83,8 +83,126 @@ p_value_straight
 observed_fancy
 ```    
 
-# Inside `davies_not_lu_depends_on_g_target_fn
+# Scribbling `basic_and_optimized_fn`
 
+```{r}
+AAA_fn = function(alpha_B, alpha_S, alpha_T, MMM){
+  III = diag(rep(1, MMM))
+  JJJ = matrix(rep(1, MMM * MMM), nrow = MMM)
+  A_1 = alpha_B * JJJ + (alpha_S + alpha_T) * III
+  A_2 = -(alpha_B * JJJ + alpha_S * III)
+  A_3 = alpha_B * JJJ + (alpha_S - alpha_T) * III
+  AAA = rbind(cbind(A_1, A_2),
+              cbind(A_2, A_3))
+  AAA
+}
+zzz_etc_fn = function(g_target, Phi, WWW, y_1, y_2){
+  z_1 = as.vector(WWW %*% t(g_target) %*% y_1)
+  z_2 = as.vector(WWW %*% t(g_target) %*% y_2)
+  zzz = c(z_1, z_2)
+  
+  e_g_target_1 = colMeans(g_target)
+  e_g_target = matrix(rep(e_g_target_1, nrow(g_target)), nrow = nrow(g_target), byrow = TRUE)
+  e_z_1 = matrix(as.vector(WWW %*% t(e_g_target) %*% y_1), ncol = 1)
+  e_z_2 = matrix(as.vector(WWW %*% t(e_g_target) %*% y_2), ncol = 1)
+  mu_z = rbind(e_z_1, e_z_2)
+  
+  V_G = cov(g_target)
+  W_VG_W = WWW %*% V_G %*% WWW
+  V_z = kronecker(Phi, W_VG_W)
+  
+  list(zzz = zzz,
+       mu_z = mu_z,
+       V_z = V_z)
+}
+```
+
+```{r}
+basic_and_optimized_fn = function(g_target, Phi, rho_uni,  WWW, y_1, y_2){
+  # ---------------------------------------------------- zzz etc
+  zzz_etc = zzz_etc_fn(g_target, Phi, WWW, y_1, y_2)
+  zzz = zzz_etc$zzz
+  mu_z = zzz_etc$mu_z
+  V_z = zzz_etc$V_z
+  # -------------------------------------------------- alpha_uni
+  alpha_uni_zero = expand.grid(
+    B = rho_uni, 
+    S = rho_uni, 
+    T = rho_uni)
+  alpha_uni_zero_sum = apply(alpha_uni_zero, 1, sum)
+  alpha_uni = alpha_uni_zero[
+    0 < alpha_uni_zero_sum & alpha_uni_zero_sum <= 1, ]
+  row.names(alpha_uni) = NULL
+  look = alpha_uni[apply(alpha_uni, 1, function(row){
+    sum(row == 0) > 1
+  }), ]
+  # -------------------------------------------------- basic_AAA
+  basic_ones = c(10, 65, 279)
+  look = alpha_uni[basic_ones, ]
+  MMM = ncol(g_target)
+  AAA_basic = lapply(basic_ones, function(jjj){
+    alpha = alpha_uni[jjj, ]
+    AAA = AAA_fn(alpha$B, alpha$S, alpha$T, MMM)
+    list(alpha = alpha, AAA = AAA)
+  })
+  # ------------------------------------------------ df contains 
+  # ----------------------B, S, T (the three components of alpha
+  # ----------------------- as well as  q, and (nominal) p_value
+  df = do.call(rbind, lapply(1:nrow(alpha_uni), function(jjj){
+    alpha = alpha_uni[jjj, ]
+    AAA = AAA_fn(alpha$B, alpha$S, alpha$T, MMM)
+    davies_answer = davies_fn(zzz, mu_z, V_z, AAA)
+    cbind(alpha, davies_answer)
+  }))
+  # ------------------------- basic is a data.frame that contains 
+  # ------------------------ the quadratic form q and the p-value 
+  # ----------------------- of the three basic statistics B, S, T
+  basic = rbind(df[df$B == 1, ],
+                df[df$S == 1, ],
+                df[df$T == 1, ])
+  rownames(basic) =  c("B", "S", "T")
+  # --------------------- optimized is a data.frame that contains
+  # ------------ the quadratic form q, the nominal p-value, and x
+  # ----------------- of the optimized statistics BS, BT, ST, BST
+  bs_0 = df[df$B + df$S == 1, ]
+  bt_0 = df[df$B + df$T == 1, ]
+  st_0 = df[df$S + df$T == 1, ]
+  bs = bs_0[which.min(bs_0$p_value), ]
+  bt = bt_0[which.min(bt_0$p_value), ]
+  st = st_0[which.min(st_0$p_value), ]
+  bst = df[which.min(df$p_value), ] 
+  optimized = rbind(bs, bt, st, bst)
+  x = unlist(lapply(optimized$p_value, q_alice_fn))
+  optimized$x = x
+  rownames(optimized) =  c("BS", "BT", "ST", "BST")
+  #------------------------------------------------------- output
+  list(
+    AAA_basic = AAA_basic,
+    basic = basic,
+    optimized = optimized)
+}
+```
+  
+
+
+```{r}
+basic_and_optimized_fn(g_target, Phi, rho_uni, WWW, y_1, y_2)
+```
+
+```{r}
+davies_not_lu_depends_on_g_target_fn(
+  g_target,
+  MMM,
+  rho_uni,
+  Phi,
+  WWW,
+  www,
+  y_1,
+  y_2
+)
+```
+
+# inside `davies_not_lu_depends_on_g_target_fn`
 
 ```{r}
 JJJ = matrix(rep(1, MMM * MMM), nrow = MMM)
@@ -102,49 +220,9 @@ mu_z = rbind(e_z_1, e_z_2)
 V_G = cov(g_target)
 W_VG_W = WWW %*% V_G %*% WWW
 V_z = kronecker(Phi, W_VG_W)
-list(
-  g_target = g_target,
-  e_g_target = e_g_target,
-  WWW = WWW,
-  zzz = zzz,
-  mu_z = mu_z,
-  Phi = Phi,
-  V_G = V_G,
-  W_VG_W = W_VG_W,
-  V_z = V_z)
-```
-
-```{r}
 # ----------------------------------------------- straight, fancy_grid
 alpha_uni_zero = expand.grid(a1 = rho_uni, a2 = rho_uni, a3 = rho_uni)
 alpha_uni = alpha_uni_zero[apply(alpha_uni_zero, 1, sum) <= 1, ]
-str(alpha_uni)
-```
-
-# an interlude where I look at AAA for each of the 4 basic statistics
-```{r}
-look_fn = function(alpha){
-  a4 = (1 - sum(as.vector(alpha)))
-  A_1 = alpha[, 1] * JJJ + alpha[,2] * III
-  A_2 = alpha[, 3] * JJJ + a4 * III
-  AAA =  rbind(cbind(A_1 + A_2, -A_1),
-               cbind(-A_1, A_1 - A_2))
-  list(alpha = alpha,
-       AAA = AAA)
-}
-basic = data.frame(a1 = c(1, 0, 0), a2 = c(0, 1, 0), a3 = c(0, 0, 0))
-rownames(basic) = c("B", "S", "T")
-sapply(rownames(basic), function(rowname){
-  alpha = basic[rowname, ]
-  look_fn(alpha)
-}, simplify = FALSE)
-```
-
-And these match Equations (6) of the manuscript.
-
-# Continue with `davies_not_lu_depends_on_g_target_fn`
-  
-```{r}
 answer_0 = do.call(rbind, lapply(1:nrow(alpha_uni), function(jjj){
   alpha = alpha_uni[jjj, ]
   a4 = (1 - sum(as.vector(alpha)))
@@ -155,7 +233,6 @@ answer_0 = do.call(rbind, lapply(1:nrow(alpha_uni), function(jjj){
   davies_answer = davies_fn(zzz, mu_z, V_z, AAA)
   cbind(alpha, a4, davies_answer)
 }))
-head(answer_0)
 a1 = answer_0$a1
 a2 = answer_0$a2
 a3 = answer_0$a3
@@ -189,4 +266,4 @@ qqq = data.frame(t(q_straight), t(q_fancy))
 list(p_value = p_value,
      qqq = qqq)
 ```
-`
+

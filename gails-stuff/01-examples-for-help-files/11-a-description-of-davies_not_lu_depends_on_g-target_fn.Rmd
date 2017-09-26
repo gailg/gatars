@@ -85,8 +85,8 @@ $Z = \begin{pmatrix}
 Z_1 \\
 Z_2
 \end{pmatrix} = \begin{pmatrix}
-W G Y \\
-W G \mu
+W G^T Y \\
+W G^T \mu
 \end{pmatrix}$
 
 $Z_k = 1(k \le M) \sum_{n = 1}^N w_k g_{k n} y_n + 1(k > M) \sum_{n = 1}^N w_{k-M+1} g_{k-M+1} \mu_n$
@@ -140,7 +140,14 @@ y^T \\
 The second argument $W \Gamma W$ is an $M \times M$ matrix, and so the `kronecker` of the two is a $2M \times 2M$ matrix.
 
 
+# A closer look at A and Q for the three basic statistics
 
 
+## Burden 
+
+$A = \begin{pmatrix}
+I_{M \times M} & -I \\
+-I             &  I
+\end{pmatrix}$
 
 

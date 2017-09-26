@@ -3,7 +3,6 @@ one_experiment_fn = function(
   params,
   calculate_fancy = TRUE
 ){
-  theta_init = params$theta_init
   g_target = params$g_target
   MMM = params$MMM
   WWW = params$WWW
@@ -16,7 +15,7 @@ one_experiment_fn = function(
     list(message = "error--g_target not full rank")
   } else {
     xxx = davies_not_lu_depends_on_g_target_fn(
-      g_target, MMM, rho_uni, Phi, theta_init, WWW, www, y_1, y_2)
+      g_target, MMM, rho_uni, Phi, WWW, www, y_1, y_2)
     p_value_straight = xxx$p_value
     observed = xxx$qqq
     fancy_names = names(observed)[!(names(observed) %in% names(p_value_straight))]
@@ -24,7 +23,7 @@ one_experiment_fn = function(
     #----------------------------------------------------------------p_value_fancy
     fff = p_value_fancy_fn(params,
                            calculate_fancy, fancy_names, MMM, observed_fancy, Phi, rho_uni,
-                           theta_init, WWW, www, y_1, y_2)
+                           WWW, www, y_1, y_2)
     so_far_so_good = fff$so_far_so_good
     N_sim_reps_required = fff$N_sim_reps_required
     p_value_fancy = fff$p_value_fancy

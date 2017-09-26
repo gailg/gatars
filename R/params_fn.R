@@ -12,7 +12,6 @@ params_fn = function(
   N_sim_reps_limit = N_sim_reps
   rho_uni = seq(0, 1, by = 0.1)
   test_size = 0.01
-  theta_init = rep(pi/4, 3)
   y_1 = yyy = fam$y
   y_2 = e_y = fam$e_y
   Phi = Phi_fn(Psi, y_1, y_2)
@@ -37,7 +36,6 @@ params_fn = function(
     rho_uni = rho_uni,
     sampling_set = sampling_set,
     test_size = test_size,
-    theta_init = theta_init,
     WWW = WWW,
     www = www,
     yyy = yyy)

@@ -1,0 +1,50 @@
+---
+title: "12-2017-09-26-gatars-before-removing-theta"
+author: ""
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-09-14 08:12:36 PDT"
+
+Last knit was `r Sys.time()`
+
+```{r}
+library(gatars)
+bim = alternative_example$bim
+genotype = alternative_example$genotype
+fam = alternative_example$fam
+target_markers = alternative_example$target_markers[3:5]
+Psi = alternative_example$Psi
+exclusion_region = alternative_example$exclusion_region
+genotype_target_markers = genotype[, target_markers]
+set.seed(2)
+epsilon_on_log_scale = 0.02
+sampling_set = gatars_sampling_set(
+    bim, epsilon_on_log_scale, exclusion_region,
+    genotype, hotspot, target_markers)
+print(sampling_set)
+
+N_sim_reps = 10
+gatars(fam, Psi, sampling_set, N_sim_reps = 10)
+```

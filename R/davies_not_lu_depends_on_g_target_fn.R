@@ -4,7 +4,6 @@ davies_not_lu_depends_on_g_target_fn = function(
   MMM,
   rho_uni,
   Phi,
-  theta,
   WWW,
   www,
   y_1,
