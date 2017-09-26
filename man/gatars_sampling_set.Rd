@@ -67,7 +67,9 @@ of the column \code{bim$snp}. This vector names the target markers.}
 A list containing the following 11 objects
 \itemize{
 \item{\code{params_sampling_set}: } {
-The values of a call to \code{params_sampling_set}.  
+A list containing objects that will be useful in the calculations of 
+the \code{gatars} function.
+The result (Value) of a call to \code{params_sampling_set}.  
 See \code{\link{params_sampling_set_fn}}.
 }
 \item{\code{report}: } {

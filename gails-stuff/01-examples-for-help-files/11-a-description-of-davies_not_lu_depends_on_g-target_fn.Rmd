@@ -1,0 +1,146 @@
+---
+title: "11-a-description-of-davies_not_lu_depends_on_g-target_fn"
+author: ""
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-09-25 19:09:11 PDT"
+
+Last knit was `r Sys.time()`
+
+
+# To get the distribution of the quadratic forms, we will use Davies, and therefore we need $\mu_Z$ and $V_Z$
+
+# `davies_fn`
+
+Given the $J$ dimensional random vector (of functions of genotypes) $Z \sim N \big( \mu_Z, V_Z \big)$ and the matrix $A$, 
+the p-value for the statistic $Q = Z^T A Z$ can be gotten from `davies_fn(zzz, mu_z, V_z, AAA)`
+
+**This function performs the following calculations**
+
+$\tilde{Z} = V_{Z}^{-1/2} Z \sim N \big( \mu_{\tilde{Z}} = V_{Z}^{-1/2} \mu_Z, I \big)$.
+
+$Q = Z^T A Z = Z^T V^{-1/2} V^{1/2} A V^{1/2} V^{-1/2} Z = \tilde{Z}^T \tilde{A} \tilde{Z}$
+
+$\tilde{A} = V^{1/2} A V^{1/2}$
+
+$\tilde{A} = U^T \Lambda U$. The spectral decomposition of $\tilde{A}$, so $\Lambda$ is a diagonal matrix containing the eigenvalues of $\tilde{A}$, and $U^T U = U U^T = I$.
+
+$Q = \tilde{Z}^T \tilde{A} \tilde{Z} = \tilde{Z}^T U^T \Lambda U \tilde{Z} = X^T \Lambda X$
+
+$X = U \tilde{Z} \sim N \big( \mu_X = U \mu_{\tilde{Z}}, U I U^T = I)$
+
+$Q = X^T \Lambda X = \sum_{j = 1}^J \lambda_j X_j^2$ is a sum of independent $\chi^2$ random variables with noncentrality parameters $\mu_X^2$.
+
+The R package `CompQuadForm` provides the function `davies` which computes $P(Q > q)$ where $Q = \sum_{j = 1}^J \lambda_j X_j + \sigma X_0$ where $X_j$ are independent randomvariables having a non-central $\chi^2$ distribution with $n_j$ degrees of freedom and noncentrality parameter $\delta_j^2$, and $X_0$ having a standard normal distribution.
+
+In our case, the degrees of freedom is $n_j = 1$, and the noncentrality parameter is $\delta_j^2 = \mu_X^2$.
+
+# The phenotype matrix
+
+The phenoytpe matrix has `N` rows, one for each person, and the following columns
+
+$Y$ is an indicator of disease or a continuous trait.  `y_1`
+
+$\mu$ is a predictor for $y$.  `y_2`
+
+$Psi$ is the kinship matrix (supplied by the user) $\Psi_{n_1, n_2} = \text{Cor}(G_{n_1, m}, G_{n_2, m})$ while holding $m$ equal to any number in `1, ..., M`.
+
+
+# The genotype matrix
+
+$G$  is the genotype matrix. `g_target` is an `N x M` matrix
+
+$E(G)$. `e_g_target` is an `N x M` matrix
+
+$\Gamma = cov(G_n)$. `V_G = cov(g_target)` is an `M x M` matrix
+
+$W$ is an `M x M` diagonal matrix of weights.  These weights reflect relative importances of the $M$ target markers.
+
+# The statistics we consider are quadratic forms $Z^T A Z$
+
+
+$Z = \begin{pmatrix}
+Z_1 \\
+Z_2
+\end{pmatrix} = \begin{pmatrix}
+W G Y \\
+W G \mu
+\end{pmatrix}$
+
+$Z_k = 1(k \le M) \sum_{n = 1}^N w_k g_{k n} y_n + 1(k > M) \sum_{n = 1}^N w_{k-M+1} g_{k-M+1} \mu_n$
+
+
+Each term $\text{cov}(Z_{k_1}, Z_{k_2})$ is of the form (in the following expression I need to replace $k_1$ with $k_1\text{mod}K$
+and $k_2$ with $k_2\text{mod}K$) 
+$\text{cov}\Big( \sum_{n_1 = 1}^N w_{k_1} g_{k_1 n_1} a_{n_1}, \sum_{n_2 = 1}^N w_{k_2} g_{k_2 n_2} b_{n_2} \Big)$
+
+Where $a_{n_1}$ and $b_{n_2}$ are either $y_{n_1}$ or $\mu_{n_2}$ depending upon whether each of $k_1$ and $k_2$ do not or do exceed $M$.
+
+
+$\text{cov}\Big( \sum_{n_1 = 1}^N w_{k_1} g_{k_1 n_1} a_{n_1}, \sum_{n_2 = 1}^N w_{k_2} g_{k_2 n_2} b_{n_2} \Big)
+= w_{k_1} w_{k_2} \sum_{n_1 = 1}^N   a_{n_1} \sum_{n_2 = 1}^N  b_{n_2}\text{cov}\Big(g_{k_1 n_1}, g_{k_2 n_2} \Big)$
+$= w_{k_1} w_{k_2} \sum_{n_1 = 1}^N   a_{n_1} \sum_{n_2 = 1}^N  b_{n_2} \Gamma_{k_1, k_2} \Psi_{n_1, n_2}
+= w_{k_1}\Gamma_{k_1, k_2} w_{k_2} \sum_{n_1 = 1}^N   \sum_{n_2 = 1}^N a_{n_1}  \Psi_{n_1, n_2} b_{n_2}$
+$= \Big(W \Gamma W \Big)_{k_1, k_2} a^T \Psi b = a^T \Psi b \Big(W \Gamma W \Big)_{k_1, k_2}$
+
+$\text{cov}(Z) = \begin{pmatrix}
+y^T   \Psi y \;  W \Gamma W  & y^T   \Psi \mu \; W \Gamma W   \\
+\mu^T \Psi y \;  W \Gamma W  & \mu^T \Psi \mu \; W \Gamma W  
+\end{pmatrix}$
+
+
+The R function `kronecker` behaves like this
+
+```{r echo = TRUE}
+a = matrix(1:6, nrow = 3)
+b = matrix((1:4) * 10, nrow = 1)
+list(a = a,
+     b = b,
+     kronecker = kronecker(a, b))
+```
+
+And so I believe I want to write
+
+$\text{cov} = \text{kronecker} \Big(  \begin{pmatrix}
+ y^T \Psi y   &   y^T \Psi \mu \\
+ \mu^T \Psi y &  \mu^T \Psi \mu
+\end{pmatrix} \otimes W \Gamma W 
+\Big) = \text{kronecker}  \begin{pmatrix}
+y^T \\
+\mu^T
+\end{pmatrix} \Psi \begin{pmatrix} y & \mu \end{pmatrix} \otimes W \Gamma W$
+
+The first argument in the the `kronecker` function 
+$\begin{pmatrix}
+y^T \\
+\mu^T
+\end{pmatrix} \Psi \begin{pmatrix} y & \mu \end{pmatrix}$ is a $2 \times 2$ matrix.
+The second argument $W \Gamma W$ is an $M \times M$ matrix, and so the `kronecker` of the two is a $2M \times 2M$ matrix.
+
+
+
+
+
+

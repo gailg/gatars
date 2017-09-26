@@ -1,0 +1,176 @@
+---
+title: "08-davies_not_lu_depends_on_g_target_fn"
+author: ""
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-09-14 08:12:36 PDT"
+
+Last knit was `r Sys.time()`
+
+```{r}
+library(gatars)
+bim = alternative_example$bim
+genotype = alternative_example$genotype
+fam = alternative_example$fam
+target_markers = alternative_example$target_markers[3:5]
+Psi = alternative_example$Psi
+exclusion_region = alternative_example$exclusion_region
+genotype_target_markers = genotype[, target_markers]
+set.seed(2)
+epsilon_on_log_scale = 0.02
+sampling_set = gatars_sampling_set(
+    bim, epsilon_on_log_scale, exclusion_region,
+    genotype, hotspot, target_markers)
+print(sampling_set)
+
+N_sim_reps = 10
+set.seed(1)
+gatars(fam, Psi, sampling_set, N_sim_reps = 10)
+```
+
+
+```{r}
+set.seed(1)
+params_sampling_set = sampling_set$params_sampling_set
+sampling_set = sampling_set$sampling_set
+weights = NULL
+params = params_fn(params_sampling_set, fam, Psi, sampling_set, N_sim_reps, weights)
+ooo = one_experiment_fn(params, calculate_fancy = TRUE)
+ooo$p_value
+```
+
+```{r}
+calculate_fancy = TRUE
+theta_init = params$theta_init
+g_target = params$g_target
+MMM = params$MMM
+WWW = params$WWW
+www = params$www
+y_1 = params$yyy
+y_2 = params$e_y
+rho_uni = params$rho_uni
+Phi = params$Phi
+xxx = davies_not_lu_depends_on_g_target_fn(
+  g_target, MMM, rho_uni, Phi, theta_init, WWW, www, y_1, y_2)
+xxx
+p_value_straight = xxx$p_value
+observed = xxx$qqq
+fancy_names = names(observed)[!(names(observed) %in% names(p_value_straight))]
+observed_fancy = observed[, fancy_names]
+p_value_straight
+observed_fancy
+```    
+
+# `davies_not_lu_depends_on_g_target_fn
+
+```{r}
+theta = theta_init
+JJJ = matrix(rep(1, MMM * MMM), nrow = MMM)
+III = diag(rep(1, MMM))
+zero_M = matrix(rep(0, MMM * MMM), nrow = MMM)
+zero_M_2M = matrix(rep(0, MMM * 2 * MMM), nrow = MMM)
+z_1 = as.vector(WWW %*% t(g_target) %*% y_1)
+z_2 = as.vector(WWW %*% t(g_target) %*% y_2)
+zzz = c(z_1, z_2)
+e_g_target_1 = colMeans(g_target)
+e_g_target = matrix(rep(e_g_target_1, nrow(g_target)), nrow = nrow(g_target), byrow = TRUE)
+e_z_1 = matrix(as.vector(WWW %*% t(e_g_target) %*% y_1), ncol = 1)
+e_z_2 = matrix(as.vector(WWW %*% t(e_g_target) %*% y_2), ncol = 1)
+mu_z = rbind(e_z_1, e_z_2)
+V_G = cov(g_target)
+W_VG_W = WWW %*% V_G %*% WWW
+V_z = kronecker(Phi, W_VG_W)
+list(
+  III = III,
+  JJJ = JJJ,
+  zero_M = zero_M,
+  zero_M_2M = zero_M_2M,
+  WWW = WWW,
+  zzz = zzz,
+  e_g_target = e_g_target,
+  V_G = V_G,
+  mu_z = mu_z,
+  V_z = V_z)
+```
+
+
+
+```
+# ----------------------------------------------- straight, fancy_grid
+alpha_uni_zero = expand.grid(a1 = rho_uni, a2 = rho_uni, a3 = rho_uni)
+alpha_uni = alpha_uni_zero[apply(alpha_uni_zero, 1, sum) <= 1, ]
+answer_0 = do.call(rbind, lapply(1:nrow(alpha_uni), function(jjj){
+  alpha = alpha_uni[jjj, ]
+  a4 = (1 - sum(as.vector(alpha)))
+  A_1 = alpha[, 1] * JJJ + alpha[,2] * III
+  A_2 = alpha[, 3] * JJJ + a4 * III
+  AAA =  rbind(cbind(A_1 + A_2, -A_1),
+               cbind(-A_1, A_1 - A_2))
+  davies_answer = davies_fn(zzz, mu_z, V_z, AAA)
+  cbind(alpha, a4, davies_answer)
+}))
+a1 = answer_0$a1
+a2 = answer_0$a2
+a3 = answer_0$a3
+a4 = answer_0$a4
+standard_lee_0 = answer_0[a1 + a2 == 1, ]
+optim_skat_0   = answer_0[a2 + a4 == 1, ]
+odd_0          = answer_0[a1 + a4 == 1, ]
+#--------------------------------------------------------------------- pause for straight
+straight = rbind(standard_burden = answer_0[a1 == 1, ],
+                 standard_skat   = answer_0[a2 == 1, ],
+                 altern_skat     = answer_0[a4 == 1, ])
+q_straight = straight$q
+names(q_straight) = rownames(straight)
+p_value = data.frame(t(straight$p_value))
+names(p_value) = rownames(straight)
+#--------------------------------------------------------------------- pause for straight
+fancy_grid = rbind(
+  standard_lee    = standard_lee_0[which.min(standard_lee_0$p_value), ],
+  optim_skat      = optim_skat_0[which.min(optim_skat_0$p_value), ],
+  odd             = odd_0[which.min(odd_0$p_value), ],
+  optim           = answer_0[which.min(answer_0$p_value), ])
+fancy_grid$q = unlist(lapply(fancy_grid$p_value, q_alice_fn))
+fancy_grid
+#---------------------------------------------------------------------------------- fancy_best
+fancy_best = fancy_grid
+q_fancy = fancy_best$q
+names(q_fancy) = rownames(fancy_best)
+
+qqq = data.frame(t(q_straight), t(q_fancy))
+
+list(p_value = p_value,
+     qqq = qqq)
+```
+
+
+```{r echo = TRUE}
+a = matrix(1:6, nrow = 3)
+b = matrix((1:4) * 10, nrow = 1)
+list(a = a,
+     b = b,
+     kronecker = kronecker(a, b))
+```
+
