@@ -95,7 +95,7 @@ zzz_etc_fn = function(g_target, Phi, WWW, y_1, y_2){
        mu_z = mu_z,
        V_z = V_z)
 }
-basic_and_optimized_fn = function(g_target, Phi, rho_uni,  WWW, y_1, y_2){
+basic_and_optimized_fn = function(alpha_uni, g_target, Phi, WWW, y_1, y_2){
   # ---------------------------------------------------- zzz etc
   zzz_etc = zzz_etc_fn(g_target, Phi, WWW, y_1, y_2)
   zzz = zzz_etc$zzz
@@ -176,11 +176,11 @@ basic_and_optimized_fn = function(g_target, Phi, rho_uni,  WWW, y_1, y_2){
 }
 
 genome_resampling_fn = function(
+  alpha_uni,
   MMM,
   N_sim_reps_interval,
   optimized_names,
   Phi,
-  rho_uni,
   sampling_set,
   WWW,
   y_1,
@@ -213,7 +213,7 @@ genome_resampling_fn = function(
       }
     }
     if(good_genotype_sim){
-      bo = basic_and_optimized_fn(genotype_sim, Phi, rho_uni, WWW, y_1, y_2)
+      bo = basic_and_optimized_fn(alpha_uni, genotype_sim, Phi, WWW, y_1, y_2)
       one_row_in_simulated = bo$xxx
       simulated[n_sim, ] = one_row_in_simulated
       n_sim = n_sim + 1
@@ -260,13 +260,13 @@ rejuvenate_successes_fn = function(
 }
 p_value_optimized_fn = function(
   adaptive_conf_level,
+  alpha_uni, 
   calculate_optimized,
   MMM,
   N_sim_reps_interval,
   N_sim_reps_limit,
   x_observed,
   Phi,
-  rho_uni,
   test_size,
   WWW,
   y_1,
@@ -279,7 +279,7 @@ p_value_optimized_fn = function(
     N_sim_reps_required = 0
     still_looking = TRUE
     while(still_looking){
-      sss = genome_resampling_fn(MMM, N_sim_reps_interval, optimized_names, Phi, rho_uni,
+      sss = genome_resampling_fn(alpha_uni, MMM, N_sim_reps_interval, optimized_names, Phi, 
                            sampling_set, WWW, y_1, y_2)
 
       simulated = sss$simulated
@@ -308,6 +308,7 @@ p_value_optimized_fn = function(
 
 uno_experimento_fn = function(params, calculate_optimized){
   adaptive_conf_level = params$adaptive_conf_level
+  alpha_uni = params$alpha_uni
   g_target = params$g_target
   MMM = params$MMM
   N_sim_reps_interval = params$N_sim_reps_interval
@@ -315,13 +316,12 @@ uno_experimento_fn = function(params, calculate_optimized){
   WWW = params$WWW
   y_1 = params$yyy
   y_2 = params$e_y
-  rho_uni = params$rho_uni
   Phi = params$Phi
   test_size = params$test_size
   answer = if (rankMatrix(g_target) < MMM) {
     list(message = "error--g_target not full rank")
   } else {
-    bo = basic_and_optimized_fn(g_target, Phi, rho_uni, WWW, y_1, y_2)
+    bo = basic_and_optimized_fn(alpha_uni, g_target, Phi,  WWW, y_1, y_2)
     
     p_value_basic = bo$p_value_basic
     p_value_basic = bo$p_value_basic
@@ -332,8 +332,9 @@ uno_experimento_fn = function(params, calculate_optimized){
     x_observed
     #--------------------------------------------------- p_value_optimized
     ooo = p_value_optimized_fn(
-      adaptive_conf_level, calculate_optimized, MMM, N_sim_reps_interval, 
-      N_sim_reps_limit, x_observed, Phi, rho_uni, test_size, WWW, y_1, y_2
+      adaptive_conf_level, alpha_uni, calculate_optimized, MMM, 
+      N_sim_reps_interval, N_sim_reps_limit, x_observed, Phi, 
+      test_size, WWW, y_1, y_2
     )
     so_far_so_good = ooo$so_far_so_good
     N_sim_reps_required = ooo$N_sim_reps_required

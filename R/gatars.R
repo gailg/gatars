@@ -42,6 +42,6 @@ gatars = function(fam, Psi, sampling_set, N_sim_reps, weights = NULL){
   params_sampling_set = sampling_set$params_sampling_set
   sampling_set = sampling_set$sampling_set
   params = params_fn(params_sampling_set, fam, Psi, sampling_set, N_sim_reps, weights)
-  ooo = one_experiment_fn(params, calculate_fancy = TRUE)
-  ooo$p_value
+  ooo = uno_experimento_fn(params, calculate_optimized = TRUE)
+  ooo
 }

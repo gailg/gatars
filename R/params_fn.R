@@ -8,6 +8,15 @@ params_fn = function(
   weights = NULL
 ){
   adaptive_conf_level = 0.99
+  rho_uni_times_10 = 0:10
+  alpha_uni_zero = expand.grid(
+    B = rho_uni_times_10,
+    S = rho_uni_times_10,
+    T = rho_uni_times_10)
+  alpha_uni_zero_sum = apply(alpha_uni_zero, 1, sum)
+  alpha_uni = alpha_uni_zero[alpha_uni_zero_sum == 10, ]
+  row.names(alpha_uni) = NULL
+  alpha_uni = alpha_uni/10
   N_sim_reps_interval = N_sim_reps
   N_sim_reps_limit = N_sim_reps
   rho_uni = seq(0, 1, by = 0.1)
@@ -26,6 +35,7 @@ params_fn = function(
   www = t(t(www))
   list(
     adaptive_conf_level = adaptive_conf_level,
+    alpha_uni = alpha_uni,
     e_y = e_y,
     g_target = params_sampling_set$g_target,
     MMM = params_sampling_set$MMM,
