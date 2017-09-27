@@ -1,0 +1,173 @@
+---
+title: "19-for-now-just-correct-davies_not_lu"
+author: ""
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = FALSE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-09-26 11:06:13 PDT"
+
+Last knit was `r Sys.time()`
+
+```{r}
+library(gatars)
+keeper = c(1:12, 101:112)
+bim = alternative_example$bim
+genotype = alternative_example$genotype[keeper, ]
+fam = alternative_example$fam[keeper, ]
+target_markers = alternative_example$target_markers[c(3, 5)]
+Psi = alternative_example$Psi[keeper, keeper]
+exclusion_region = alternative_example$exclusion_region
+genotype_target_markers = genotype[, target_markers]
+set.seed(2)
+epsilon_on_log_scale = 0.2
+sampling_set = gatars_sampling_set(
+    bim, epsilon_on_log_scale, exclusion_region,
+    genotype, hotspot, target_markers)
+print(sampling_set)
+
+N_sim_reps = 10
+# gatars(fam, Psi, sampling_set, N_sim_reps = 10)
+params_sampling_set = sampling_set$params_sampling_set
+sampling_set = sampling_set$sampling_set
+weights = NULL
+params = params_fn(params_sampling_set, fam, Psi, sampling_set, N_sim_reps, weights)
+# ooo = one_experiment_fn(params, calculate_optimized = TRUE)
+# ooo$p_value
+# inside one_experiment_fn
+calculate_optimized = TRUE
+theta_init = params$theta_init
+g_target = params$g_target
+library(Matrix)
+rankMatrix(g_target)
+# ooo = one_experiment_fn(params, calculate_fancy = TRUE)
+# ooo
+```
+
+
+```{r}
+g_target = params$g_target
+MMM = params$MMM
+WWW = params$WWW
+www = params$www
+y_1 = params$yyy
+y_2 = params$e_y
+rho_uni = params$rho_uni
+Phi = params$Phi
+```
+
+# `davies_not_lu_depends_on_g_target_fn`
+```{r}
+JJJ = matrix(rep(1, MMM * MMM), nrow = MMM)
+III = diag(rep(1, MMM))
+zero_M = matrix(rep(0, MMM * MMM), nrow = MMM)
+zero_M_2M = matrix(rep(0, MMM * 2 * MMM), nrow = MMM)
+z_1 = as.vector(WWW %*% t(g_target) %*% y_1)
+z_2 = as.vector(WWW %*% t(g_target) %*% y_2)
+zzz = c(z_1, z_2)
+e_g_target_1 = colMeans(g_target)
+e_g_target = matrix(rep(e_g_target_1, nrow(g_target)), nrow = nrow(g_target), byrow = TRUE)
+e_z_1 = matrix(as.vector(WWW %*% t(e_g_target) %*% y_1), ncol = 1)
+e_z_2 = matrix(as.vector(WWW %*% t(e_g_target) %*% y_2), ncol = 1)
+mu_z = rbind(e_z_1, e_z_2)
+V_G = cov(g_target)
+W_VG_W = WWW %*% V_G %*% WWW
+V_z = kronecker(Phi, W_VG_W)
+# ----------------------------------------------- straight, fancy_grid
+alpha_uni_zero = expand.grid(a1 = rho_uni, a2 = rho_uni)
+alpha_uni = alpha_uni_zero[apply(alpha_uni_zero, 1, sum) <= 1, ]
+rownames(alpha_uni) = NULL
+str(alpha_uni)
+```
+
+
+```{r}
+AAA_fn = function(alpha_B, alpha_S, alpha_T, MMM){
+  III = diag(rep(1, MMM))
+  JJJ = matrix(rep(1, MMM * MMM), nrow = MMM)
+  A_1 = alpha_B * JJJ + (alpha_S + alpha_T) * III
+  A_2 = -(alpha_B * JJJ + alpha_S * III)
+  A_3 = alpha_B * JJJ + (alpha_S - alpha_T) * III
+  AAA = rbind(cbind(A_1, A_2),
+              cbind(A_2, A_3))
+  AAA
+}
+zzz_etc_fn = function(g_target, Phi, WWW, y_1, y_2){
+  z_1 = as.vector(WWW %*% t(g_target) %*% y_1)
+  z_2 = as.vector(WWW %*% t(g_target) %*% y_2)
+  zzz = c(z_1, z_2)
+  
+  e_g_target_1 = colMeans(g_target)
+  e_g_target = matrix(rep(e_g_target_1, nrow(g_target)), nrow = nrow(g_target), byrow = TRUE)
+  e_z_1 = matrix(as.vector(WWW %*% t(e_g_target) %*% y_1), ncol = 1)
+  e_z_2 = matrix(as.vector(WWW %*% t(e_g_target) %*% y_2), ncol = 1)
+  mu_z = rbind(e_z_1, e_z_2)
+  
+  V_G = cov(g_target)
+  W_VG_W = WWW %*% V_G %*% WWW
+  V_z = kronecker(Phi, W_VG_W)
+  
+  list(zzz = zzz,
+       mu_z = mu_z,
+       V_z = V_z)
+}
+```
+
+```{r echo = TRUE}
+rho_uni_times_10 = 0:10
+alpha_uni_zero = expand.grid(
+  B = rho_uni_times_10,
+  S = rho_uni_times_10,
+  T = rho_uni_times_10)
+str(alpha_uni_zero)
+alpha_uni_zero_sum = apply(alpha_uni_zero, 1, sum)
+alpha_uni = alpha_uni_zero[alpha_uni_zero_sum == 10, ]
+row.names(alpha_uni) = NULL
+alpha_uni = alpha_uni/10
+```
+# ---------------------------------------------------- zzz etc
+zzz_etc = zzz_etc_fn(g_target, Phi, WWW, y_1, y_2)
+zzz = zzz_etc$zzz
+mu_z = zzz_etc$mu_z
+V_z = zzz_etc$V_z
+# -------------------------------------------------- alpha_uni
+alpha_uni_zero = expand.grid(
+  B = rho_uni, 
+  S = rho_uni, 
+  T = rho_uni)
+alpha_uni_zero_sum = apply(alpha_uni_zero, 1, sum)
+alpha_uni = alpha_uni_zero[alpha_uni_zero_sum == 1, ]
+row.names(alpha_uni) = NULL
+
+
+another_0 = expand.grid(
+  B = rho_uni,
+  S = rho_uni)
+another = another_0[apply(another_0, 1, sum) <= 1, ]
+row.names(another) = NULL
+another$T = round(1 - another$B - another$S, 1)
+
+another[do.call(order, another), ]
+alpha_uni[do.call(order, alpha_uni), ]
+```
+

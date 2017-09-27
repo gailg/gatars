@@ -1,0 +1,363 @@
+---
+title: "20-uno_experimento_fn-in-ernest"
+author: ""
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-09-26 11:06:13 PDT"
+
+Last knit was `r Sys.time()`
+
+```{r}
+library(gatars)
+keeper = c(1:12, 101:112)
+bim = alternative_example$bim
+genotype = alternative_example$genotype[keeper, ]
+fam = alternative_example$fam[keeper, ]
+target_markers = alternative_example$target_markers[c(3, 5)]
+Psi = alternative_example$Psi[keeper, keeper]
+exclusion_region = alternative_example$exclusion_region
+genotype_target_markers = genotype[, target_markers]
+set.seed(2)
+epsilon_on_log_scale = 0.2
+sampling_set = gatars_sampling_set(
+    bim, epsilon_on_log_scale, exclusion_region,
+    genotype, hotspot, target_markers)
+print(sampling_set)
+
+N_sim_reps = 100
+# gatars(fam, Psi, sampling_set, N_sim_reps = 10)
+params_sampling_set = sampling_set$params_sampling_set
+sampling_set = sampling_set$sampling_set
+weights = NULL
+params = params_fn(params_sampling_set, fam, Psi, sampling_set, N_sim_reps, weights)
+# ooo = one_experiment_fn(params, calculate_optimized = TRUE)
+# ooo$p_value
+# inside one_experiment_fn
+calculate_optimized = TRUE
+theta_init = params$theta_init
+g_target = params$g_target
+library(Matrix)
+rankMatrix(g_target)
+```
+
+
+# function definitions
+
+```{r}
+AAA_fn = function(alpha_B, alpha_S, alpha_T, MMM){
+  III = diag(rep(1, MMM))
+  JJJ = matrix(rep(1, MMM * MMM), nrow = MMM)
+  A_1 = alpha_B * JJJ + (alpha_S + alpha_T) * III
+  A_2 = -(alpha_B * JJJ + alpha_S * III)
+  A_3 = alpha_B * JJJ + (alpha_S - alpha_T) * III
+  AAA = rbind(cbind(A_1, A_2),
+              cbind(A_2, A_3))
+  AAA
+}
+zzz_etc_fn = function(g_target, Phi, WWW, y_1, y_2){
+  z_1 = as.vector(WWW %*% t(g_target) %*% y_1)
+  z_2 = as.vector(WWW %*% t(g_target) %*% y_2)
+  zzz = c(z_1, z_2)
+  
+  e_g_target_1 = colMeans(g_target)
+  e_g_target = matrix(rep(e_g_target_1, nrow(g_target)), nrow = nrow(g_target), byrow = TRUE)
+  e_z_1 = matrix(as.vector(WWW %*% t(e_g_target) %*% y_1), ncol = 1)
+  e_z_2 = matrix(as.vector(WWW %*% t(e_g_target) %*% y_2), ncol = 1)
+  mu_z = rbind(e_z_1, e_z_2)
+  
+  V_G = cov(g_target)
+  W_VG_W = WWW %*% V_G %*% WWW
+  V_z = kronecker(Phi, W_VG_W)
+  
+  list(zzz = zzz,
+       mu_z = mu_z,
+       V_z = V_z)
+}
+basic_and_optimized_fn = function(g_target, Phi, rho_uni,  WWW, y_1, y_2){
+  # ---------------------------------------------------- zzz etc
+  zzz_etc = zzz_etc_fn(g_target, Phi, WWW, y_1, y_2)
+  zzz = zzz_etc$zzz
+  mu_z = zzz_etc$mu_z
+  V_z = zzz_etc$V_z
+  # -------------------------------------------------- alpha_uni
+  rho_uni_times_10 = 0:10
+  alpha_uni_zero = expand.grid(
+    B = rho_uni_times_10,
+    S = rho_uni_times_10,
+    T = rho_uni_times_10)
+  alpha_uni_zero_sum = apply(alpha_uni_zero, 1, sum)
+  alpha_uni = alpha_uni_zero[alpha_uni_zero_sum == 10, ]
+  row.names(alpha_uni) = NULL
+  alpha_uni = alpha_uni/10
+  # -------------------------------------------------- basic_AAA
+  basic_ones = alpha_uni[apply(alpha_uni, 1, function(row){
+    sum(row == 0) > 1
+  }), ]
+  MMM = ncol(g_target)
+  AAA_basic = lapply(1:nrow(basic_ones), function(jjj){
+    alpha = basic_ones[jjj, ]
+    AAA = AAA_fn(alpha$B, alpha$S, alpha$T, MMM)
+    list(alpha = alpha, AAA = AAA)
+  })
+  # ------------------------------------------------ df contains 
+  # ----------------------B, S, T (the three components of alpha
+  # ----------------------- as well as  q, and (nominal) p_value
+  df = do.call(rbind, lapply(1:nrow(alpha_uni), function(jjj){
+    alpha = alpha_uni[jjj, ]
+    AAA = AAA_fn(alpha$B, alpha$S, alpha$T, MMM)
+    davies_answer = davies_fn(zzz, mu_z, V_z, AAA)
+    cbind(alpha, davies_answer)
+  }))
+  # ------------------------- basic is a data.frame that contains 
+  # ------------------------ the quadratic form q and the p-value 
+  # ----------------------- of the three basic statistics B, S, T
+  basic = rbind(df[df$B == 1, ],
+                df[df$S == 1, ],
+                df[df$T == 1, ])
+  rownames(basic) =  c("B", "S", "T")
+  # --------------------- optimized is a data.frame that contains
+  # ------------ the quadratic form q, the nominal p-value, and x
+  # ----------------- of the optimized statistics BS, BT, ST, BST
+  bs_0 = df[df$B + df$S == 1, ]
+  bt_0 = df[df$B + df$T == 1, ]
+  st_0 = df[df$S + df$T == 1, ]
+  bs = bs_0[which.min(bs_0$p_value), ]
+  bt = bt_0[which.min(bt_0$p_value), ]
+  st = st_0[which.min(st_0$p_value), ]
+  bst = df[which.min(df$p_value), ] 
+  optimized = rbind(bs, bt, st, bst)
+  xxx = unlist(lapply(optimized$p_value, q_alice_fn))
+  optimized$x = xxx
+  rownames(optimized) =  c("BS", "BT", "ST", "BST")
+  #------------------------------------------------------- output
+  p_value_basic = basic$p_value
+  names(p_value_basic) = rownames(basic)
+  p_value_basic
+  
+  q_basic = basic$q
+  names(q_basic) = rownames(basic)
+  q_basic
+  
+  q_optimized = optimized$q
+  names(q_optimized) = rownames(optimized)
+  q_optimized
+  
+  names(xxx) = rownames(optimized)
+  list(
+    AAA_basic = AAA_basic,
+    basic = basic,
+    optimized = optimized,
+    p_value_basic = p_value_basic,
+    q_basic = q_basic,
+    q_optimized = q_optimized,
+    xxx = xxx)
+}
+
+genome_resampling_fn = function(
+  MMM,
+  N_sim_reps_interval,
+  optimized_names,
+  Phi,
+  rho_uni,
+  sampling_set,
+  WWW,
+  y_1,
+  y_2
+){
+  simulated = data.frame(rep(NA, N_sim_reps_interval), 
+                         rep(NA, N_sim_reps_interval), 
+                         rep(NA, N_sim_reps_interval), 
+                         rep(NA, N_sim_reps_interval))
+  names(simulated) = optimized_names
+  so_far_so_good = TRUE
+  n_sim = 1
+  while(so_far_so_good & n_sim <= N_sim_reps_interval){
+    still_looking_for_genotype_sim = TRUE
+    N_bad_genotype_sim = 0
+    while(still_looking_for_genotype_sim){
+      genotype_sim = do.call(cbind, lapply(sampling_set, function(this_snp){
+        this_snp[, sample(1:ncol(this_snp), 1)]
+      }))
+      if(rankMatrix(genotype_sim) == MMM) {
+        good_genotype_sim = TRUE
+        still_looking_for_genotype_sim = FALSE
+      } else {
+        print("genotype_sim not full rank")
+        N_bad_genotype_sim = N_bad_genotype_sim + 1
+        if(N_bad_genotype_sim > 1000) {
+          good_genotype_sim = FALSE
+          still_looking_for_genotype_sim = FALSE
+        }
+      }
+    }
+    if(good_genotype_sim){
+      bo = basic_and_optimized_fn(genotype_sim, Phi, rho_uni, WWW, y_1, y_2)
+      one_row_in_simulated = bo$xxx
+      simulated[n_sim, ] = one_row_in_simulated
+      n_sim = n_sim + 1
+    } else {
+      so_far_so_good = FALSE
+    }
+  }
+  list(
+    simulated = simulated,
+    so_far_so_good = so_far_so_good
+  )
+}
+rejuvenate_successes_fn = function(
+  adaptive_conf_level,
+  N_sim_reps_limit,
+  N_sim_reps_required,
+  optimized_names,
+  simulated,
+  so_far_so_good,
+  successes,
+  test_size,
+  x_observed
+){
+  if(so_far_so_good){
+    more = unlist(sapply(optimized_names, function(this){
+      sum(simulated[[this]] > x_observed[[this]])
+    }, simplify = FALSE))
+    successes = successes + more
+    N_sim_reps_required = N_sim_reps_required + nrow(simulated)
+    ambiguous = any(sapply(successes, function(xxx){
+      ci = prop.test(xxx,
+                     N_sim_reps_required,
+                     conf.level = adaptive_conf_level)$conf.int
+      ci[1] <= test_size && test_size <= ci[2]
+    }))
+    still_looking = ambiguous && N_sim_reps_required < N_sim_reps_limit
+  } else { # prepare to jetison
+    still_looking = FALSE
+  }
+  list(
+    N_sim_reps_required = N_sim_reps_required,
+    successes = successes,
+    still_looking = still_looking)
+}
+p_value_optimized_fn = function(
+  adaptive_conf_level,
+  calculate_optimized,
+  MMM,
+  N_sim_reps_interval,
+  N_sim_reps_limit,
+  x_observed,
+  Phi,
+  rho_uni,
+  test_size,
+  WWW,
+  y_1,
+  y_2
+){
+  if(calculate_optimized){
+    optimized_names = names(x_observed)
+    successes = rep(0, length(x_observed))
+    names(successes) = names(x_observed)
+    N_sim_reps_required = 0
+    still_looking = TRUE
+    while(still_looking){
+      sss = genome_resampling_fn(MMM, N_sim_reps_interval, optimized_names, Phi, rho_uni,
+                           sampling_set, WWW, y_1, y_2)
+
+      simulated = sss$simulated
+      so_far_so_good = sss$so_far_so_good
+      uuu = rejuvenate_successes_fn(adaptive_conf_level, N_sim_reps_limit, N_sim_reps_required,
+                                optimized_names, simulated, so_far_so_good, successes, test_size, x_observed)
+      N_sim_reps_required = uuu$N_sim_reps_required
+      successes = uuu$successes
+      still_looking = uuu$still_looking
+    }
+    p_value = if(so_far_so_good){
+      successes / N_sim_reps_required
+    } else {
+      list(message = "could not obtain full-rank genotype_sim matrices")
+    }
+  } else {
+    so_far_so_good = TRUE
+    N_sim_reps_required = 0
+    p_value = sapply(optimized_names, function(dummy) -1)
+  }
+  list(
+    so_far_so_good = so_far_so_good,
+    N_sim_reps_required = N_sim_reps_required,
+    p_value_optimized = p_value)
+}
+
+uno_experimento_fn = function(params, calculate_optimized){
+  adaptive_conf_level = params$adaptive_conf_level
+  g_target = params$g_target
+  MMM = params$MMM
+  N_sim_reps_interval = params$N_sim_reps_interval
+  N_sim_reps_limit = params$N_sim_reps_interval
+  WWW = params$WWW
+  y_1 = params$yyy
+  y_2 = params$e_y
+  rho_uni = params$rho_uni
+  Phi = params$Phi
+  test_size = params$test_size
+  answer = if (rankMatrix(g_target) < MMM) {
+    list(message = "error--g_target not full rank")
+  } else {
+    bo = basic_and_optimized_fn(g_target, Phi, rho_uni, WWW, y_1, y_2)
+    
+    p_value_basic = bo$p_value_basic
+    p_value_basic = bo$p_value_basic
+    q_basic = bo$q_basic
+    q_optimized = bo$q_optimized
+    qqq = c(q_basic, q_optimized)
+    x_observed = bo$xxx
+    x_observed
+    #--------------------------------------------------- p_value_optimized
+    ooo = p_value_optimized_fn(
+      adaptive_conf_level, calculate_optimized, MMM, N_sim_reps_interval, 
+      N_sim_reps_limit, x_observed, Phi, rho_uni, test_size, WWW, y_1, y_2
+    )
+    so_far_so_good = ooo$so_far_so_good
+    N_sim_reps_required = ooo$N_sim_reps_required
+    p_value_optimized = ooo$p_value_optimized
+    #-------------------------------------------------------------- output
+    if(so_far_so_good){
+      p_value = c(p_value_basic, p_value_optimized)
+      list(
+        N_sim_reps_required = N_sim_reps_required,
+        p_value = p_value,
+        q = qqq,
+        x = x_observed)
+    } else {
+      list(message = "could not obtain full-rank g_target_sim matrices")
+    }
+  }
+  answer
+}
+```
+
+
+
+
+```{r}
+uno_experimento_fn(params, calculate_optimized = TRUE)
+```
+

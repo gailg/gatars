@@ -1,0 +1,73 @@
+---
+title: "52-2017-09-27-i-have-wrong-definition-for-A"
+author: ''
+output:
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-09-27 06:36:35 PDT"
+
+Last knit was `r Sys.time()`
+
+```
+    alpha = alpha_uni[jjj, ]
+    a4 = (1 - sum(as.vector(alpha)))
+    A_1 = alpha[, 1] * JJJ + alpha[,2] * III
+    A_2 = alpha[, 3] * JJJ + a4 * III
+    AAA =  rbind(cbind(A_1 + A_2, -A_1),
+                 cbind(-A_1, A_1 - A_2))
+```
+$A_1 = \alpha_1 J + \alpha_2 I$
+
+$A_2 = \alpha_3 J + \alpha_4 I$
+
+$A = \begin{pmatrix}
+A_1 + A_2 & -A_1 \\
+-A_1      & A_1 - A_2 \end{pmatrix}$
+
+
+
+When $\alpha_1 = 1$, I get $A_1 = J$, $A_2 = 0$ and 
+$A = \begin{pmatrix}
+J & -J\\
+-J & J \end{pmatrix}$
+
+When $\alpha_2 = 1$ I get $A_1 = I$, $A_2 = 0$ and
+$A = \begin{pmatrix}
+I & -I\\
+-I & I \end{pmatrix}$
+
+When $\alpha_4 = 1$ I get $A_1 = 0$, $A_2 = I$ and
+$A = \begin{pmatrix}
+I & 0 \\
+0 & -I \end{pmatrix}$
+
+However, this is a possiblity
+
+$\alpha_3 = 1$, so $A_1 = 0$, $A_2 = J$ and
+$A = \begin{pmatrix}
+J & 0 \\
+0 & -J \end{pmatrix}$
+
+
+I believe B, S, T, BS, BT, and ST are correct, but BST is optimized over many more points than described in Equation (7)
