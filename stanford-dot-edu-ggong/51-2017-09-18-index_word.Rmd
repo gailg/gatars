@@ -3,16 +3,6 @@
 title: "gatars version 0.2.0"
 author: ''
 output:
-  word_document:
-  highlight: "tango"
-  fig_width: 5
-  fig_height: 5 
-  fig_caption: false
-  pdf_document:
-    highlight: tango
-    number_sections: yes
-    pandoc_args: --variable=geometry:margin=0.75in
-    toc: yes
   html_document:
     css: ~/Documents/headings.css
     fig_caption: yes
@@ -20,6 +10,16 @@ output:
     number_sections: yes
     theme: readable
     toc: yes
+  fig_height: 5
+  fig_width: 5
+  highlight: tango
+  fig_caption: no
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: yes
+  word_document: null
 fontsize: 12pt
 ---
 <A NAME="top"> </A>

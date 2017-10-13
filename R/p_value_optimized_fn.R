@@ -6,16 +6,16 @@ p_value_optimized_fn = function(
   MMM,
   N_sim_reps_interval,
   N_sim_reps_limit,
-  x_observed,
   Phi,
   sampling_set,
   test_size,
   WWW,
+  x_observed,
   y_1,
   y_2
 ){
+  optimized_names = names(x_observed)
   if(calculate_optimized){
-    optimized_names = names(x_observed)
     successes = rep(0, length(x_observed))
     names(successes) = names(x_observed)
     N_sim_reps_required = 0

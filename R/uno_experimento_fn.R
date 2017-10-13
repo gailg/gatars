@@ -27,8 +27,8 @@ uno_experimento_fn = function(params, calculate_optimized){
     #--------------------------------------------------- p_value_optimized
     ooo = p_value_optimized_fn(
       adaptive_conf_level, alpha_uni, calculate_optimized, MMM, 
-      N_sim_reps_interval, N_sim_reps_limit, x_observed, Phi, sampling_set,
-      test_size, WWW, y_1, y_2
+      N_sim_reps_interval, N_sim_reps_limit, Phi, sampling_set,
+      test_size, WWW, x_observed, y_1, y_2
     )
     so_far_so_good = ooo$so_far_so_good
     N_sim_reps_required = ooo$N_sim_reps_required

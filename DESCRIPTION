@@ -1,8 +1,8 @@
 Package: gatars
 Type: Package
 Title: Genetic Association Tests for Arbitrarily Related Subjects
-Version: 0.2.0
-Date: 2017-08-30
+Version: 0.2.1
+Date: 2017-09-27
 Authors@R: as.person(c(
     "Gail Gong <gailgongster@gmail.com> [aut, cre]"))
 Description: Calculates the p-values of a family of statistics that test the association between specified genetic markers, called target markers, and a binary trait. The family includes the burden statistic, the linear kernel, statistic, a new case-based kernel statistic, and optimal ensembles formed by taking linear combinations of these three statistics. Allows imputed genotypes. New in this version: Uses one-segment-assign-many to create sampling sets.
