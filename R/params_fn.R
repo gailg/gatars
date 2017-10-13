@@ -1,22 +1,25 @@
 #' @export
 params_fn = function(
+  alpha_uni_N_increments,
   params_sampling_set,
   fam,
   Psi,
   sampling_set,
   N_sim_reps,
+  
   weights = NULL
 ){
   adaptive_conf_level = 0.99
-  rho_uni_times_10 = 0:10
+  rho_uni_times_10 = 0:alpha_uni_N_increments
   alpha_uni_zero = expand.grid(
     B = rho_uni_times_10,
     S = rho_uni_times_10,
     T = rho_uni_times_10)
   alpha_uni_zero_sum = apply(alpha_uni_zero, 1, sum)
-  alpha_uni = alpha_uni_zero[alpha_uni_zero_sum == 10, ]
+  alpha_uni = alpha_uni_zero[alpha_uni_zero_sum == alpha_uni_N_increments, ]
   row.names(alpha_uni) = NULL
-  alpha_uni = alpha_uni/10
+  alpha_uni = alpha_uni/alpha_uni_N_increments
+  
   N_sim_reps_interval = N_sim_reps
   N_sim_reps_limit = N_sim_reps
   rho_uni = seq(0, 1, by = 0.1)

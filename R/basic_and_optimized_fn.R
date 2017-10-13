@@ -5,16 +5,6 @@ basic_and_optimized_fn = function(alpha_uni, g_target, Phi, WWW, y_1, y_2){
   zzz = zzz_etc$zzz
   mu_z = zzz_etc$mu_z
   V_z = zzz_etc$V_z
-  # -------------------------------------------------- alpha_uni
-  rho_uni_times_10 = 0:10
-  alpha_uni_zero = expand.grid(
-    B = rho_uni_times_10,
-    S = rho_uni_times_10,
-    T = rho_uni_times_10)
-  alpha_uni_zero_sum = apply(alpha_uni_zero, 1, sum)
-  alpha_uni = alpha_uni_zero[alpha_uni_zero_sum == 10, ]
-  row.names(alpha_uni) = NULL
-  alpha_uni = alpha_uni/10
   # -------------------------------------------------- basic_AAA
   basic_ones = alpha_uni[apply(alpha_uni, 1, function(row){
     sum(row == 0) > 1
