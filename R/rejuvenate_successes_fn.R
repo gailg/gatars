@@ -20,7 +20,7 @@ rejuvenate_successes_fn = function(
       ci = prop.test(xxx,
                      N_sim_reps_required,
                      conf.level = adaptive_conf_level)$conf.int
-      ci[1] <= test_size && test_size <= ci[2]
+      ci[1] <= .10
     }))
     still_looking = ambiguous && N_sim_reps_required < N_sim_reps_limit
   } else { # prepare to jetison
