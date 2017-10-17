@@ -6,7 +6,6 @@ params_fn = function(
   Psi,
   sampling_set,
   N_sim_reps,
-  
   weights = NULL
 ){
   adaptive_conf_level = 0.99
@@ -28,6 +27,7 @@ params_fn = function(
   y_2 = e_y = fam$e_y
   Phi = Phi_fn(Psi, y_1, y_2)
   MMM = params_sampling_set$MMM
+  theta_init = rep(pi/3, 2)
   www_num = if(!is.null(weights)){
     weights
   } else {
@@ -49,6 +49,7 @@ params_fn = function(
     rho_uni = rho_uni,
     sampling_set = sampling_set,
     test_size = test_size,
+    theta_init = theta_init,
     WWW = WWW,
     www = www,
     yyy = yyy)

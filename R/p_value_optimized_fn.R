@@ -9,6 +9,7 @@ p_value_optimized_fn = function(
   Phi,
   sampling_set,
   test_size,
+  theta,
   WWW,
   x_observed,
   y_1,
@@ -22,7 +23,7 @@ p_value_optimized_fn = function(
     still_looking = TRUE
     while(still_looking){
       sss = genome_resampling_fn(alpha_uni, MMM, N_sim_reps_interval, optimized_names, Phi, 
-                                 sampling_set, WWW, y_1, y_2)
+                                 sampling_set, theta, WWW, y_1, y_2)
       
       simulated = sss$simulated
       so_far_so_good = sss$so_far_so_good

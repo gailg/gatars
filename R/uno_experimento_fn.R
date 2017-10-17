@@ -6,29 +6,31 @@ uno_experimento_fn = function(params, calculate_optimized){
   MMM = params$MMM
   N_sim_reps_interval = params$N_sim_reps_interval
   N_sim_reps_limit = params$N_sim_reps_limit
+  theta_init = params$theta_init
   WWW = params$WWW
   y_1 = params$yyy
   y_2 = params$e_y
   Phi = params$Phi
   sampling_set = params$sampling_set
   test_size = params$test_size
+  theta_init = params$theta_init
   answer = if (rankMatrix(g_target) < MMM) {
     list(message = "error--g_target not full rank")
   } else {
-    bo = basic_and_optimized_fn(alpha_uni, g_target, Phi,  WWW, y_1, y_2)
-    
+    bo = basic_and_optimized_lu_fn(alpha_uni, g_target, Phi, theta_init, WWW, y_1, y_2)
     p_value_basic = bo$p_value_basic
     p_value_basic = bo$p_value_basic
     q_basic = bo$q_basic
     q_optimized = bo$q_optimized
     qqq = c(q_basic, q_optimized)
+    theta = bo$theta
     x_observed = bo$xxx
     x_observed
     #--------------------------------------------------- p_value_optimized
     ooo = p_value_optimized_fn(
       adaptive_conf_level, alpha_uni, calculate_optimized, MMM, 
       N_sim_reps_interval, N_sim_reps_limit, Phi, sampling_set,
-      test_size, WWW, x_observed, y_1, y_2
+      test_size, theta, WWW, x_observed, y_1, y_2
     )
     so_far_so_good = ooo$so_far_so_good
     N_sim_reps_required = ooo$N_sim_reps_required
