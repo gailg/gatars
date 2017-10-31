@@ -1,6 +1,6 @@
 
 ---
-title: "gatars version 0.2.0"
+title: "gatars version 0.2.5"
 author: ''
 output:
   html_document:
@@ -23,7 +23,7 @@ require(knitr)
 opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 8, tidy=FALSE)
 ```
 
-"2017-09-12 14:17:17 PDT"
+"2017-10-31 14:59:03 PDT"
 
 # Introduction {#intro}
 
