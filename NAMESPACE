@@ -3,6 +3,7 @@
 export(AAA_fn)
 export(Phi_fn)
 export(basic_and_optimized_fn)
+export(basic_and_optimized_lu_fn)
 export(bim_with_target_and_exclusion_regions_removed_fn)
 export(crocodile)
 export(davies_fn)
