@@ -101,13 +101,17 @@ bim_with_target_and_exclusion_regions_removed_fn = function(params_sampling_set)
   chromosomes_with_target_and_exlusion_regions_removed = lapply(1:22, function(chromosome){  
     answer = if(chromosome %in% exclusion_chromosome){
       segments_0 = independent_segment_fn(bim, chromosome, hotspot)
-      eee = exclusion_region[exclusion_region$chromosome == chromosome, ]
-      intersect_with_genotype_q = sapply(segments_0, function(this){
-        any(unlist(lapply(1:nrow(eee), function(kkk){
-          any(eee[kkk, ]$start : eee[kkk, ]$end %in% this$bp)
-        })))
-      })
-      do.call(rbind, segments_0[!intersect_with_genotype_q])
+      if( is.null(segments_0) ) {
+        NULL
+      } else {
+        eee = exclusion_region[exclusion_region$chromosome == chromosome, ]
+        intersect_with_genotype_q = sapply(segments_0, function(this){
+          any(unlist(lapply(1:nrow(eee), function(kkk){
+            any(eee[kkk, ]$start : eee[kkk, ]$end %in% this$bp)
+          })))
+        })
+        do.call(rbind, segments_0[!intersect_with_genotype_q])
+      }
     } else {
       bim[bim$chromosome == chromosome, ]
     }
