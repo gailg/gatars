@@ -49,6 +49,7 @@
 #' 
 #' @export
 sampling_set_fn = function(params_sampling_set){
+  genotype = params_sampling_set$genotype
   MMM = params_sampling_set$MMM
   epsilon_on_log_scale = params_sampling_set$epsilon_on_log_scale
   # p_target are the mafs of the target snps and the mafs we want to match

@@ -382,7 +382,7 @@ list(target_markers = target_markers,
 
 # Creating the sampling_set
 set.seed(2)
-epsilon_on_log_scale = 0.02
+epsilon_on_log_scale = 0.01
 exclusion_region = NULL
 sampling_set = gatars_sampling_set(
   bim,
