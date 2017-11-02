@@ -11,8 +11,8 @@ davies_fn = function(zzz, mu_z, V_z, AAA){
   A_tilde = V_z_one_half %*% AAA %*% V_z_one_half
   # ------------------------------------------------- breve, lambda, delta
   eigen_A_tilde = eigen(A_tilde)
-  UUU = t(eigen_A_tilde$vectors)
-  lambda = eigen_A_tilde$values
+  UUU = Re(t(eigen_A_tilde$vectors))
+  lambda = Re(eigen_A_tilde$values)
   Lambda = diag(lambda)
   z_breve = UUU %*% z_tilde
   mu_z_breve = UUU %*% mu_z_tilde
