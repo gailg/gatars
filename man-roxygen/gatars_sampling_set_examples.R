@@ -1,10 +1,10 @@
 #' @examples
-#' bim = alternative_example$bim
-#' genotype = alternative_example$genotype
-#' fam = alternative_example$fam
-#' target_markers = alternative_example$target_markers[3:5]
-#' exclusion_region = alternative_example$exclusion_region
-#' Psi = alternative_example$Psi
+#' bim = gatars_example$bim
+#' genotype = gatars_example$genotype
+#' fam = gatars_example$fam
+#' target_markers = gatars_example$target_markers[3:5]
+#' exclusion_region = gatars_example$exclusion_region
+#' Psi = gatars_example$Psi
 #' target_markers = target_markers
 #' 
 #' NNN = nrow(fam)

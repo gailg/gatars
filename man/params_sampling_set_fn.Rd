@@ -116,12 +116,12 @@ inputs that are passed through.  \code{g_target}, \code{p_target},
 the inputs.
 }
 \examples{
-bim = alternative_example$bim
+bim = gatars_example$bim
 epsilon_on_log_scale = 0.02
-exclusion_region = alternative_example$exclusion_region
-genotype = alternative_example$genotype
+exclusion_region = gatars_example$exclusion_region
+genotype = gatars_example$genotype
 str(hotspot)
-target_markers = alternative_example$target_markers[3:5]
+target_markers = gatars_example$target_markers[3:5]
 params_sampling_set = params_sampling_set_fn(
   bim, epsilon_on_log_scale, exclusion_region,
   genotype, hotspot, target_markers)
