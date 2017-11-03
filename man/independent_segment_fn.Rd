@@ -27,7 +27,7 @@ and (c) using \code{hotspot} cut up the remaining \code{bim}
 into independent segments.
 }
 \examples{
-bim = alternative_example$bim
+bim = gatars_example$bim
 chromosome = 21 # I chose 21 because in our example it is the shortest
 table(bim$chromosome)
 independent_segment_fn_answer = independent_segment_fn(bim, chromosome, hotspot)

@@ -18,7 +18,7 @@
 #' 
 #' @examples 
 #' #--------------- Get ready to call the function
-#' bim = alternative_example$bim
+#' bim = gatars_example$bim
 #' epsilon_on_log_scale = 0.02
 #' table(bim$chromosome)
 #' bim_for_chromosome_21 = bim[bim$chromosome == 21, ]
@@ -26,7 +26,7 @@
 #' target_markers = c("exm-rs1006899",  "exm1564039")
 #' bim[bim$snp %in% target_markers, ]
 #' exclusion_region = NULL
-#' genotype = alternative_example$genotype
+#' genotype = gatars_example$genotype
 #' params_sampling_set = params_sampling_set_fn(
 #'   bim, epsilon_on_log_scale, exclusion_region,
 #'   genotype, hotspot, target_markers)

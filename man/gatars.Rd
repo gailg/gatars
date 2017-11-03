@@ -59,7 +59,7 @@ of the three basic statistics.  See \url{http://stanford.edu/~ggong/gatars/} for
 
 \strong{The datasets used are:}
 
-\code{alternative_example}: A list of the 6 objects you need to provide to run \code{gatars}.
+\code{gatars_example}: A list of the 6 objects you need to provide to run \code{gatars}.
 
 \code{hotspot}: The hotspot data used to create the independent segments that are used by \code{gatars_sampling_set}.
 

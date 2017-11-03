@@ -42,11 +42,11 @@ that match the maf of its
 corresponding target snp.
 }
 \examples{
-bim = alternative_example$bim
+bim = gatars_example$bim
 epsilon_on_log_scale = 0.02
-exclusion_region = alternative_example$exclusion_region
-genotype = alternative_example$genotype
-target_markers = alternative_example$target_markers[3:5]
+exclusion_region = gatars_example$exclusion_region
+genotype = gatars_example$genotype
+target_markers = gatars_example$target_markers[3:5]
 set.seed(1)
 params_sampling_set = params_sampling_set_fn(
   bim, epsilon_on_log_scale, exclusion_region,

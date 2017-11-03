@@ -1,0 +1,166 @@
+---
+title: "305-2017-11-02-example-after-basic_and_optimized_lu_fn"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 8, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+Last knit was `r Sys.time()`
+
+
+# A little history for the 305 file
+
+The data set in `gatars`: `gatars_example`  I will be creating here.  
+
+There is some history.  From `lacie/aaa/packages/gritsr2/gails-stuff/a-chronicle/04-v-0.1.4.html` I see that gritsr2 contains the following four data sets
+```
+bim_original.RData
+exclusion_region.RData
+genotype_bim_original.RData
+hotspot.RData
+```
+
+`bim_original` is a data.frame containing the columns `chromosome`, `snp`, and `bp` and 124303 rows, so these are possibilities for sampling sets.
+
+
+`genotype_bim_original` is a data.frame containing the columns `chromosome`, `snp`, and `bp` and 47 rows, so these are possibilities for target markers.
+
+
+`exclusion_region` is a data.frame containing the columns `chromosome` `begin` and `end` and 113 rows.
+
+`hotspot` is a data.frame with 25657 rows and the columns `chromosome`, `center`, `start` and `end`.
+
+
+
+which I moved from `d-2016-04-20/06-adding-valeries-data/gritsr_packages_RData`
+
+These files were created by “107-2016-10-24-description-adding-valeries-data.Rmd”
+
+The code below, I copied from "lacie/aaa/packages/gritsr2/gails-stuff/b-examples/03-v-0.1.4/a-build-hg38/201-gritsr-example-dot-RData"
+
+
+```{r}
+library(gatars)
+library(gritsr2)
+set.seed(31)
+RData_file = "gatars_example.RData"
+source_0 = getwd()
+source_1 = strsplit(source_0, "/")[[1]]
+source = paste0(paste(source_1[(length(source_1) - 2):length(source_1)], collapse = "/"),
+      "/305-2017-11-02-example-after-basic_and_optimized_lu_fn.Rmd")
+genotype_bim_original = genotype_bim_original[1:5, ]
+params_example = params_example_fn(
+  bim_original, genotype_bim_original, hotspot,
+  NNN = 200,
+  p_subset_genotype = .2,
+  beta_causal_snps = .85,
+  causal_snps = 3:5)
+gatars_example = example_fn(params_example)
+names(gatars_example)
+str(gatars_example$bim)
+str(gatars_example$genotype)
+str(gatars_example$exclusion_region)
+str(gatars_example$fam)
+gatars_example$target_markers
+str(gatars_example$Psi)
+gatars_example$Psi[1:10, 1:10]
+gatars_example$params_example = params_example
+
+additional_attributes = list(
+  RData_file = RData_file,
+  when_created = Sys.time(),
+  source = source
+)
+attributes(gatars_example) = c(attributes(gatars_example),
+                                    additional_attributes)
+                                               
+save(gatars_example, file = RData_file)
+```
+
+```{r}
+# here i am calling `gatars`
+bim = gatars_example$bim
+exclusion_region = gatars_example$exclusion_region
+fam = gatars_example$fam
+genotype = gatars_example$genotype
+target_markers = gatars_example$target_markers[3:5]
+Psi = gatars_example$Psi
+NNN = nrow(fam)
+first_ten = 1:10
+last_ten = NNN - (9:0)
+matrix_image_fn(Psi[c(first_ten, last_ten), c(first_ten, last_ten)],
+                main = "First and last 10 rows and columns of Psi")
+
+# Checking the rank of the genotype_target_markers matrix
+library(Matrix)
+genotype_target_markers = genotype[, target_markers]
+list(target_markers = target_markers,
+     rank = as.numeric(rankMatrix( genotype_target_markers)))
+
+# Creating the sampling_set
+set.seed(1)
+epsilon_on_log_scale = 0.01
+exclusion_region = NULL
+sampling_set = gatars_sampling_set(
+  bim,
+  epsilon_on_log_scale,
+  exclusion_region,
+  genotype,
+  hotspot,
+  target_markers
+)
+print(sampling_set)
+
+previous_sampling_set = sampling_set
+set.seed(1)
+exclusion_region = gatars_example$exclusion_region
+head(exclusion_region)
+sampling_set = gatars_sampling_set(
+  bim,
+  epsilon_on_log_scale,
+  exclusion_region,
+  genotype,
+  hotspot,
+  target_markers
+)
+print(previous_sampling_set)
+print(sampling_set)
+
+# Calling gatars 
+set.seed(2)
+start = Sys.time()
+gatars(fam, Psi, sampling_set, N_sim_reps = 100, weights = c(5, 3, 2))
+elapsed_time = Sys.time() - start
+elapsed_time
+
+start = Sys.time()
+gatars(fam, Psi, sampling_set, N_sim_reps = 1000, weights = c(5, 3, 2))
+elapsed_time = Sys.time() - start
+elapsed_time
+
+start = Sys.time()
+gatars(fam, Psi, sampling_set, N_sim_reps = 2000, weights = c(5, 3, 2))
+elapsed_time = Sys.time() - start
+elapsed_time
+```
+
