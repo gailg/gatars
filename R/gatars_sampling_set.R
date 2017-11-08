@@ -48,14 +48,14 @@
 #' @template params_sampling_set_examples
 #' @examples
 #' sampling_set = gatars_sampling_set(
-#'     bim, epsilon_on_log_scale, exclusion_region,
+#'     bim, epsilon, exclusion_region,
 #'     genotype, hotspot, target_markers)
 #' print(sampling_set)
 #' str(sampling_set$sampling_set)
 #' @export
 gatars_sampling_set = function(
   bim,
-  epsilon_on_log_scale,
+  epsilon,
   exclusion_region,
   genotype,
   hotspot,
@@ -63,7 +63,7 @@ gatars_sampling_set = function(
 ){
   params_sampling_set = params_sampling_set_fn(
     bim,
-    epsilon_on_log_scale,
+    epsilon,
     exclusion_region,
     genotype,
     hotspot,

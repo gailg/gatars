@@ -8,7 +8,7 @@
 #' corresponding target snp.
 #' 
 #' @param params_sampling_set, and in particular the objects 
-#' \code{epsilon_on_log_scale}, \code{MMM}, and \code{p_target}.
+#' \code{epsilon}, \code{MMM}, and \code{p_target}.
 #' See \code{\link{params_sampling_set_fn}}.
 #' 
 #' @return A \code{list} containing the following two objects
@@ -34,13 +34,13 @@
 #' 
 #' @examples 
 #' bim = gatars_example$bim
-#' epsilon_on_log_scale = 0.02
+#' epsilon = 0.01
 #' exclusion_region = gatars_example$exclusion_region
 #' genotype = gatars_example$genotype
 #' target_markers = gatars_example$target_markers[3:5]
 #' set.seed(1)
 #' params_sampling_set = params_sampling_set_fn(
-#'   bim, epsilon_on_log_scale, exclusion_region,
+#'   bim, epsilon, exclusion_region,
 #'   genotype, hotspot, target_markers)
 #' names(params_sampling_set)
 #' sampling_set = sampling_set_fn(params_sampling_set)
@@ -51,7 +51,7 @@
 sampling_set_fn = function(params_sampling_set){
   genotype = params_sampling_set$genotype
   MMM = params_sampling_set$MMM
-  epsilon_on_log_scale = params_sampling_set$epsilon_on_log_scale
+  epsilon = params_sampling_set$epsilon
   # p_target are the mafs of the target snps and the mafs we want to match
   p_target = params_sampling_set$p_target
   # Remove from bim and genotype the regions specified by exclusion_region
@@ -65,12 +65,12 @@ sampling_set_fn = function(params_sampling_set){
   # For sampling_set I march through each mmm = 1, ...M, 
   # for each mmm, I find the good_ones, the columns of genotype_with_stuff_removed
   # whose mafs match.  
-  # I use epsilon_on_log_scale to parametrize the matching.
+  # I use epsilon to parametrize the matching.
   # Notice that if I get more than 1000 good ones, I sample to get at most 1000.
   sampling_set = lapply(1:MMM, function(mmm){
     p_this = p_target[mmm]
-    lower = p_this * (1 - epsilon_on_log_scale)
-    upper = p_this * (1 + epsilon_on_log_scale)
+    lower = p_this * (1 - epsilon)
+    upper = p_this * (1 + epsilon)
     good_ones_q = (lower < p_sim & p_sim < upper)
     good_ones = which(good_ones_q)
     N_good_ones = length(good_ones)

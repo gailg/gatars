@@ -4,8 +4,8 @@
 \alias{gatars_sampling_set}
 \title{Create sampling sets for genome resampling}
 \usage{
-gatars_sampling_set(bim, epsilon_on_log_scale, exclusion_region, genotype,
-  hotspot, target_markers)
+gatars_sampling_set(bim, epsilon, exclusion_region, genotype, hotspot,
+  target_markers)
 }
 \arguments{
 \item{bim}{A data.frame containing \code{LLL} rows corresponding to
@@ -21,12 +21,12 @@ The \code{lll}-th row of \code{bim} corresponds to the \code{lll}-th column of
 \code{bp} must be expressed in the same build as \code{hotspot}, and if you 
 are using \code{hotspot} provided by \code{gatars} this build is hg38/GRCh38.}
 
-\item{epsilon_on_log_scale}{A positive real number used to parametrize the matching.
+\item{epsilon}{A positive real number used to parametrize the matching.
 For the \code{mmm}-th sampling set of a target marker with minor allele
 frequency \code{pi[mmm]}, only those markers whose minor allele frequencies fall
-in the interval \code{pi[mmm] * [1 - epsilon_on_log_scale, 1 + epsilon_on_log_scale]}
+in the interval \code{pi[mmm] * [1 - epsilon, 1 + epsilon]}
 are candidates for its the sampling set. In our simulations we set
-\code{epsilon_on_log_scale} equal to 0.02.}
+\code{epsilon} equal to 0.02.}
 
 \item{exclusion_region}{A \code{data.frame} with one or several rows of the three
 columns \code{chromosome}, \code{start}, and \code{end}.  Each row of this
@@ -111,13 +111,13 @@ contain target markers or any defined by the \code{exclusion region}.
 }
 \examples{
 bim = gatars_example$bim
-epsilon_on_log_scale = 0.02
+epsilon = 0.01
 exclusion_region = gatars_example$exclusion_region
 genotype = gatars_example$genotype
 str(hotspot)
 target_markers = gatars_example$target_markers[3:5]
 sampling_set = gatars_sampling_set(
-    bim, epsilon_on_log_scale, exclusion_region,
+    bim, epsilon, exclusion_region,
     genotype, hotspot, target_markers)
 print(sampling_set)
 str(sampling_set$sampling_set)

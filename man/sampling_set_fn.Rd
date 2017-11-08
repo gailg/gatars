@@ -8,7 +8,7 @@ sampling_set_fn(params_sampling_set)
 }
 \arguments{
 \item{params_sampling_set, }{and in particular the objects 
-\code{epsilon_on_log_scale}, \code{MMM}, and \code{p_target}.
+\code{epsilon}, \code{MMM}, and \code{p_target}.
 See \code{\link{params_sampling_set_fn}}.}
 }
 \value{
@@ -43,13 +43,13 @@ corresponding target snp.
 }
 \examples{
 bim = gatars_example$bim
-epsilon_on_log_scale = 0.02
+epsilon = 0.01
 exclusion_region = gatars_example$exclusion_region
 genotype = gatars_example$genotype
 target_markers = gatars_example$target_markers[3:5]
 set.seed(1)
 params_sampling_set = params_sampling_set_fn(
-  bim, epsilon_on_log_scale, exclusion_region,
+  bim, epsilon, exclusion_region,
   genotype, hotspot, target_markers)
 names(params_sampling_set)
 sampling_set = sampling_set_fn(params_sampling_set)

@@ -1,6 +1,6 @@
 #' @examples
 #' bim = gatars_example$bim
-#' epsilon_on_log_scale = 0.02
+#' epsilon = 0.01
 #' exclusion_region = gatars_example$exclusion_region
 #' genotype = gatars_example$genotype
 #' str(hotspot)

@@ -1,12 +1,12 @@
 #' @examples
 #' bim = gatars_example$bim
 #' genotype = gatars_example$genotype
-#' fam = gatars_example$fam
+#' phenotype = gatars_example$phenotype
 #' target_markers = gatars_example$target_markers[3:5]
 #' Psi = gatars_example$Psi
 #' exclusion_region = gatars_example$exclusion_region
 #' 
-#' NNN = nrow(fam)
+#' NNN = nrow(phenotype)
 #' first_ten = 1:10
 #' last_ten = NNN - (9:0)
 #' matrix_image_fn(Psi[c(first_ten, last_ten), c(first_ten, last_ten)],
@@ -18,11 +18,11 @@
 #'      rank = as.numeric(rankMatrix( genotype_target_markers)))
 #'      
 #' set.seed(2)
-#' epsilon_on_log_scale = 0.02
+#' epsilon = 0.01
 #' sampling_set = gatars_sampling_set(
-#'     bim, epsilon_on_log_scale, exclusion_region,
+#'     bim, epsilon, exclusion_region,
 #'     genotype, hotspot, target_markers)
 #' print(sampling_set)
 #' 
 #' N_sim_reps = 10
-#' gatars(fam, Psi, sampling_set, N_sim_reps = 10)
+#' gatars(phenotype, Psi, sampling_set, N_sim_reps = 10)

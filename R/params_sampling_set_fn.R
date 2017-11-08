@@ -18,12 +18,12 @@
 #' \code{bp} must be expressed in the same build as \code{hotspot}, and if you 
 #' are using \code{hotspot} provided by \code{gatars} this build is hg38/GRCh38.
 #'
-#' @param epsilon_on_log_scale A positive real number used to parametrize the matching.
+#' @param epsilon A positive real number used to parametrize the matching.
 #' For the \code{mmm}-th sampling set of a target marker with minor allele
 #' frequency \code{pi[mmm]}, only those markers whose minor allele frequencies fall
-#' in the interval \code{pi[mmm] * [1 - epsilon_on_log_scale, 1 + epsilon_on_log_scale]}
+#' in the interval \code{pi[mmm] * [1 - epsilon, 1 + epsilon]}
 #' are candidates for its the sampling set. In our simulations we set
-#' \code{epsilon_on_log_scale} equal to 0.02.
+#' \code{epsilon} equal to 0.02.
 #' 
 #' @param exclusion_region A \code{data.frame} with one or several rows of the three
 #' columns \code{chromosome}, \code{start}, and \code{end}.  Each row of this
@@ -74,8 +74,8 @@
 #' The \code{mmm}-th column contains the mean of the \code{mmm}-th
 #' column of \code{g_target}.
 #' }
-#' \item{\code{epsilon_on_log_scale}: } {
-#' The same as the input \code{epsilon_on_log_scale}.
+#' \item{\code{epsilon}: } {
+#' The same as the input \code{epsilon}.
 #' }
 #' \item{\code{exclusion_region}: } {
 #' The same as the input \code{exclusion region}.
@@ -108,13 +108,13 @@
 #' @template params_sampling_set_examples
 #' @examples
 #' params_sampling_set = params_sampling_set_fn(
-#'   bim, epsilon_on_log_scale, exclusion_region,
+#'   bim, epsilon, exclusion_region,
 #'   genotype, hotspot, target_markers)
 #' names(params_sampling_set)
 #' @export
 params_sampling_set_fn = function(
   bim,
-  epsilon_on_log_scale,
+  epsilon,
   exclusion_region,
   genotype,
   hotspot,
@@ -130,7 +130,7 @@ params_sampling_set_fn = function(
     bim = bim,
     genotype = genotype,
     e_g_target = e_g_target,
-    epsilon_on_log_scale = epsilon_on_log_scale,
+    epsilon = epsilon,
     exclusion_region = exclusion_region,
     g_target = g_target,
     hotspot = hotspot,

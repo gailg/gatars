@@ -8,13 +8,13 @@
 #' statistics \eqn{Q_BS}, \eqn{Q_BC}, \eqn{Q_SC}, \eqn{Q_BSC} that optimize linear combinations
 #' of the three basic statistics.  See \url{http://stanford.edu/~ggong/gatars/} for more details.
 #' 
-#' @param fam A data.frame containing \code{NNN} rows and at least the two columns
-#' \code{y} and \code{e_y}, where \code{y[nnn]} is an indicator for the \code{nnn}-th person
-#' having disease and \code{e_y[nnn]} is is a trait probability, the predicted value of 
+#' @param phenotype A data.frame containing \code{NNN} rows and at least the two columns
+#' \code{y} and \code{mu}, where \code{y[nnn]} is an indicator for the \code{nnn}-th person
+#' having disease and \code{mu[nnn]} is is a trait probability, the predicted value of 
 #' \code{y[nnn]} based on nongenetic covariates and possibly principal components of ancestry. 
 #' After we saw that principal conponents of ancestry were insignificant, we performed a 
 #' logistic regression of \code{y} on (1) age, (2) membership in family or case/control data, 
-#' and (3) their interaction, and used \code{e_y} to be the fitted values of the logistic 
+#' and (3) their interaction, and used \code{mu} to be the fitted values of the logistic 
 #' regression.
 #' 
 #' @param Psi A matrix with \code{NNN} rows and \code{NNN} columns.  \code{Psi[n1, n2]} is the 
@@ -38,12 +38,12 @@
 #' @template gatars_examples
 #' 
 #' @export
-gatars = function(fam, Psi, sampling_set, N_sim_reps, weights = NULL){
+gatars = function(phenotype, Psi, sampling_set, N_sim_reps, weights = NULL){
   params_sampling_set = sampling_set$params_sampling_set
   sampling_set = sampling_set$sampling_set
   alpha_uni_N_increments = 10
   params = params_fn(
-    alpha_uni_N_increments, params_sampling_set, fam, Psi, sampling_set, N_sim_reps, weights)
+    alpha_uni_N_increments, params_sampling_set, phenotype, Psi, sampling_set, N_sim_reps, weights)
   ooo = uno_experimento_fn(params, calculate_optimized = TRUE)
   ooo
 }

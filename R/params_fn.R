@@ -2,7 +2,7 @@
 params_fn = function(
   alpha_uni_N_increments,
   params_sampling_set,
-  fam,
+  phenotype,
   Psi,
   sampling_set,
   N_sim_reps,
@@ -23,8 +23,8 @@ params_fn = function(
   N_sim_reps_limit = N_sim_reps
   rho_uni = seq(0, 1, by = 0.1)
   test_size = 0.01
-  y_1 = yyy = fam$y
-  y_2 = e_y = fam$e_y
+  y_1 = yyy = phenotype$y
+  y_2 = mu = phenotype$mu
   Phi = Phi_fn(Psi, y_1, y_2)
   MMM = params_sampling_set$MMM
   theta_init = rep(pi/3, 2)
@@ -39,7 +39,7 @@ params_fn = function(
   list(
     adaptive_conf_level = adaptive_conf_level,
     alpha_uni = alpha_uni,
-    e_y = e_y,
+    mu = mu,
     g_target = params_sampling_set$g_target,
     MMM = params_sampling_set$MMM,
     NNN = params_sampling_set$NNN,

@@ -1,5 +1,5 @@
 ---
-title: "305-2017-11-02-example-after-basic_and_optimized_lu_fn"
+title: "305-2017-11-08-example-after-basic_and_optimized_lu_fn"
 author: ''
 output:
   html_document:
@@ -62,12 +62,12 @@ The code below, I copied from "lacie/aaa/packages/gritsr2/gails-stuff/b-examples
 ```{r}
 library(gatars)
 library(gritsr2)
-set.seed(31)
+set.seed(2)
 RData_file = "gatars_example.RData"
 source_0 = getwd()
 source_1 = strsplit(source_0, "/")[[1]]
 source = paste0(paste(source_1[(length(source_1) - 2):length(source_1)], collapse = "/"),
-      "/305-2017-11-02-example-after-basic_and_optimized_lu_fn.Rmd")
+      "/305-2017-11-08-example-after-basic_and_optimized_lu_fn.Rmd")
 genotype_bim_original = genotype_bim_original[1:5, ]
 params_example = params_example_fn(
   bim_original, genotype_bim_original, hotspot,
@@ -78,11 +78,12 @@ params_example = params_example_fn(
 gatars_example = example_fn(params_example)
 names(gatars_example)
 str(gatars_example$bim)
-str(gatars_example$genotype)
 str(gatars_example$exclusion_region)
-str(gatars_example$fam)
-gatars_example$target_markers
+str(gatars_example$genotype)
+
+str(gatars_example$phenotype)
 str(gatars_example$Psi)
+gatars_example$target_markers
 gatars_example$Psi[1:10, 1:10]
 gatars_example$params_example = params_example
 
@@ -101,29 +102,21 @@ save(gatars_example, file = RData_file)
 # here i am calling `gatars`
 bim = gatars_example$bim
 exclusion_region = gatars_example$exclusion_region
-fam = gatars_example$fam
 genotype = gatars_example$genotype
-target_markers = gatars_example$target_markers[3:5]
+phenotype = gatars_example$phenotype
 Psi = gatars_example$Psi
-NNN = nrow(fam)
+target_markers = gatars_example$target_markers[3:5]
+NNN = nrow(phenotype)
 first_ten = 1:10
 last_ten = NNN - (9:0)
-matrix_image_fn(Psi[c(first_ten, last_ten), c(first_ten, last_ten)],
-                main = "First and last 10 rows and columns of Psi")
-
-# Checking the rank of the genotype_target_markers matrix
-library(Matrix)
-genotype_target_markers = genotype[, target_markers]
-list(target_markers = target_markers,
-     rank = as.numeric(rankMatrix( genotype_target_markers)))
 
 # Creating the sampling_set
-set.seed(1)
-epsilon_on_log_scale = 0.01
+set.seed(42)
+epsilon = 0.01
 exclusion_region = NULL
 sampling_set = gatars_sampling_set(
   bim,
-  epsilon_on_log_scale,
+  epsilon,
   exclusion_region,
   genotype,
   hotspot,
@@ -132,12 +125,12 @@ sampling_set = gatars_sampling_set(
 print(sampling_set)
 
 previous_sampling_set = sampling_set
-set.seed(1)
+set.seed(42)
 exclusion_region = gatars_example$exclusion_region
 head(exclusion_region)
 sampling_set = gatars_sampling_set(
   bim,
-  epsilon_on_log_scale,
+  epsilon,
   exclusion_region,
   genotype,
   hotspot,
@@ -147,20 +140,26 @@ print(previous_sampling_set)
 print(sampling_set)
 
 # Calling gatars 
-set.seed(2)
 start = Sys.time()
-gatars(fam, Psi, sampling_set, N_sim_reps = 100, weights = c(5, 3, 2))
+set.seed(1)
+gatars(phenotype, Psi, sampling_set, N_sim_reps = 100, weights = c(5, 3, 2))
 elapsed_time = Sys.time() - start
-elapsed_time
+paste("100 sim reps used", 
+      round(elapsed_time, 1), attributes(elapsed_time)$units)
 
 start = Sys.time()
-gatars(fam, Psi, sampling_set, N_sim_reps = 1000, weights = c(5, 3, 2))
+set.seed(1)
+gatars(phenotype, Psi, sampling_set, N_sim_reps = 1000, weights = c(5, 3, 2))
 elapsed_time = Sys.time() - start
-elapsed_time
+paste("1000 sim reps used", 
+      round(elapsed_time, 1), attributes(elapsed_time)$units)
 
 start = Sys.time()
-gatars(fam, Psi, sampling_set, N_sim_reps = 2000, weights = c(5, 3, 2))
+set.seed(1)
+gatars(phenotype, Psi, sampling_set, N_sim_reps = 2000, weights = c(5, 3, 2))
 elapsed_time = Sys.time() - start
-elapsed_time
+paste("2000 sim reps used", 
+      round(elapsed_time, 1), attributes(elapsed_time)$units)
+
 ```
 

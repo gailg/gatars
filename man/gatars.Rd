@@ -7,16 +7,16 @@
 \alias{gatars}
 \title{Genetic Association Tests for Arbitrarily Related Subjects}
 \usage{
-gatars(fam, Psi, sampling_set, N_sim_reps, weights = NULL)
+gatars(phenotype, Psi, sampling_set, N_sim_reps, weights = NULL)
 }
 \arguments{
-\item{fam}{A data.frame containing \code{NNN} rows and at least the two columns
-\code{y} and \code{e_y}, where \code{y[nnn]} is an indicator for the \code{nnn}-th person
-having disease and \code{e_y[nnn]} is is a trait probability, the predicted value of 
+\item{phenotype}{A data.frame containing \code{NNN} rows and at least the two columns
+\code{y} and \code{mu}, where \code{y[nnn]} is an indicator for the \code{nnn}-th person
+having disease and \code{mu[nnn]} is is a trait probability, the predicted value of 
 \code{y[nnn]} based on nongenetic covariates and possibly principal components of ancestry. 
 After we saw that principal conponents of ancestry were insignificant, we performed a 
 logistic regression of \code{y} on (1) age, (2) membership in family or case/control data, 
-and (3) their interaction, and used \code{e_y} to be the fitted values of the logistic 
+and (3) their interaction, and used \code{mu} to be the fitted values of the logistic 
 regression.}
 
 \item{Psi}{A matrix with \code{NNN} rows and \code{NNN} columns.  \code{Psi[n1, n2]} is the 
@@ -69,12 +69,12 @@ October 2005.
 \examples{
 bim = gatars_example$bim
 genotype = gatars_example$genotype
-fam = gatars_example$fam
+phenotype = gatars_example$phenotype
 target_markers = gatars_example$target_markers[3:5]
 Psi = gatars_example$Psi
 exclusion_region = gatars_example$exclusion_region
 
-NNN = nrow(fam)
+NNN = nrow(phenotype)
 first_ten = 1:10
 last_ten = NNN - (9:0)
 matrix_image_fn(Psi[c(first_ten, last_ten), c(first_ten, last_ten)],
@@ -86,12 +86,12 @@ list(target_markers = target_markers,
      rank = as.numeric(rankMatrix( genotype_target_markers)))
      
 set.seed(2)
-epsilon_on_log_scale = 0.02
+epsilon = 0.01
 sampling_set = gatars_sampling_set(
-    bim, epsilon_on_log_scale, exclusion_region,
+    bim, epsilon, exclusion_region,
     genotype, hotspot, target_markers)
 print(sampling_set)
 
 N_sim_reps = 10
-gatars(fam, Psi, sampling_set, N_sim_reps = 10)
+gatars(phenotype, Psi, sampling_set, N_sim_reps = 10)
 }
