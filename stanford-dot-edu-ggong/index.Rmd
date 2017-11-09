@@ -1,6 +1,6 @@
 
 ---
-title: "gatars version 0.2.10"
+title: "gatars version 0.2.12"
 author: ''
 output:
   html_document:
@@ -23,7 +23,7 @@ require(knitr)
 opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 8, tidy=FALSE)
 ```
 
-"2017-11-08 07:16:32 PST"
+"2017-11-09 09:36:00 PST"
 
 # Introduction {#intro}
 
@@ -51,7 +51,7 @@ matrix $G$ whose $(n,m)$-th component is the genotype $g_{nm}$ of the $n$-th sub
 target marker.
 
 The test statistics account for covariances among the components of $G$.  For pairwise 
-intermarker covariances (summarized by the $M \times M$ matrix $\Gamma$ in the manuscript). `gatars` uses the
+intermarker covariances (summarized by the $M \times M$ matrix $\Gamma$ in the manuscript) `gatars` uses the
 empirical covariances based on the genotypes of the $N$ subjects.  The user must provide the
 pairwise inter-personal correlation coefficients (summarized by the $N \times N$ matrix $\Psi$ in the
 manuscript).
@@ -99,13 +99,13 @@ If your installation was successful, you should see the message
 
 # Data required {#data-required}
 
-`gatars` requires quite large data, and typically, which can be organized in Plink (http://pngu.mgh.harvard.edu/~purcell/plink/).  We assume that you can bring your data into R and create the following data sets.
+`gatars` requires quite large amounts of data, and typically, which can be organized in Plink (http://pngu.mgh.harvard.edu/~purcell/plink/).  We assume that you can bring your data into R and create the following six data sets.
 
 ## `bim`
 
-A `data.frame` containing the three columns `chromosome`, `snp`, `bp` and 
+A `data.frame` containing the three columns `chromosome`, `snp`, `bp`, and 
 containing $L$ rows corresponding to the $M$ target markers and those used to build the
-sampling sets.  The $l$-th row of `bim` summarizes the $l$-th marker and corresponds to the $l$-th column of `genotype`(described below). The column labeled `chromosome` contains integers between $1$ and $22$ (other integers may be included, but only chromosomes $1$ through $22$` will be used), the `snp` column contains character strings that name the marker, and the `bp` column is contains integers giving the markers' positions (bp).  (Because the `gatars` data set `hotspot` (described below) is in Build hg38/GRCh38, `bp` must also be expressed in Build hg38/GRCh38.) 
+sampling sets.  The $l$-th row of `bim` summarizes the $l$-th marker and corresponds to the $l$-th column of `genotype` (described below). The column labeled `chromosome` contains integers between $1$ and $22$ (other integers may be included, but only chromosomes $1$ through $22$ will be used), the `snp` column contains character strings that name the marker, and the `bp` column contains integers giving the markers' bp positions.  (Because the `gatars` data set `hotspot` (described below) is given in Build hg38/GRCh38, `bp` must also be expressed in Build hg38/GRCh38.) 
 
 ## `genotype`
 
@@ -114,15 +114,15 @@ of $L$ markers. The $l$-th column of `genotype` corresponds to the $l$-th row of
 `genotype` could be obtained by reading in the `.bed` file from plink.  (Here we distinguish
 `genotype` (the $N \times L$ matrix whose columns correspond to the $M$ target markers AND the
 additional $L - M$ potential sampling set markers) from the $N \times M$ matrix $G$, described in the manuscript, containing just the $M$ target 
-markers.)
+markers).
 
 ## `target_markers`
 
-A vector that is a subset of the column `bim$snp`.  This vector identifies the target markers.
+A character vector that is a subset of the column `bim$snp`.  This vector identifies the target markers.
 
-## `phen`
+## `phenotype`
 
-A `data.frame` containing $N$ rows and the two column `y` and `mu` where `y` contains the subjects' coded phenotypes (either `0` or `1` if the trait is binary or a real number if the trait is quantitative) and whre `mu` contains the user-specified null trait prediction (a real number) for $y$.
+A `data.frame` containing $N$ rows and the two columns `y` and `mu` where `y` contains the subjects' coded phenotypes (either `0` or `1` if the trait is binary or a real number if the trait is quantitative) and where `mu` contains the user-specified null trait prediction (a real number) for $y$.
 
 ## `Psi` = $\Psi$
 
@@ -144,7 +144,8 @@ to the position of this marker.  `start` and `end` must be expressed in Build hg
 
 In addition, the `gatars` package provides the data set `hotspot` for your convenience.
 `hotspot contains the columns `chromosome`, `start`, and `end`. `chromosome` gives the 
-chromosome (an integer between $1$ and $22$); `start` and `end` give the extent of the recombination
+chromosome (an integer between $1$ and $22$) containing a given recombination hotspot; 
+`start` and `end` give the extent of the recombination
 hotspot (integers reflecting their Build hg38/GRCh38 bp positions).
 
 [TOP](#top)
@@ -153,8 +154,10 @@ hotspot (integers reflecting their Build hg38/GRCh38 bp positions).
 
 For illustration I will now use the example data set provided by `gatars`.
 You can access this example data with the following commands.
+
 ```{r}
 library(gatars)
+# Preparing the data
 bim = gatars_example$bim
 exclusion_region = gatars_example$exclusion_region
 genotype = gatars_example$genotype
@@ -207,9 +210,10 @@ str(phenotype)
 str(Psi)
 ```
 
-The following figure reflects the fact that the first `100` people are made up of `50` sib pairs, and the last `100` people` are independent.
+The following figure reflects the fact that the first `100` people are made up of `50` sib pairs, and the last `100` people are independent.
 
 ```{r Psi_picture, fig.height = 4, fig.width = 5}
+# figure to illustrate Psi
 NNN = nrow(phenotype)
 first_ten = 1:10
 last_ten = NNN - (9:0)
@@ -218,7 +222,7 @@ matrix_image_fn(Psi[c(first_ten, last_ten), c(first_ten, last_ten)],
 ```
 
 
-## `exclusion_region` is a `data.frame` containing  the columns `chromosome`, `begin`, and `end`
+## `exclusion_region` is a `data.frame` containing  the columns `chromosome`, `start`, and `end`
 
 ```{r}
 str(exclusion_region)
@@ -231,11 +235,12 @@ str(hotspot)
 ```
 
 
-# Check that your genotype matrix has full rank
+# Check that your genotype matrix has rank $M$
 
 `genotype_target_markers` is the $N \times M$ genotype matrix.
 
 ```{r}
+# Checking the rank of the genotype_target_markers matrix
 library(Matrix)
 genotype_target_markers = genotype[, target_markers]
 list(target_markers = target_markers,
@@ -250,9 +255,8 @@ Once you have your data in R, and you have checked that the column rank of your 
 
 Each column in `genotype` corresponds to a row in `bim`, and both correspond to a marker. After removing the target markers, we want to use the remaining markers to form $M$ sampling sets, one for each of the target markers. The two requirements for the markers in a sampling set are: 1) that they have MAFs matching that of the target marker; and 2) that they are independent of all target markers and all markers known to be trait-associated.
 
-We assume that the recombination hotspots divide the autosomal genome into independent segments, and so markers within two consecutive hotspots are independent of those within another two consecutive hotspots.  Also, we remove all segments containing any target markers or any markers defined by the `exclusion_region` data set.
-
-We calculate the empirical MAFs of the markers in the remaining segments, say that a marker's MAF matches the MAF $\pi_m$ of the $m$-th target marker if it is within
+Assuming that markers within two consecutive hotspots are independent of those within any other two consecutive hotspots, 
+the recombination hotspots divide the autosomal genome into independent segments.  Remove all segments containing any target markers or any markers defined by the `exclusion_region` data set. On the markers in the remaining segments, calculate the empirical MAFs and say that a marker's MAF matches the MAF $\pi_m$ of the $m$-th target marker if it is within
 $\pi_m \times \big[1 -$ `epsilon` $, 1 +$ `epsilon` $\big]$.  If the number of markers satisfying the matching requirement exceeds `1000`, `gatars` randomly chooses `1000`.
 
 
@@ -276,15 +280,14 @@ These objects have already been discussed in [An example data set](#example-data
 
 ### `epsilon` 
 
-A positive small real number used to parametrize the matching.
-
-When creating the $m$-th sampling set for target marker with minor allele frequency $\pi_m$, only those markers whose minor allele frequencies falling within the interval
+A positive small real number used to parametrize the matching.  When creating the $m$-th sampling set for target marker with minor allele frequency $\pi_m$, only those markers whose minor allele frequencies falling within the interval
 $\pi_m \times \big[1 -$ `epsilon` $, 1 +$ `epsilon` $\big]$ 
 can be included in the sampling set.
 
 ## Example calls to `gatars_sampling_set` 
 
 ```{r eval = TRUE}
+# Example calls to gatars_sampling_set
 set.seed(42)
 epsilon = 0.01
 exclusion_region = NULL
@@ -322,23 +325,36 @@ print(sampling_set)
 
 ## A description of `gatars`
 
-`gatars` calculates the p-values of the following seven statistics: the squared burden $Q_B$, the SKAT $Q_S$, the case based $Q_T$, and optimal linear combinations $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$. 
-The p-value of any linear combination of the basic statistics $Q_B$, $Q_S$, and $Q_T$  can be calculated using the `davies` function from the `CompQuadForm` package, but this theory no longer applies when a statistic is an optimal one in a universe of linear combinations. We obtain the null distribution of these optimal statistics by resorting to an innovative kind of simulation, which we call _Genome Resampling_. 
+Recall the notation from the manuscript: $G$ is the $N \times M$ genotype matrix of target markers, $y$ is the $N \times 1$ column vector of subjects’ coded trait phenotypes, and $\mu$ is the $N \times 1$ column vector of user-specified phenotype predictions. Any linear combination of the three basic statistics can be written as a quadratic form $Q(\alpha) = Z^T A(\alpha) Z$. Here $Z$ is a linear function of the two vectors $W G y$ and $W G \mu$, $W$ is a diagonal matrix whose user-specified diagonal components weight the target markers, $A(\alpha)$ is a square matrix that does not depend on $G$, and $\alpha = \big( \alpha_B, \alpha_S, \alpha_T \big)$  is a triple of coefficients that lie in the unit triangle shown in Figure 1 of the manuscript.  The limiting null distribution of $Z$ when $N$ is large is multivariate normal with mean and covariance matrix that involve the first two moments of $G$.
 
-Recall our notation:  $G$ is the $N \times M$ genotype matrix of target markers,  $y$ is the $N$-vector indicator for disease or a quantative measurement, and  `e_y` is an $N$-vector of trait predictions.
-Any linear combination of the basic statistics can be written as a quadratic form $Q(\alpha) = Z^T A(\alpha) Z$ where $Z$ is a linear function of the two vectors $W G y$ and $W G p$, $W$ is a diagonal matrix whose nonzero elements weight the target markers, $A(\alpha)$ is a square matrix that does not depend on $G$, and $\alpha$ are the coeffients of the linear combination of basic statistics.  $Z$ is a multivariate normal vector when $N$ is large, with mean $\mu$ and covariance matrix $\Sigma$ which depend on the first two moments of $G$. For a fixed value of $\alpha$, the `davies` function can calculate the p-value for $Q(\alpha)$. Each optimal statistic $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$ is a monotonoic (decreasing) function, $-\text{log}_{10}$, of the smallest p-value of $Q(\alpha)$ over a set of values of $\alpha$. 
+`gatars` calculates the P-values of the following seven statistics: the three
+basic statistics given by the squared burden $Q_B$, the SKAT $Q_S$ and the
+trait-based $Q_T$, and their four optimized linear combinations $Q_{BS}$, $Q_{BT}$, $Q_{ST}$,
+$Q_{BST}$. The significance level of the three basic statistics can be calculated
+using the `davies` function from the `CompQuadForm` package. However this function
+cannot be used for the remaining four statistics, each of which is optimized to
+produce the smallest P-value within specified constraints.  Instead, `gatars` estimates the
+significance levels of these statistics using *"genome resampling"*, as outlined
+below. (See the manuscript "Null distributions of test statistics" pp 4-5 and "B. Optimizing the data-adaptive statistics" pp 9-10 for details)
 
-To run a simulation to get the null distribution of an optimal statistic $Q_{\text{optimal}}$, we need to obtain simulated observations of a large number $S$ of replications of the genotype matrix $\Big\{\tilde{G}^{(1)}, \cdots, \tilde{G}^{(S)}\Big\}$. On the $s$-th simulated genotype matrix $\tilde{G}_s$, we calculate $Q(\alpha)$ over the set of values of $\alpha$ and obtain the optimal one $Q^{(s)}_{\text{optimal}}$. The p-value of $Q_{\text{optimal}}$ is the proportion of $\Big\{ Q^{(1)}_{\text{optimal}}, \cdots, Q^{(S)}_{\text{optimal}} \Big\}$ that exceed $Q_{\text{optimal}}$.
-
-The question becomes how to generate each $\tilde{G}^{(s)}$ so that it has the same distribution as the observed genotype matrix $G$ conditional on its following the null model? We propose _Genome Resampling_: Form $\tilde{G}^{(s)}$ by sampling one column from each sampling set created according to Section 
-[gatars-sampling-set](#gatars-sampling-set). 
+To estimate the limiting null distribution of an optimized $Q$-statistic, we 
+simulate  many null versions of the $Q$-statistic corresponding to a large number 
+$K$ of simulated null genotype matrices $\tilde{G}^{(1)}, \cdots, \tilde{G}^{(K)}$.  Specifically, for
+each $k$,  we construct the $N \times M$ matrix $\tilde{G}^{(k)}$ by sampling one column from each
+sampling set described in Section [gatars-sampling-set](#gatars-sampling-set).  Then, for the $k$-th
+simulated matrix $\tilde{G}^{(k)}$, we find the linear combination $\alpha^{k}$  having minimal nominal
+significance level $P_{\alpha^{k}}$  and store the transformed value $X_{\alpha^{k}} = - \text{log}_{10} \big( P_{\alpha^{k}} \big)$ . 
+We repeat this
+procedure $K$ times and estimate the significance level of the observed $Q$
+statistic to be the proportion of the $K$ transformed values $\Big\{X_{\alpha^k} \Big\}_{k = 1, \cdots, K}$ that exceed the
+observed transformed P-value corresponding to our $Q$ statistic.
 
 ## The arguments of `gatars`
 
 The following is the function header of `gatars` showing which arguments are needed and in which order.
 
 ```
-gatars(phenotype, Psi, sampling_set, N_sim_reps, weights)
+gatars(phenotype, Psi, sampling_set, N_simulated_nulls, weights)
 ```
 
 ### `phenotype` and `Psi` 
@@ -349,14 +365,14 @@ These objects have already been discussed in [An example data set](#example-data
 
 This object is the result of `gatars_sampling_set` and you may follow the example from [gatars-sampling-set](#gatars-sampling-set)
 
-### `N_sim_reps
+### `N_simulated_nulls =` $K$
 
-An positive integer which specifies the number of replications in the something.
+A positive integer which specifies the number of simulated null genotype matrices to generate to determine the p-value of the optimized statistics.
 
 
 ### `weights`
 
-A vector of length `MMM = 3`.  The entries in the vector are non-negative real numbers.  The size of the `m`-th entry reflects the importance of the `m`-th target marker. If `weights` is not specified, the function assume you would like equal weights among the `MMM` target markers.
+A vector of length equal to $M$ the length of `target_markers`.  The entries in the vector are non-negative real numbers.  The size of the `m`-th entry reflects the importance of the `m`-th target marker. If `weights` is not specified, the `gatars` assumes you would like equal weights among the $M$ target markers.
 
 [TOP](#top)
 
@@ -376,6 +392,8 @@ genotype = gatars_example$genotype
 phenotype = gatars_example$phenotype
 Psi = gatars_example$Psi
 target_markers = gatars_example$target_markers[3:5]
+
+# figure to illustrate Psi
 NNN = nrow(phenotype)
 first_ten = 1:10
 last_ten = NNN - (9:0)
@@ -388,7 +406,7 @@ genotype_target_markers = genotype[, target_markers]
 list(target_markers = target_markers,
      rank = as.numeric(rankMatrix( genotype_target_markers)))
 
-# Creating the sampling_set
+# Example calls to gatars_sampling_set
 set.seed(42)
 epsilon = 0.01
 exclusion_region = NULL
@@ -420,25 +438,24 @@ print(sampling_set)
 # Calling gatars 
 start = Sys.time()
 set.seed(42)
-gatars(phenotype, Psi, sampling_set, N_sim_reps = 100, weights = c(5, 3, 2))
+gatars(phenotype, Psi, sampling_set, N_simulated_nulls = 100, weights = c(5, 3, 2))
 elapsed_time = Sys.time() - start
 paste("100 sim reps used", 
       round(elapsed_time, 1), attributes(elapsed_time)$units)
 
 start = Sys.time()
 set.seed(42)
-gatars(phenotype, Psi, sampling_set, N_sim_reps = 1000, weights = c(5, 3, 2))
+gatars(phenotype, Psi, sampling_set, N_simulated_nulls = 1000, weights = c(5, 3, 2))
 elapsed_time = Sys.time() - start
 paste("1000 sim reps used", 
       round(elapsed_time, 1), attributes(elapsed_time)$units)
 
 start = Sys.time()
 set.seed(42)
-gatars(phenotype, Psi, sampling_set, N_sim_reps = 2000, weights = c(5, 3, 2))
+gatars(phenotype, Psi, sampling_set, N_simulated_nulls = 2000, weights = c(5, 3, 2))
 elapsed_time = Sys.time() - start
 paste("2000 sim reps used", 
       round(elapsed_time, 1), attributes(elapsed_time)$units)
-
 ```
 
 

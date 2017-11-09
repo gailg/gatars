@@ -1,0 +1,72 @@
+---
+title: "insert"
+author: ''
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: yes
+fontsize: 12pt
+---
+<A NAME="top"> </A>
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 8, tidy=FALSE)
+```
+
+
+
+
+
+Recall the notation from the manuscript: $G$ is the $N \times M$ genotype matrix of target markers, $y$ is the $N \times 1$ column vector of subjects’ coded trait phenotypes, and $\mu$ is the $N \times 1$ column vector of user-specified phenotype predictions. Any linear combination of the three basic statistics can be written as a quadratic form $Q(\alpha) = Z^T A(\alpha) Z$. Here $Z$ is a linear function of the two vectors $W G y$ and $W G p$, $W$ is a diagonal matrix whose user-specified diagonal components weight the target markers, $A(\alpha)$ is a square matrix that does not depend on $G$, and $\alpha = \big( \alpha_B, \alpha_S, \alpha_T \big)$  is a triple of coefficients that lie in the unit triangle shown in Figure 1 of the manuscript.  The limiting null distribution of $Z$ when $N$ is large is multivariate normal with mean and covariance matrix that involve the first two moments of $G$.
+
+`gatars` calculates the P-values of the following seven statistics: the three
+basic statistics given by the squared burden $Q_B$, the SKAT $Q_S$ and the
+trait-based $Q_T$, and their four optimized linear combinations $Q_{BS}$, $Q_{BT}$, $Q_{ST}$,
+$Q_{BST}$. The significance level of the three basic statistics can be calculated
+using the `davies` function from the `CompQuadForm` package. However this function
+cannot be used for the remaining four statistics, each of which is optimized to
+produce the smallest P-value given specified constraints.  Instead, `gatars` estimates the
+significance levels of these statistics using *genome resampling*, as outlined
+below. (See the manuscript "Null distributions of test statistics" pp 4-5 and "B. Optimizing the data-adaptive statistics" pp 9-10 for details)
+
+To estimate the limiting null distribution of an optimized $Q$-statistic, we 
+simulate  many null versions of the $Q$-statistic corresponding to a large number 
+$K$ of simulated null genotype matrices $\tilde{G}^{(1)}, \cdots, \tilde{G}^{(K)}$.  Specifically, for
+each $k$,  we construct the $N \times M$ matrix $\tilde{G}^{(k)}$ by sampling one column from each
+sampling set described in Section [gatars-sampling-set](#gatars-sampling-set).  Then, for the $k$-th
+simulated matrix $\tilde{G}^{(k)}$, we find the linear combination $\alpha^{k}$  having minimal nominal
+significance level $P_{\alpha^{k}}$  and store the transformed value $X_{\alpha^{k}} = - \text{log}_{10} \big( P_{\alpha^{k}} \big)$ . 
+We repeat this
+procedure $K$ times and estimate the significance level of the observed $Q$
+statistic to be the proportion of the $K$ transformed values $X_{\alpha^k}$ that exceed the
+observed transformed P-value corresponding to our $Q$ statistic.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

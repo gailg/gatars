@@ -7,7 +7,7 @@
 \alias{gatars}
 \title{Genetic Association Tests for Arbitrarily Related Subjects}
 \usage{
-gatars(phenotype, Psi, sampling_set, N_sim_reps, weights = NULL)
+gatars(phenotype, Psi, sampling_set, N_simulated_nulls, weights = NULL)
 }
 \arguments{
 \item{phenotype}{A data.frame containing \code{NNN} rows and at least the two columns
@@ -92,6 +92,6 @@ sampling_set = gatars_sampling_set(
     genotype, hotspot, target_markers)
 print(sampling_set)
 
-N_sim_reps = 10
-gatars(phenotype, Psi, sampling_set, N_sim_reps = 10)
+N_simulated_nulls = 10
+gatars(phenotype, Psi, sampling_set, N_simulated_nulls)
 }

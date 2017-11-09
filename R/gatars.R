@@ -38,7 +38,8 @@
 #' @template gatars_examples
 #' 
 #' @export
-gatars = function(phenotype, Psi, sampling_set, N_sim_reps, weights = NULL){
+gatars = function(phenotype, Psi, sampling_set, N_simulated_nulls, weights = NULL){
+  N_sim_reps = N_simulated_nulls
   params_sampling_set = sampling_set$params_sampling_set
   sampling_set = sampling_set$sampling_set
   alpha_uni_N_increments = 10

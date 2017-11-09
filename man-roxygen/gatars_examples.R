@@ -24,5 +24,5 @@
 #'     genotype, hotspot, target_markers)
 #' print(sampling_set)
 #' 
-#' N_sim_reps = 10
-#' gatars(phenotype, Psi, sampling_set, N_sim_reps = 10)
+#' N_simulated_nulls = 10
+#' gatars(phenotype, Psi, sampling_set, N_simulated_nulls)
