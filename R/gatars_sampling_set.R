@@ -1,47 +1,53 @@
 #' @title Create sampling sets for genome resampling
 #' 
 #' @description Each column in \code{genotype} corresponds to a row in \code{bim}, and both 
-#' correspond to a marker or snp. After removing the target markers and exclusion regions,
+#' correspond to a marker. After removing the target markers and exclusion regions,
+#' \code{gatars_sampling_set} uses the remaining markers to
 #' form \code{MMM} sampling sets, one for each of the target markers.  
-#' The two conditions we require of the sampling sets are \strong{the matching requirement:}
-#' the snps in the sampling set for a target marker has minor allele frequencies that 
-#' match closely with that of the target marker, and \strong{the independence requirement:}
-#' any snp from any sampling set is statistically independent of the target markers and any 
-#' marker in the exclusion regions.
+#' The two requirements for the markers in a sampling set are
+#' 1) that they have minor allele frequencies matching that of the target marker; and
+#' 2) that they are independent of all target markers and all markers known to be 
+#' trait-associated.
 #' 
-#' @details We assume that hotspots from Myers et.al. cut the genome into independent segments, 
-#' and so snps residing within two consecutive hotspots are independent of snps residing 
-#' within another two consecutive hotspots. Defining a segment to be a set of snps that 
-#' all lie within two consecutive hotspots, we obtain a (large) set of independent segments. 
-#' To satisfy \strong{the independence requirement} we need only remove any segments that
-#' contain target markers or any defined by the \code{exclusion region}.
+#' @details Assuming that markers within two consecutive hotspots are independent of those
+#' within any other two consecutive hotspots, the recombination hotspots divide the
+#' autosomal genome into independent segments.  Remove all segments containing any 
+#' target markers or any markers defined by the `exclusion_region` data set.
+#' On the markers in the remaining segments, calculate the empirical minor allele
+#' frequencies and say that a marker's minor allele frequency  matches 
+#' the minor allele frequency \code{pi[mmm]} of the 
+#' \code{mmm}-th target marker if it falls in the closed interval
+#' \code{pi[mmm] * [1 - epsilon, 1 + epsilon]}.  (If the number of markers satisfying the 
+#' matching requirement exceeds \code{1000}, \code{gatars} randomly chooses \code{1000}.)
+
 #' 
 #' @inheritParams params_sampling_set_fn
 #' 
-#' @return A list containing the following 11 objects
+#' @return A list containing the following objects
 #' \itemize{
 #' \item{\code{params_sampling_set}: } {
 #' A list containing objects that will be useful in the calculations of 
 #' the \code{gatars} function.
-#' The result (Value) of a call to \code{params_sampling_set}.  
+#' The result of a call to \code{params_sampling_set}.  
 #' See \code{\link{params_sampling_set_fn}}.
 #' }
 #' \item{\code{report}: } {
 #' A \code{data.frame} containing \code{MMM} rows and the columns
 #' \code{min}, \code{p_target}, \code{max}, and \code{set_size}.
-#' \code{min}/\code{max} contains the smallest/largest maf among
+#' \code{min}/\code{max} contains the smallest/largest 
+#' minor allele frequency among
 #' the columns in the \code{mmm}-th sampling set, \code{p_target}
-#' the maf of the \code{mmm}-th target marker, and \code{set_size}
+#' the minor allele frequency of the \code{mmm}-th target marker, and \code{set_size}
 #' the number of columns in the \code{mmm}-th sampling set.
 #' }
 #' \item{\code{sampling_set}: }{
-#' A list of \code{MMM} matrices, one matrix for each target snp.
+#' A list of \code{MMM} matrices, one matrix for each target marker.
 #' The \code{mmm}-th matrix is the sampling set for the \code{mmm}-th
-#' target snp and has \code{NNN} rows and up to 1000 columns, each 
+#' target marker and has \code{NNN} rows and up to code{1000} columns, each 
 #' column containing a column from \code{genotype}.  These columns
-#' do not intersect with any of the target snps or exclusion regions
-#' and the mafs of the columns in \code{mmm}-th sampling set match
-#' the maf of the \code{mmm}-th target snp.
+#' do not intersect with any of the target markers or exclusion regions
+#' and the minor allele frequencies of the columns in \code{mmm}-th sampling set match
+#' the minor allele frequency of the \code{mmm}-th target marker.
 #' }
 #' }
 #' 
@@ -51,6 +57,9 @@
 #'     bim, epsilon, exclusion_region,
 #'     genotype, hotspot, target_markers)
 #' print(sampling_set)
+#' names(sampling_set)
+#' names(sampling_set$params_sampling_set)
+#' sampling_set$report
 #' str(sampling_set$sampling_set)
 #' @export
 gatars_sampling_set = function(

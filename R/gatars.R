@@ -31,7 +31,7 @@
 #' for genome resampling, \code{gatars} creates "simulated genotype matrices" by sampling
 #' and cbinding together one column from each of the \code{MMM} matrices.  
 #' 
-#' @param N_sim_reps An integer equal to the number of "simulated genotype matrices to generate
+#' @param N_simulated_nulls An integer equal to the number of "simulated genotype matrices to generate
 #' when calculating the test sizes of the optimal statistics.
 
 
@@ -39,12 +39,12 @@
 #' 
 #' @export
 gatars = function(phenotype, Psi, sampling_set, N_simulated_nulls, weights = NULL){
-  N_sim_reps = N_simulated_nulls
+  N_simulated_nulls = N_simulated_nulls
   params_sampling_set = sampling_set$params_sampling_set
   sampling_set = sampling_set$sampling_set
   alpha_uni_N_increments = 10
   params = params_fn(
-    alpha_uni_N_increments, params_sampling_set, phenotype, Psi, sampling_set, N_sim_reps, weights)
+    alpha_uni_N_increments, params_sampling_set, phenotype, Psi, sampling_set, N_simulated_nulls, weights)
   ooo = uno_experimento_fn(params, calculate_optimized = TRUE)
   ooo
 }

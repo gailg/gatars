@@ -2,7 +2,7 @@
 genome_resampling_fn = function(
   alpha_uni,
   MMM,
-  N_sim_reps_interval,
+  N_simulated_nulls_interval,
   optimized_names,
   Phi,
   sampling_set,
@@ -11,14 +11,14 @@ genome_resampling_fn = function(
   y_1,
   y_2
 ){
-  simulated = data.frame(rep(NA, N_sim_reps_interval), 
-                         rep(NA, N_sim_reps_interval), 
-                         rep(NA, N_sim_reps_interval), 
-                         rep(NA, N_sim_reps_interval))
+  simulated = data.frame(rep(NA, N_simulated_nulls_interval), 
+                         rep(NA, N_simulated_nulls_interval), 
+                         rep(NA, N_simulated_nulls_interval), 
+                         rep(NA, N_simulated_nulls_interval))
   names(simulated) = optimized_names
   so_far_so_good = TRUE
   n_sim = 1
-  while(so_far_so_good & n_sim <= N_sim_reps_interval){
+  while(so_far_so_good & n_sim <= N_simulated_nulls_interval){
     still_looking_for_genotype_sim = TRUE
     N_bad_genotype_sim = 0
     while(still_looking_for_genotype_sim){

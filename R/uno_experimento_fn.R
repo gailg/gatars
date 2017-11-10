@@ -4,8 +4,8 @@ uno_experimento_fn = function(params, calculate_optimized){
   alpha_uni = params$alpha_uni
   g_target = params$g_target
   MMM = params$MMM
-  N_sim_reps_interval = params$N_sim_reps_interval
-  N_sim_reps_limit = params$N_sim_reps_limit
+  N_simulated_nulls_interval = params$N_simulated_nulls_interval
+  N_simulated_nulls_limit = params$N_simulated_nulls_limit
   theta_init = params$theta_init
   WWW = params$WWW
   y_1 = params$yyy
@@ -29,17 +29,17 @@ uno_experimento_fn = function(params, calculate_optimized){
     #--------------------------------------------------- p_value_optimized
     ooo = p_value_optimized_fn(
       adaptive_conf_level, alpha_uni, calculate_optimized, MMM, 
-      N_sim_reps_interval, N_sim_reps_limit, Phi, sampling_set,
+      N_simulated_nulls_interval, N_simulated_nulls_limit, Phi, sampling_set,
       test_size, theta, WWW, x_observed, y_1, y_2
     )
     so_far_so_good = ooo$so_far_so_good
-    N_sim_reps_required = ooo$N_sim_reps_required
+    N_simulated_nulls_required = ooo$N_simulated_nulls_required
     p_value_optimized = ooo$p_value_optimized
     #-------------------------------------------------------------- output
     if(so_far_so_good){
       p_value = c(p_value_basic, p_value_optimized)
       list(
-        N_sim_reps_required = N_sim_reps_required,
+        N_simulated_nulls_required = N_simulated_nulls_required,
         p_value = p_value,
         q = qqq,
         x = x_observed)

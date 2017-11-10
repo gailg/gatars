@@ -10,8 +10,10 @@
 #' and candidates for the sampling sets. The columns of \code{bim} 
 #' must contain  \code{chromosome}, \code{snp}, and \code{bp}, giving
 #' respectively,
-#' for each marker its chromosome number, its name, and its base-pair
-#' position (in bp units).  The object \code{bim} could be the 
+#' for each marker its chromosome number (an integer), 
+#' its name (a character string), and its base-pair
+#' position (an integer in bp units expressed in the same build as \code{hotspot}).  
+#' The object \code{bim} could be the 
 #' \code{.map} or \code{.bim} file from plink. 
 #' The \code{lll}-th row of \code{bim} corresponds to the \code{lll}-th column of 
 #' \code{genotype}.  
@@ -22,8 +24,8 @@
 #' For the \code{mmm}-th sampling set of a target marker with minor allele
 #' frequency \code{pi[mmm]}, only those markers whose minor allele frequencies fall
 #' in the interval \code{pi[mmm] * [1 - epsilon, 1 + epsilon]}
-#' are candidates for its the sampling set. In our simulations we set
-#' \code{epsilon} equal to 0.02.
+#' are candidates for the sampling set. In our simulations we set
+#' \code{epsilon} equal to 0.01.
 #' 
 #' @param exclusion_region A \code{data.frame} with one or several rows of the three
 #' columns \code{chromosome}, \code{start}, and \code{end}.  Each row of this
@@ -31,7 +33,7 @@
 #' with the binary or continuous trait.  
 #' The column \code{chromosome} is an integer between
 #' \code{1} and \code{22} and names in which chromosome the region lies, and \code{start}
-#' and \code{end} describe the starting and ending positions (in bp units) of the contiguous
+#' and \code{end} describe the starting and ending positions (integers in bp units) of the contiguous
 #' region.
 #' If the region consists of a single marker, then \code{start} and \code{end} should
 #' both be set equal to the position of this marker.  \code{start} and \code{end} must be 
@@ -41,12 +43,12 @@
 #' @param genotype A matrix with \code{NNN} rows and \code{LLL} columns, whose 
 #' \code{(nnn,lll)}-th element records either the number (0, 1 or 2) of minor alleles 
 #' of snp \code{lll} found in the \code{nnn}-th subject or an indicator (0 or 1) 
-#' for the \code{nnn}-th person carrying at least one minor allele of snp \code{lll}. 
+#' for the \code{nnn}-th person carrying at least one minor allele of marker \code{lll}. 
 #' The \code{lll}-th column of \code{genotype} corresponds to the \code{lll}-th row of 
 #' \code{bim}. The object \code{genotype} could be gotten by reading in the \code{.bed} file 
 #' from plink after massaging genotype information into either dosage or carriage. 
 #' (Distinguish the object \code{genotype} here, containing target markers AND 
-#' sampling set snps from the “genotype matrix” denoted by \eqn{G} in the manuscript, 
+#' sampling set markers from the “genotype matrix” denoted by \eqn{G} in the manuscript, 
 #' the matrix containing just the target markers.)
 #' 
 #' @param hotspot The \pkg{gatars} package provides this data set for your 

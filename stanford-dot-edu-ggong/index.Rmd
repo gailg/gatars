@@ -1,6 +1,6 @@
 
 ---
-title: "gatars version 0.2.12"
+title: "gatars version 0.2.13"
 author: ''
 output:
   html_document:
@@ -253,7 +253,7 @@ Once you have your data in R, and you have checked that the column rank of your 
 
 ## A description of how `gatars_sampling_set` builds the sampling sets
 
-Each column in `genotype` corresponds to a row in `bim`, and both correspond to a marker. After removing the target markers, we want to use the remaining markers to form $M$ sampling sets, one for each of the target markers. The two requirements for the markers in a sampling set are: 1) that they have MAFs matching that of the target marker; and 2) that they are independent of all target markers and all markers known to be trait-associated.
+Each column in `genotype` corresponds to a row in `bim`, and both correspond to a marker. After removing the target markers and exclusion regions, we want to use the remaining markers to form $M$ sampling sets, one for each of the target markers. The two requirements for the markers in a sampling set are: 1) that they have MAFs matching that of the target marker; and 2) that they are independent of all target markers and all markers known to be trait-associated.
 
 Assuming that markers within two consecutive hotspots are independent of those within any other two consecutive hotspots, 
 the recombination hotspots divide the autosomal genome into independent segments.  Remove all segments containing any target markers or any markers defined by the `exclusion_region` data set. On the markers in the remaining segments, calculate the empirical MAFs and say that a marker's MAF matches the MAF $\pi_m$ of the $m$-th target marker if it is within

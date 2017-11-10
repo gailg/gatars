@@ -5,7 +5,7 @@ params_fn = function(
   phenotype,
   Psi,
   sampling_set,
-  N_sim_reps,
+  N_simulated_nulls,
   weights = NULL
 ){
   adaptive_conf_level = 0.99
@@ -19,8 +19,8 @@ params_fn = function(
   row.names(alpha_uni) = NULL
   alpha_uni = alpha_uni/alpha_uni_N_increments
   
-  N_sim_reps_interval = N_sim_reps
-  N_sim_reps_limit = N_sim_reps
+  N_simulated_nulls_interval = N_simulated_nulls
+  N_simulated_nulls_limit = N_simulated_nulls
   rho_uni = seq(0, 1, by = 0.1)
   test_size = 0.01
   y_1 = yyy = phenotype$y
@@ -43,8 +43,8 @@ params_fn = function(
     g_target = params_sampling_set$g_target,
     MMM = params_sampling_set$MMM,
     NNN = params_sampling_set$NNN,
-    N_sim_reps_interval = N_sim_reps_interval,
-    N_sim_reps_limit = N_sim_reps_limit,
+    N_simulated_nulls_interval = N_simulated_nulls_interval,
+    N_simulated_nulls_limit = N_simulated_nulls_limit,
     Phi = Phi,
     rho_uni = rho_uni,
     sampling_set = sampling_set,
