@@ -27,7 +27,7 @@
 #' \itemize{
 #' \item{\code{params_sampling_set}: } {
 #' A list containing objects that will be useful in the calculations of 
-#' the \code{gatars} function.
+#' the \code{gatars_test_size} function.
 #' The result of a call to \code{params_sampling_set}.  
 #' See \code{\link{params_sampling_set_fn}}.
 #' }

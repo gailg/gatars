@@ -1,6 +1,6 @@
 #' @title Create sampling sets
 #' 
-#' @description For each target marker, gatars requires a sampling set,
+#' @description For each target marker, \code{gatars} requires a sampling set,
 #' a collection of columns from \code{genotype}.  Each sampling set
 #' must contain snps that (1) do not intersect with any of the target snps or 
 #' exclusion regions, and (2) have mafs (minor allele frequencies)

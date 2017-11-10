@@ -25,4 +25,4 @@
 #' print(sampling_set)
 #' 
 #' N_simulated_nulls = 10
-#' gatars(phenotype, Psi, sampling_set, N_simulated_nulls)
+#' gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls)

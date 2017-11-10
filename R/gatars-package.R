@@ -8,8 +8,8 @@
 #' 
 #' \code{gatars_sampling_set}: Create the sampling sets that are used in genome resampling.
 #' 
-#' \code{gatars}: Uses \code{davies} to calculate the p-values of the basic statistics,
-#'  and genome resampling to calculate the p-values of the optimal statistics.       
+#' \code{gatars_test_size}: Uses \code{davies} to calculate the p-values of the basic statistics,
+#'  and genome resampling to calculate the p-values of the optimized statistics.       
 #'   
 #' \code{matrix_image_fn}: A little helper function to display the Psi matrix.
 #' 

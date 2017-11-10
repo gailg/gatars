@@ -1,6 +1,6 @@
 
 ---
-title: "gatars version 0.2.13"
+title: "gatars version 0.2.15"
 author: ''
 output:
   html_document:
@@ -23,7 +23,7 @@ require(knitr)
 opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 8, tidy=FALSE)
 ```
 
-"2017-11-09 09:36:00 PST"
+"2017-11-10 13:06:33 PST"
 
 # Introduction {#intro}
 
@@ -321,19 +321,19 @@ print(sampling_set)
 
 [TOP](#top)
 
-# `gatars`
+# `gatars_test_size`
 
-## A description of `gatars`
+## A description of `gatars_test_size`
 
 Recall the notation from the manuscript: $G$ is the $N \times M$ genotype matrix of target markers, $y$ is the $N \times 1$ column vector of subjects’ coded trait phenotypes, and $\mu$ is the $N \times 1$ column vector of user-specified phenotype predictions. Any linear combination of the three basic statistics can be written as a quadratic form $Q(\alpha) = Z^T A(\alpha) Z$. Here $Z$ is a linear function of the two vectors $W G y$ and $W G \mu$, $W$ is a diagonal matrix whose user-specified diagonal components weight the target markers, $A(\alpha)$ is a square matrix that does not depend on $G$, and $\alpha = \big( \alpha_B, \alpha_S, \alpha_T \big)$  is a triple of coefficients that lie in the unit triangle shown in Figure 1 of the manuscript.  The limiting null distribution of $Z$ when $N$ is large is multivariate normal with mean and covariance matrix that involve the first two moments of $G$.
 
-`gatars` calculates the P-values of the following seven statistics: the three
+`gatars_test_size` calculates the P-values of the following seven statistics: the three
 basic statistics given by the squared burden $Q_B$, the SKAT $Q_S$ and the
 trait-based $Q_T$, and their four optimized linear combinations $Q_{BS}$, $Q_{BT}$, $Q_{ST}$,
 $Q_{BST}$. The significance level of the three basic statistics can be calculated
 using the `davies` function from the `CompQuadForm` package. However this function
 cannot be used for the remaining four statistics, each of which is optimized to
-produce the smallest P-value within specified constraints.  Instead, `gatars` estimates the
+produce the smallest P-value within specified constraints.  Instead, `gatars_test_size` estimates the
 significance levels of these statistics using *"genome resampling"*, as outlined
 below. (See the manuscript "Null distributions of test statistics" pp 4-5 and "B. Optimizing the data-adaptive statistics" pp 9-10 for details)
 
@@ -349,12 +349,12 @@ procedure $K$ times and estimate the significance level of the observed $Q$
 statistic to be the proportion of the $K$ transformed values $\Big\{X_{\alpha^k} \Big\}_{k = 1, \cdots, K}$ that exceed the
 observed transformed P-value corresponding to our $Q$ statistic.
 
-## The arguments of `gatars`
+## The arguments of `gatars_test_size`
 
-The following is the function header of `gatars` showing which arguments are needed and in which order.
+The following is the function header of `gatars_test_size` showing which arguments are needed and in which order.
 
 ```
-gatars(phenotype, Psi, sampling_set, N_simulated_nulls, weights)
+gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls, weights)
 ```
 
 ### `phenotype` and `Psi` 
@@ -372,12 +372,15 @@ A positive integer which specifies the number of simulated null genotype matrice
 
 ### `weights`
 
-A vector of length equal to $M$ the length of `target_markers`.  The entries in the vector are non-negative real numbers.  The size of the `m`-th entry reflects the importance of the `m`-th target marker. If `weights` is not specified, the `gatars` assumes you would like equal weights among the $M$ target markers.
+A vector of length equal to $M$ the length of `target_markers`.  The entries in the vector are non-negative real numbers.  The size of the `m`-th entry reflects the importance of the `m`-th target marker. If `weights` is not specified, the `gatars_test_size` assumes you would like equal weights among the $M$ target markers.
 
 [TOP](#top)
 
-## Example calls to `gatars`
+## Example calls to `gatars_test_size`
 
+```{r}
+
+```
 
 
 
@@ -435,24 +438,24 @@ sampling_set = gatars_sampling_set(
 print(previous_sampling_set)
 print(sampling_set)
 
-# Calling gatars 
+# Calling gatars_test_size 
 start = Sys.time()
 set.seed(42)
-gatars(phenotype, Psi, sampling_set, N_simulated_nulls = 100, weights = c(5, 3, 2))
+gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls = 100, weights = c(5, 3, 2))
 elapsed_time = Sys.time() - start
 paste("100 sim reps used", 
       round(elapsed_time, 1), attributes(elapsed_time)$units)
 
 start = Sys.time()
 set.seed(42)
-gatars(phenotype, Psi, sampling_set, N_simulated_nulls = 1000, weights = c(5, 3, 2))
+gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls = 1000, weights = c(5, 3, 2))
 elapsed_time = Sys.time() - start
 paste("1000 sim reps used", 
       round(elapsed_time, 1), attributes(elapsed_time)$units)
 
 start = Sys.time()
 set.seed(42)
-gatars(phenotype, Psi, sampling_set, N_simulated_nulls = 2000, weights = c(5, 3, 2))
+gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls = 2000, weights = c(5, 3, 2))
 elapsed_time = Sys.time() - start
 paste("2000 sim reps used", 
       round(elapsed_time, 1), attributes(elapsed_time)$units)

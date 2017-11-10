@@ -35,10 +35,10 @@
 #' when calculating the test sizes of the optimal statistics.
 
 
-#' @template gatars_examples
+#' @template gatars_test_size_examples
 #' 
 #' @export
-gatars = function(phenotype, Psi, sampling_set, N_simulated_nulls, weights = NULL){
+gatars_test_size = function(phenotype, Psi, sampling_set, N_simulated_nulls, weights = NULL){
   N_simulated_nulls = N_simulated_nulls
   params_sampling_set = sampling_set$params_sampling_set
   sampling_set = sampling_set$sampling_set
