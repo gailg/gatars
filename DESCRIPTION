@@ -1,11 +1,11 @@
 Package: gatars
 Type: Package
 Title: Genetic Association Tests for Arbitrarily Related Subjects
-Version: 0.2.14
+Version: 0.2.15
 Date: 2017-11-10
 Authors@R: as.person(c(
     "Gail Gong <gailgongster@gmail.com> [aut, cre]"))
-Description: Calculates the p-values of a family of statistics that test the association between specified genetic markers, called target markers, and a binary trait. The family includes the burden statistic, the linear kernel, statistic, a new case-based kernel statistic, and optimal ensembles formed by taking linear combinations of these three statistics. Allows imputed genotypes. New in this version: Uses one-segment-assign-many to create sampling sets.
+Description: Test the association between a specified set of M target markers and a binary or quantitative trait using subjects with any genealogical relationship.
 License: GPL-3
 LazyData: TRUE
 RoxygenNote: 6.0.1

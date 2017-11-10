@@ -33,10 +33,10 @@
 #' }
 #' \item{\code{report}: } {
 #' A \code{data.frame} containing \code{MMM} rows and the columns
-#' \code{min}, \code{p_target}, \code{max}, and \code{set_size}.
+#' \code{min}, \code{pi}, \code{max}, and \code{set_size}.
 #' \code{min}/\code{max} contains the smallest/largest 
 #' minor allele frequency among
-#' the columns in the \code{mmm}-th sampling set, \code{p_target}
+#' the columns in the \code{mmm}-th sampling set, \code{pi}
 #' the minor allele frequency of the \code{mmm}-th target marker, and \code{set_size}
 #' the number of columns in the \code{mmm}-th sampling set.
 #' }

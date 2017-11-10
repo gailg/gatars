@@ -1,6 +1,8 @@
 #' Genetic Association Tests for Arbitrarily Related Subjects
 #'
-#' Calculate the p-values of a family of statistics that test the association between a specifed set of genetic markers and a binary or quantitative trait.
+#' Test the association between a specified set of \code{MMM} target markers and a binary
+#' or quantitative trait using subjects with any genealogical relationship.
+#' v-0.2.15
 #' 
 #' \strong{The three functions used in \url{http://stanford.edu/~ggong/gatars/} are:}
 #' 

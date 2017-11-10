@@ -37,7 +37,9 @@ and cbinding together one column from each of the \code{MMM} matrices.}
 when calculating the test sizes of the optimal statistics.}
 }
 \description{
-Calculate the p-values of a family of statistics that test the association between a specifed set of genetic markers and a binary or quantitative trait.
+Test the association between a specified set of \code{MMM} target markers and a binary
+or quantitative trait using subjects with any genealogical relationship.
+v-0.2.15
 
 (Genetic Association Tests for Arbitrarily Related Subjects) 
 Calculate the p-values of a family of statistics that test the association between

@@ -85,7 +85,7 @@ sampling_set_fn = function(params_sampling_set){
     this_genotype = sampling_set[[mmm]]
     p_sim = unname(colMeans(this_genotype)/2)
     data.frame(min = round(min(p_sim), 5),
-               p_target = round(p_target[mmm], 5),
+               pi = round(p_target[mmm], 5),
                max = round(max(p_sim), 5),
                set_size = ncol(this_genotype))
   }))
