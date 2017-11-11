@@ -4,8 +4,8 @@
 \alias{matrix_image_fn}
 \title{Display a correlation type matrix}
 \usage{
-matrix_image_fn(the_matrix, main = "", legend_name = "",
-  vertical_line_after = NULL, horizontal_line_after = NULL, size = 3,
+matrix_image_fn(the_matrix, main = "", legend_title = "",
+  horizontal_line_after = NULL, vertical_line_after = NULL, size = 3,
   linetype = 3, xlab = "", ylab = "", row_ticks = 1:nrow(the_matrix),
   column_ticks = 1:ncol(the_matrix), legend_position = "right")
 }
@@ -13,10 +13,35 @@ matrix_image_fn(the_matrix, main = "", legend_name = "",
 \item{the_matrix}{The matrix you would like to display.}
 
 \item{main}{The title if you would like one.}
+
+\item{legend_title}{The title of the legend. A character string.}
+
+\item{horizontal_line_after}{If you would like to delineate the rows with a drawn
+line, you can specify an integer (or integers) an a line (or lines) will be drawn 
+below that row}
+
+\item{vertical_line_after}{Analogous to horizontal_line_after but for rows
+instead of columns}
+
+\item{size}{The size of the \code{vertical_line_after} and \code{horizontal_line_after}.
+A positive real numer.}
+
+\item{linetype}{A \code{ggplot2} linetype.  Examples are integers \code{1}, \code{2}, \code{3}, or 
+\code{"solid"}, \code{"dashed"}, \code{"dotted"}.}
+
+\item{xlab}{A character string specifying a label for the x-axis.}
+
+\item{ylab}{Analogous to xlab but for the y-axis.}
+
+\item{column_ticks}{Anagloous to \code{rowticks} but for columns.}
+
+\item{rowticks}{If you would like a different set of x-axis ticks to be labeled besides the 
+default ticks of \code{1:nrow(the_matrix)} specify a vector of integers.}
 }
 \description{
 \code{matrix_image_fn} uses \code{geom_tile} from \code{ggplot2} to display a 
-correlation type image in the orientation that I think a mathematician would
+correlation type image in the following orientation: x increases from left to right
+and y increases from top to bottom.
 expect.
 }
 \examples{
@@ -30,4 +55,13 @@ x3 = x + rnorm(NNN, 0, epsilon)
 independent_columns = matrix(rnorm(5 * NNN, 0, 1), ncol = 5)
 data = cbind(x1, x2, x3, independent_columns)
 matrix_image_fn(cor(data), "The correlation of some multivariate normal data")
+matrix_image_fn(cor(data), 
+main = "Showing other options",
+legend_title = "larry's legend",
+horizontal_line_after = 3,
+vertical_line_after = c(3, 5),
+size = 1, linetype = "dotdash",
+xlab = "George", ylab = "Harry",
+row_ticks = 1:3, column_ticks = 1:3,
+legend_position = "top")
 }
