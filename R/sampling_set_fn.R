@@ -2,22 +2,21 @@
 #' 
 #' @description For each target marker, \code{gatars} requires a sampling set,
 #' a collection of columns from \code{genotype}.  Each sampling set
-#' must contain snps that (1) do not intersect with any of the target snps or 
+#' must contain snps that (1) are independent of the target snps and 
 #' exclusion regions, and (2) have mafs (minor allele frequencies)
-#' that match the maf of its
-#' corresponding target snp.
+#' that match the maf of its corresponding target snp.
 #' 
-#' @param params_sampling_set, and in particular the objects 
-#' \code{epsilon}, \code{MMM}, and \code{p_target}.
+#' @param params_sampling_set and in particular the objects 
+#' \code{epsilon}, \code{genotype}, \code{MMM}, and \code{p_target}.
 #' See \code{\link{params_sampling_set_fn}}.
 #' 
 #' @return A \code{list} containing the following two objects
 #' \itemize{
 #' \item{\code{report}: } {
 #' A \code{data.frame} containing \code{MMM} rows and the columns
-#' \code{min}, \code{p_target}, \code{max}, and \code{set_size}.
-#' \code{min}/\code{max} contains the smallest/largest maf among
-#' the columns in the \code{mmm}-th sampling set, \code{p_target}
+#' \code{min}, \code{pi = p_target}, \code{max}, and \code{set_size}.
+#' \code{min},/\code{max} contains the smallest/largest maf among
+#' the columns in the \code{mmm}-th sampling set, \code{pi = p_target}
 #' the maf of the \code{mmm}-th target marker, and \code{set_size}
 #' the number of columns in the \code{mmm}-th sampling set.
 #' }
@@ -38,14 +37,18 @@
 #' exclusion_region = gatars_example$exclusion_region
 #' genotype = gatars_example$genotype
 #' target_markers = gatars_example$target_markers[3:5]
-#' set.seed(1)
 #' params_sampling_set = params_sampling_set_fn(
 #'   bim, epsilon, exclusion_region,
 #'   genotype, hotspot, target_markers)
 #' names(params_sampling_set)
+#' # If any of your sampling sets exceed 1000 in number
+#' # sampling_sets_fn will randomly choose 1000.
+#' # If you wish to replicate your results, set a seed
+#' # set.seed(1)
 #' sampling_set = sampling_set_fn(params_sampling_set)
 #' names(sampling_set)
 #' sampling_set$report
+#' str(sampling_set$sampling_set)
 #' 
 #' @export
 sampling_set_fn = function(params_sampling_set){
