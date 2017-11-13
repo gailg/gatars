@@ -23,7 +23,7 @@ require(knitr)
 opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 8, tidy=FALSE)
 ```
 
-"2017-11-10 13:06:33 PST"
+"2017-11-13 07:09:21 PST"
 
 # Introduction {#intro}
 
@@ -31,43 +31,24 @@ For comments or questions, please contact Gail Gong at gailgongster@gmail.com
 
 `gatars` is an acronym for "Genetic Association Tests for Arbitrarily Related Subjects"
 
-`gatars` tests the association between a specified set of $M$ genetic markers, called target 
-markers, and a binary or quantitative trait using subjects with any genealogical 
-relationship. The goal is to test the null hypothesis of no association between trait and 
-genotypes at the M target markers.  We condition on trait phenotypes and treat genotypes
-as random.  Test statistics include three "basic" statistics--the squared burden statistic $Q_B$,
-the sequence kernel association test (SKAT) statistic $Q_S$, and a new trait-based kernel
-statistic $Q_T$--as well as an ensemble of four statistics $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$ that optimize
-linear combinations of the three basic statistics.  All seven statistics are summarized in 
-Table 1 of the manuscript.
+`gatars` tests the association between a specified set of genetic markers, called target markers, and a binary or quantitative trait using subjects with any genealogical relationship by calculating the P-values of the following seven statistics: the three basic statistics given by the squared burden $Q_B$, the SKAT $Q_S$ and the trait-based $Q_T$, and their four optimized linear combinations $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$.
 
-The test statistics use obervations on $N$ subjects, who are sampled based on their
-phenotypes $y_n$ for a binary or quantitative trait, $n = 1, \cdots, N$.  The calculations require for
-each subject a vector $g_n = \big(g_{n1}, \cdots, g_{nM} \big)$ of coded genotypes at $M$ target markers, and a
-user-specified null trait prediction $\mu_n$ (for example $\mu_n$ can be the mean of the $N$ $y_n$ values
-or the value predicted from a logistic or linear regression of $y_n$ on nongenetic covariates
-and/or on principal components of ancestry.)  Define the genotype matrix to be the $N \times M$
-matrix $G$ whose $(n,m)$-th component is the genotype $g_{nm}$ of the $n$-th subject at the $m$-th 
-target marker.
+Recall the notation from the manuscript: $G$ is the $N \times M$ genotype matrix of target markers, $y$ is the $N \times 1$ column vector of subjects’ coded trait phenotypes, and $\mu$ is the $N \times 1$ column vector of user-specified phenotype predictions. Any linear combination of the three basic statistics can be written as a quadratic form $Q(\alpha) = Z^T A(\alpha) Z$. Here $Z$ is a linear function of the two vectors $W G y$ and $W G \mu$, $W$ is a diagonal matrix whose user-specified diagonal components weight the target markers, $A(\alpha)$ is a square matrix that does not depend on $G$, and $\alpha = \big( \alpha_B, \alpha_S, \alpha_T \big)$  is a triple of coefficients that lie in the unit triangle shown in Figure 1 of the manuscript.  The limiting null distribution of $Z$ when $N$ is large is multivariate normal with mean and covariance matrix that involve the first two moments of $G$.
 
-The test statistics account for covariances among the components of $G$.  For pairwise 
-intermarker covariances (summarized by the $M \times M$ matrix $\Gamma$ in the manuscript) `gatars` uses the
-empirical covariances based on the genotypes of the $N$ subjects.  The user must provide the
-pairwise inter-personal correlation coefficients (summarized by the $N \times N$ matrix $\Psi$ in the
-manuscript).
+The significance level $Q(\alpha)$ for any given $\alpha$ can be calculated using the `davies` function from the `CompQuadForm` package. Such $Q(\alpha)$ include the three basic statistics.  However `davies` cannot be directly used for the four optimized statistics, since these depend on data-driven $\alpha$'s. Instead, `gatars` estimates the significance levels of the optimized statistics using *genome resampling*.
 
-Testing the null hypothesis for the optimized statistics requires resampling from sets of
-markers located throughout the autosomal genome. `gatars` needs $M$ sampling sets, one for 
-each target marker, with the sampling set for the $m$-th target marker containing markers
-all of whose minor allele frequencies (MAFs) match that of target marker $m$.  The markers in
-the sampling sets should be independent of the target markers and of any markers known
-to be associated with the trait.  `gatars` can create these sampling sets provided the user
-supplies two data sets containing: (1) the $N$ subjects' genotypes at roughly 100,000
-markers located thoughout the autosomal genome; (2) the bp positions of any autosomal 
-markers known to be trait-assoicated.  `gatars` creates the sampling sets by dividing the
-human autosome into independent segments using the recombination hotspots identified
-by Myers et al (2005).  To do so, `gatars` has translated the base-pair positions of these 
-recombination hotspots to Build hg38/GRCh38.
+To estimate the limiting null distribution of an optimized $Q$-statistic, we simulate  many null versions of the $Q$-statistic corresponding to a large number $K$ of simulated null genotype matrices $\tilde{G}^{(1)}, \cdots, \tilde{G}^{(K)}$.  Specifically, for each $k$,  we construct the $N \times M$ matrix $\tilde{G}^{(k)}$ by sampling one column from each *sampling set*.  Then, for the $k$-th simulated matrix $\tilde{G}^{(k)}$, we find the linear combination $\alpha^{k}$  having minimal nominal significance level $P_{\alpha^{k}}$  and store the transformed value $X_{\alpha^{k}} = - \text{log}_{10} \big( P_{\alpha^{k}} \big)$ . We repeat this procedure $K$ times and estimate the significance level of the observed $Q$ statistic to be the proportion of the $K$ transformed values $\Big\{X_{\alpha^k} \Big\}_{k = 1, \cdots, K}$ that exceed the observed transformed P-value corresponding to the observed $Q$ statistic.
+
+To perform its calculations `gatars` requires the following input from the user:
+1) The binary or quantitative phenotype data $y_n$, $n = 1, \cdots, N$, of the $N$ subjects.
+2) A user-specified null trait prediction $\mu_n$ (for example $\mu_n$ can be the mean of the $N$ $y_n$ values or the value predicted from a logistic or linear regression of $y_n$ on nongenetic covariates and/or on principal components of ancestry).
+3) Coded genotypes $g_n = \big(g_{n1}, \cdots, g_{nM} \big)$ at $M$ target markers.
+4) The pairwise inter-personal correlation coefficients summarized by the $N \times N$ matrix $\Psi$ in the
+manuscript.
+5) The $N$ subjects' genotypes at roughly 100,000 markers located throughout the autosomal genome.
+6) The positions of any autosomal markers known to be trait-associated.
+
+
 
 [TOP](#top)
 
@@ -253,11 +234,11 @@ Once you have your data in R, and you have checked that the column rank of your 
 
 ## A description of how `gatars_sampling_set` builds the sampling sets
 
-Each column in `genotype` corresponds to a row in `bim`, and both correspond to a marker. After removing the target markers and exclusion regions, we want to use the remaining markers to form $M$ sampling sets, one for each of the target markers. The two requirements for the markers in a sampling set are: 1) that they have MAFs matching that of the target marker; and 2) that they are independent of all target markers and all markers known to be trait-associated.
+Testing the null hypothesis for the optimized statistics requires resampling from sets of markers located throughout the autosomal genome. `gatars` needs $M$ sampling sets, one for  each target marker, with the sampling set for the $m$-th target marker containing markers all of whose minor allele frequencies (MAFs) match that of target marker $m$.  The markers in the sampling sets should be independent of the target markers and of any markers known to be associated with the trait.  `gatars` can create these sampling sets provided the user supplies two data sets containing: (1) the $N$ subjects' genotypes at roughly 100,000 markers located thoughout the autosomal genome; (2) the bp positions of any autosomal  markers known to be trait-assoicated.  `gatars` creates the sampling sets by dividing the human autosome into independent segments using the recombination hotspots identified by Myers et al (2005).  To do so, `gatars` has translated the base-pair positions of theserecombination hotspots to Build hg38/GRCh38.
 
-Assuming that markers within two consecutive hotspots are independent of those within any other two consecutive hotspots, 
-the recombination hotspots divide the autosomal genome into independent segments.  Remove all segments containing any target markers or any markers defined by the `exclusion_region` data set. On the markers in the remaining segments, calculate the empirical MAFs and say that a marker's MAF matches the MAF $\pi_m$ of the $m$-th target marker if it is within
-$\pi_m \times \big[1 -$ `epsilon` $, 1 +$ `epsilon` $\big]$.  If the number of markers satisfying the matching requirement exceeds `1000`, `gatars` randomly chooses `1000`.
+Each column in `genotype` corresponds to a row in `bim`, and both correspond to a marker. After removing the target markers and exclusion regions, `gatars` uses the remaining markers to form $M$ sampling sets, one for each of the target markers. The two requirements for the markers in a sampling set are: 1) that they have MAFs matching that of the target marker; and 2) that they are independent of all target markers and all markers known to be trait-associated.
+
+Assuming that markers within two consecutive hotspots are independent of those within any other two consecutive hotspots, the recombination hotspots divide the autosomal genome into independent segments.  Remove all segments containing any target markers or any markers defined by the `exclusion_region` data set. On the markers in the remaining segments, calculate the empirical MAFs and say that a marker's MAF matches the MAF $\pi_m$ of the $m$-th target marker if it is within $\pi_m \times \big[1 -$ `epsilon` $, 1 +$ `epsilon` $\big]$.  If the number of markers satisfying the matching requirement exceeds `1000`, `gatars` randomly chooses `1000`.
 
 
 ## The arguments of `gatars_sampling_set`
@@ -325,29 +306,7 @@ print(sampling_set)
 
 ## A description of `gatars_test_size`
 
-Recall the notation from the manuscript: $G$ is the $N \times M$ genotype matrix of target markers, $y$ is the $N \times 1$ column vector of subjects’ coded trait phenotypes, and $\mu$ is the $N \times 1$ column vector of user-specified phenotype predictions. Any linear combination of the three basic statistics can be written as a quadratic form $Q(\alpha) = Z^T A(\alpha) Z$. Here $Z$ is a linear function of the two vectors $W G y$ and $W G \mu$, $W$ is a diagonal matrix whose user-specified diagonal components weight the target markers, $A(\alpha)$ is a square matrix that does not depend on $G$, and $\alpha = \big( \alpha_B, \alpha_S, \alpha_T \big)$  is a triple of coefficients that lie in the unit triangle shown in Figure 1 of the manuscript.  The limiting null distribution of $Z$ when $N$ is large is multivariate normal with mean and covariance matrix that involve the first two moments of $G$.
 
-`gatars_test_size` calculates the P-values of the following seven statistics: the three
-basic statistics given by the squared burden $Q_B$, the SKAT $Q_S$ and the
-trait-based $Q_T$, and their four optimized linear combinations $Q_{BS}$, $Q_{BT}$, $Q_{ST}$,
-$Q_{BST}$. The significance level of the three basic statistics can be calculated
-using the `davies` function from the `CompQuadForm` package. However this function
-cannot be used for the remaining four statistics, each of which is optimized to
-produce the smallest P-value within specified constraints.  Instead, `gatars_test_size` estimates the
-significance levels of these statistics using *"genome resampling"*, as outlined
-below. (See the manuscript "Null distributions of test statistics" pp 4-5 and "B. Optimizing the data-adaptive statistics" pp 9-10 for details)
-
-To estimate the limiting null distribution of an optimized $Q$-statistic, we 
-simulate  many null versions of the $Q$-statistic corresponding to a large number 
-$K$ of simulated null genotype matrices $\tilde{G}^{(1)}, \cdots, \tilde{G}^{(K)}$.  Specifically, for
-each $k$,  we construct the $N \times M$ matrix $\tilde{G}^{(k)}$ by sampling one column from each
-sampling set described in Section [gatars-sampling-set](#gatars-sampling-set).  Then, for the $k$-th
-simulated matrix $\tilde{G}^{(k)}$, we find the linear combination $\alpha^{k}$  having minimal nominal
-significance level $P_{\alpha^{k}}$  and store the transformed value $X_{\alpha^{k}} = - \text{log}_{10} \big( P_{\alpha^{k}} \big)$ . 
-We repeat this
-procedure $K$ times and estimate the significance level of the observed $Q$
-statistic to be the proportion of the $K$ transformed values $\Big\{X_{\alpha^k} \Big\}_{k = 1, \cdots, K}$ that exceed the
-observed transformed P-value corresponding to our $Q$ statistic.
 
 ## The arguments of `gatars_test_size`
 
