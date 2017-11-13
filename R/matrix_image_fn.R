@@ -22,7 +22,7 @@
 #' @param rowticks If you would like a different set of x-axis ticks to be labeled besides the 
 #' default ticks of \code{1:nrow(the_matrix)} specify a vector of integers.
 #' @param column_ticks Anagloous to \code{rowticks} but for columns.
-#' @legend_position Specifies the position for the legend.  This is the \code{legend_position}
+#' @param legend_position Specifies the position for the legend.  This is the \code{legend_position}
 #' from \code{ggplot2}.  Examples are \code{"none"}, \code{"left"}, \code{"right"}, \code{"bottom"},
 #' \code{"top"}
 #' @examples

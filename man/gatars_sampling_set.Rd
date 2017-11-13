@@ -8,62 +8,60 @@ gatars_sampling_set(bim, epsilon, exclusion_region, genotype, hotspot,
   target_markers)
 }
 \arguments{
-\item{bim}{A data.frame containing \code{LLL} rows corresponding to
-(a very large number of) \code{LLL} markers including the target markers
-and candidates for the sampling sets. The columns of \code{bim} 
-must contain  \code{chromosome}, \code{snp}, and \code{bp}, giving
-respectively,
-for each marker its chromosome number (an integer), 
-its name (a character string), and its base-pair
-position (an integer in bp units expressed in the same build as \code{hotspot}).  
-The object \code{bim} could be the 
-\code{.map} or \code{.bim} file from plink. 
-The \code{lll}-th row of \code{bim} corresponds to the \code{lll}-th column of 
-\code{genotype}.  
-\code{bp} must be expressed in the same build as \code{hotspot}, and if you 
-are using \code{hotspot} provided by \code{gatars} this build is hg38/GRCh38.}
+\item{bim}{A \code{data.frame} containing the three columns
+\code{chromosome}, \code{snp}, \code{bp}, and containing \code{LLL} rows 
+corresponding to the \code{MMM} target markers and those used to build
+the sampling sets. The \code{lll}-th row of \code{bim} summarizes the 
+\code{lll}-th marker and corresponds to the \code{lll}-th column of 
+\code{genotype} (described below).  The column labeled \code{chromosome} 
+contains integers between \code{1} and \code{22} (other integers may be 
+included, but only chromosomes \code{1} through \code{22} will be used),
+the \code{snp} column contains character strings that name the marker,
+and the \code{bp} column contains integers giving the markers' bp
+positions.  Because the \code{gatars} dat set \code{hotspot} (described
+below) is given in Build hg38/GRCh38, \code{bp} must also be expressed in
+Build hg38/GRCh38.) The object \code{bim} could be the 
+\code{.map} or \code{.bim} file from plink.}
 
-\item{epsilon}{A positive real number used to parametrize the matching.
-For the \code{mmm}-th sampling set of a target marker with minor allele
-frequency \code{pi[mmm]}, only those markers whose minor allele frequencies fall
-in the interval \code{pi[mmm] * [1 - epsilon, 1 + epsilon]}
-are candidates for the sampling set. In our simulations we set
+\item{epsilon}{A positive small real number used to determine if a marker
+can be included in a sampling set.
+When creating the \code{mmm}-th sampling set for a target marker with 
+minor allele frequency \code{pi[mmm]} only those markers whose minor allele 
+frequencies fall
+within the interval \code{pi[mmm] * [1 - epsilon, 1 + epsilon]}
+can be included in the sampling set. In our simulations, we set
 \code{epsilon} equal to 0.01.}
 
 \item{exclusion_region}{A \code{data.frame} with one or several rows of the three
-columns \code{chromosome}, \code{start}, and \code{end}.  Each row of this
-\code{data.frame} should reflect one contiguous genomic region known to be associated
-with the binary or continuous trait.  
-The column \code{chromosome} is an integer between
-\code{1} and \code{22} and names in which chromosome the region lies, and \code{start}
-and \code{end} describe the starting and ending positions (integers in bp units) of the contiguous
-region.
-If the region consists of a single marker, then \code{start} and \code{end} should
-both be set equal to the position of this marker.  \code{start} and \code{end} must be 
-expressed in Build hg38/GRCh38 for the same reason the column \code{bp} in
-\code{bim} must be expressed in Build hg38/GRCh38.}
+columns \code{chromosome}, \code{start}, and \code{end}.  Each row of
+\code{exclusion_region} reflects one contiguous genomic region known to be
+trait-associated and therefore a region used by \code{gatars} when creating the
+sampling sets.  The column \code{chromosome} is an integer between \code{1} and
+\code{22} identifying the autosomal choromosome containing the region, and
+\code{start} and \code{end} describe its starting and ending positions \code{bp}.
+If the region consists of a single marker, then \code{start} and \code{end}
+are both equal to the position of this marker.  \code{start} and \code{end}
+must be expressed in Build hg38/GRCh38.}
 
 \item{genotype}{A matrix with \code{NNN} rows and \code{LLL} columns, whose 
-\code{(nnn,lll)}-th element records either the number (0, 1 or 2) of minor alleles 
-of snp \code{lll} found in the \code{nnn}-th subject or an indicator (0 or 1) 
-for the \code{nnn}-th person carrying at least one minor allele of marker \code{lll}. 
-The \code{lll}-th column of \code{genotype} corresponds to the \code{lll}-th row of 
-\code{bim}. The object \code{genotype} could be gotten by reading in the \code{.bed} file 
-from plink after massaging genotype information into either dosage or carriage. 
-(Distinguish the object \code{genotype} here, containing target markers AND 
-sampling set markers from the “genotype matrix” denoted by \eqn{G} in the manuscript, 
-the matrix containing just the target markers.)}
+\code{(nnn,lll)}-th element records the \code{nnn}-th subject's coded genotype
+at the \code{lll}-th of \code{LLL} markers.  The \code{lll}-th column of 
+\code{genotype} corresponds to the \code{lll}-th row of \code{bim}.  The object
+\code{genotype} could be obtained by reading in the \code{.bed} file from
+plink.  (Here we distinguish \code{genotype} the \code{NNN} x \code{LLL} matrix
+whose columns correspond to the \code{MMM} target markers AND the
+additional \code{LLL - MMM} sampling set marker candidates) from the \code{NNN}
+x \code{MMM} matrix G, described in the manuscript, containing just the \code{MMM}
+target markers).}
 
-\item{hotspot}{The \pkg{gatars} package provides this data set for your 
-convenience.  This data.frame must contain (at least) the columns \code{chromosome},
-\code{start}, \code{center}, and \code{end};
- \code{chromosome} describes the chromosome number
-(\code{1, ..., 22}), and \code{start}, \code{center}, \code{end}
- describe the location of hotspots 
-(in bp units using Build hg38/GRCH38).}
+\item{hotspot}{\pkg{gatars} provides this data set for your convenience.
+This data.frame must contain (at least) the columns \code{chromosome},
+\code{start},  and \code{end}; \code{chromosome} gives the chromosome number
+(\code{1, ..., 22}), and \code{start}, and \code{end} give the extent of the 
+recombination hotspot (integers in bp units using Build hg38/GRCH38).}
 
 \item{target_markers}{A character vector of length \code{MMM} that is a subset 
-of the column \code{bim$snp}. This vector names the target markers.}
+of the column \code{bim$snp}. This vector identifies the target markers.}
 }
 \value{
 A list containing the following objects
@@ -95,24 +93,26 @@ the minor allele frequency of the \code{mmm}-th target marker.
 }
 }
 \description{
-Each column in \code{genotype} corresponds to a row in \code{bim}, and both 
-correspond to a marker. After removing the target markers and exclusion regions,
-\code{gatars_sampling_set} uses the remaining markers to
-form \code{MMM} sampling sets, one for each of the target markers.  
-The two requirements for the markers in a sampling set are
-1) that they have minor allele frequencies matching that of the target marker; and
-2) that they are independent of all target markers and all markers known to be 
-trait-associated.
+Testing the null hypothesis for the optimized statistics requires
+sampling sets which are sets of markers located throughout the autosomal
+genome satisfying some crucial conditions. \code{gatars_sampling_set} 
+creates \code{MMM} such sampling sets,  one for 
+for each target marker, with the sampling set for the \code{mmm}-th target 
+marker containing markers all of whose minor allele frequencies match that 
+of the \code{mmm}-th target marker and such that markers in the sampling 
+sets are independent of the target markers and of any markers known to be 
+associated with the trait.
 }
 \details{
-Assuming that markers within two consecutive hotspots are independent of those
-within any other two consecutive hotspots, the recombination hotspots divide the
-autosomal genome into independent segments.  Remove all segments containing any 
-target markers or any markers defined by the `exclusion_region` data set.
-On the markers in the remaining segments, calculate the empirical minor allele
-frequencies and say that a marker's minor allele frequency  matches 
-the minor allele frequency \code{pi[mmm]} of the 
-\code{mmm}-th target marker if it falls in the closed interval
+Each column in \code{genotype} corresponds to a row in \code{bim}, and both 
+correspond to a marker. Assuming that markers within two consecutive hotspots 
+are independent of those within any other two consecutive hotspots, the recombination 
+hotspots divide the autosomal genome contained in the columns of \code{genotype}
+into independent segments.  Remove all segments containing any target markers or 
+any markers defined by the \code{exclusion_region} data set. On the markers in the 
+remaining segments, calculate the empirical minor allele frequencies and say that 
+a marker's minor allele frequency  matches the minor allele frequency \code{pi[mmm]} 
+of the \code{mmm}-th target marker if it falls in the closed interval
 \code{pi[mmm] * [1 - epsilon, 1 + epsilon]}.  (If the number of markers satisfying the 
 matching requirement exceeds \code{1000}, \code{gatars} randomly chooses \code{1000}.)
 }

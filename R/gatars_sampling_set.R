@@ -1,22 +1,24 @@
 #' @title Create sampling sets for genome resampling
 #' 
-#' @description Each column in \code{genotype} corresponds to a row in \code{bim}, and both 
-#' correspond to a marker. After removing the target markers and exclusion regions,
-#' \code{gatars_sampling_set} uses the remaining markers to
-#' form \code{MMM} sampling sets, one for each of the target markers.  
-#' The two requirements for the markers in a sampling set are
-#' 1) that they have minor allele frequencies matching that of the target marker; and
-#' 2) that they are independent of all target markers and all markers known to be 
-#' trait-associated.
+#' @description Testing the null hypothesis for the optimized statistics requires
+#' sampling sets which are sets of markers located throughout the autosomal
+#' genome satisfying some crucial conditions. \code{gatars_sampling_set} 
+#' creates \code{MMM} such sampling sets,  one for 
+#' for each target marker, with the sampling set for the \code{mmm}-th target 
+#' marker containing markers all of whose minor allele frequencies match that 
+#' of the \code{mmm}-th target marker and such that markers in the sampling 
+#' sets are independent of the target markers and of any markers known to be 
+#' associated with the trait.
 #' 
-#' @details Assuming that markers within two consecutive hotspots are independent of those
-#' within any other two consecutive hotspots, the recombination hotspots divide the
-#' autosomal genome into independent segments.  Remove all segments containing any 
-#' target markers or any markers defined by the `exclusion_region` data set.
-#' On the markers in the remaining segments, calculate the empirical minor allele
-#' frequencies and say that a marker's minor allele frequency  matches 
-#' the minor allele frequency \code{pi[mmm]} of the 
-#' \code{mmm}-th target marker if it falls in the closed interval
+#' @details Each column in \code{genotype} corresponds to a row in \code{bim}, and both 
+#' correspond to a marker. Assuming that markers within two consecutive hotspots 
+#' are independent of those within any other two consecutive hotspots, the recombination 
+#' hotspots divide the autosomal genome contained in the columns of \code{genotype}
+#' into independent segments.  Remove all segments containing any target markers or 
+#' any markers defined by the \code{exclusion_region} data set. On the markers in the 
+#' remaining segments, calculate the empirical minor allele frequencies and say that 
+#' a marker's minor allele frequency  matches the minor allele frequency \code{pi[mmm]} 
+#' of the \code{mmm}-th target marker if it falls in the closed interval
 #' \code{pi[mmm] * [1 - epsilon, 1 + epsilon]}.  (If the number of markers satisfying the 
 #' matching requirement exceeds \code{1000}, \code{gatars} randomly chooses \code{1000}.)
 

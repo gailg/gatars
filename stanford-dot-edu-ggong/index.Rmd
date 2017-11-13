@@ -29,9 +29,7 @@ opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 8, tidy=FAL
 
 For comments or questions, please contact Gail Gong at gailgongster@gmail.com
 
-`gatars` is an acronym for "Genetic Association Tests for Arbitrarily Related Subjects"
-
-`gatars` tests the association between a specified set of genetic markers, called target markers, and a binary or quantitative trait using subjects with any genealogical relationship by calculating the P-values of the following seven statistics: the three basic statistics given by the squared burden $Q_B$, the SKAT $Q_S$ and the trait-based $Q_T$, and their four optimized linear combinations $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$.
+`gatars` ("Genetic Association Tests for Arbitrarily Related Subjects") tests the association between a specified set of genetic markers, called target markers, and a binary or quantitative trait using subjects with any genealogical relationship by calculating the P-values of the following seven statistics: the three basic statistics given by the squared burden $Q_B$, the SKAT $Q_S$ and the trait-based $Q_T$, and their four optimized linear combinations $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$.
 
 Recall the notation from the manuscript: $G$ is the $N \times M$ genotype matrix of target markers, $y$ is the $N \times 1$ column vector of subjects’ coded trait phenotypes, and $\mu$ is the $N \times 1$ column vector of user-specified phenotype predictions. Any linear combination of the three basic statistics can be written as a quadratic form $Q(\alpha) = Z^T A(\alpha) Z$. Here $Z$ is a linear function of the two vectors $W G y$ and $W G \mu$, $W$ is a diagonal matrix whose user-specified diagonal components weight the target markers, $A(\alpha)$ is a square matrix that does not depend on $G$, and $\alpha = \big( \alpha_B, \alpha_S, \alpha_T \big)$  is a triple of coefficients that lie in the unit triangle shown in Figure 1 of the manuscript.  The limiting null distribution of $Z$ when $N$ is large is multivariate normal with mean and covariance matrix that involve the first two moments of $G$.
 
@@ -84,18 +82,11 @@ If your installation was successful, you should see the message
 
 ## `bim`
 
-A `data.frame` containing the three columns `chromosome`, `snp`, `bp`, and 
-containing $L$ rows corresponding to the $M$ target markers and those used to build the
-sampling sets.  The $l$-th row of `bim` summarizes the $l$-th marker and corresponds to the $l$-th column of `genotype` (described below). The column labeled `chromosome` contains integers between $1$ and $22$ (other integers may be included, but only chromosomes $1$ through $22$ will be used), the `snp` column contains character strings that name the marker, and the `bp` column contains integers giving the markers' bp positions.  (Because the `gatars` data set `hotspot` (described below) is given in Build hg38/GRCh38, `bp` must also be expressed in Build hg38/GRCh38.) 
+A `data.frame` containing the three columns `chromosome`, `snp`, `bp`, andcontaining $L$ rows corresponding to the $M$ target markers and those used to build the sampling sets.  The $l$-th row of `bim` summarizes the $l$-th marker and corresponds to the $l$-th column of `genotype` (described below). The column labeled `chromosome` contains integers between $1$ and $22$ (other integers may be included, but only chromosomes $1$ through $22$ will be used), the `snp` column contains character strings that name the marker, and the `bp` column contains integers giving the markers' bp positions.  (Because the `gatars` data set `hotspot` (described below) is given in Build hg38/GRCh38, `bp` must also be expressed in Build hg38/GRCh38.) 
 
 ## `genotype`
 
-An $N \times L$ matrix, whose $(n,l)$-th element records the $n$-th subject's coded genotype at the $l$-th
-of $L$ markers. The $l$-th column of `genotype` corresponds to the $l$-th row of `bim`.  The object
-`genotype` could be obtained by reading in the `.bed` file from plink.  (Here we distinguish
-`genotype` (the $N \times L$ matrix whose columns correspond to the $M$ target markers AND the
-additional $L - M$ potential sampling set markers) from the $N \times M$ matrix $G$, described in the manuscript, containing just the $M$ target 
-markers).
+An $N \times L$ matrix, whose $(n,l)$-th element records the $n$-th subject's coded genotype at the $l$-th of $L$ markers. The $l$-th column of `genotype` corresponds to the $l$-th row of `bim`.  The object `genotype` could be obtained by reading in the `.bed` file from plink.  (Here we distinguish `genotype` (the $N \times L$ matrix whose columns correspond to the $M$ target markers AND the additional $L - M$ sampling set marker candidates) from the $N \times M$ matrix $G$, described in the manuscript, containing just the $M$ target markers).
 
 ## `target_markers`
 
@@ -107,34 +98,20 @@ A `data.frame` containing $N$ rows and the two columns `y` and `mu` where `y` co
 
 ## `Psi` = $\Psi$
 
-`Psi` is the $N \times N$ matrix of user-specified null correlation coefficients between pairs of subjects
-at any marker.  `Psi` can be estimated using known family pedigree structures and/or from the
-subjects' genotypes at markers independent of those in the target set in software packages
-such as KING (Manichaikul et al 2010).
+`Psi` is the $N \times N$ matrix of user-specified null correlation coefficients between pairs of subjects at any marker.  `Psi` can be estimated using known family pedigree structures and/or from the subjects' genotypes at markers independent of those in the target set in software packages such as KING (Manichaikul et al 2010).
 
 
 ## `exclusion_region`
 
-A `data.frame` with one or several rows of the three columns `chromosome`, `start`, and `end`. 
-Each row of this `exclusion_region` reflects one contiguous genomic region known to 
-be trait-associated and therefore a region used by `gatars` when creating the sampling sets.
-The column `chromosome` is an integer between `1` and `22` identifying the autosomal
-chromosome containing the region, and `start` and `end` describe its starting and ending 
-positions (bp).  If the region consists of a single marker, then `start` and `end` are both equal 
-to the position of this marker.  `start` and `end` must be expressed in Build hg38/GRCh38.
+A `data.frame` with one or several rows of the three columns `chromosome`, `start`, and `end`.  Each row of `exclusion_region` reflects one contiguous genomic region known to  be trait-associated and therefore a region used by `gatars` when creating the sampling sets. The column `chromosome` is an integer between `1` and `22` identifying the autosomal chromosome containing the region, and `start` and `end` describe its starting and ending  positions (bp).  If the region consists of a single marker, then `start` and `end` are both equal  to the position of this marker.  `start` and `end` must be expressed in Build hg38/GRCh38.
 
-In addition, the `gatars` package provides the data set `hotspot` for your convenience.
-`hotspot contains the columns `chromosome`, `start`, and `end`. `chromosome` gives the 
-chromosome (an integer between $1$ and $22$) containing a given recombination hotspot; 
-`start` and `end` give the extent of the recombination
-hotspot (integers reflecting their Build hg38/GRCh38 bp positions).
+In addition, the `gatars` package provides the data set `hotspot` for your convenience. `hotspot contains the columns `chromosome`, `start`, and `end`. `chromosome` gives the  chromosome (an integer between $1$ and $22$) containing a given recombination hotspot;  `start` and `end` give the extent of the recombination hotspot (integers reflecting their Build hg38/GRCh38 bp positions).
 
 [TOP](#top)
 
 # An example data set {#example-data-set}
 
-For illustration I will now use the example data set provided by `gatars`.
-You can access this example data with the following commands.
+For illustration I will now use the example data set provided by `gatars`. You can access this example data with the following commands.
 
 ```{r}
 library(gatars)
@@ -261,9 +238,8 @@ These objects have already been discussed in [An example data set](#example-data
 
 ### `epsilon` 
 
-A positive small real number used to parametrize the matching.  When creating the $m$-th sampling set for target marker with minor allele frequency $\pi_m$, only those markers whose minor allele frequencies falling within the interval
-$\pi_m \times \big[1 -$ `epsilon` $, 1 +$ `epsilon` $\big]$ 
-can be included in the sampling set.
+A positive small real number used to  used to determine if a marker can be included in a sampling set.  When creating the $m$-th sampling set for target marker with minor allele frequency $\pi_m$, only those markers whose minor allele frequencies fall within the interval
+$\pi_m \times \big[1 -$ `epsilon` $, 1 +$ `epsilon` $\big]$ can be included in the sampling set.
 
 ## Example calls to `gatars_sampling_set` 
 
