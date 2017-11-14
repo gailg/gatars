@@ -23,7 +23,7 @@ require(knitr)
 opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 8, tidy=FALSE)
 ```
 
-"2017-11-13 07:09:21 PST"
+"2017-11-13 20:34:39 PST"
 
 # Introduction {#intro}
 
@@ -33,9 +33,12 @@ For comments or questions, please contact Gail Gong at gailgongster@gmail.com
 
 Recall the notation from the manuscript: $G$ is the $N \times M$ genotype matrix of target markers, $y$ is the $N \times 1$ column vector of subjects’ coded trait phenotypes, and $\mu$ is the $N \times 1$ column vector of user-specified phenotype predictions. Any linear combination of the three basic statistics can be written as a quadratic form $Q(\alpha) = Z^T A(\alpha) Z$. Here $Z$ is a linear function of the two vectors $W G y$ and $W G \mu$, $W$ is a diagonal matrix whose user-specified diagonal components weight the target markers, $A(\alpha)$ is a square matrix that does not depend on $G$, and $\alpha = \big( \alpha_B, \alpha_S, \alpha_T \big)$  is a triple of coefficients that lie in the unit triangle shown in Figure 1 of the manuscript.  The limiting null distribution of $Z$ when $N$ is large is multivariate normal with mean and covariance matrix that involve the first two moments of $G$.
 
-The significance level $Q(\alpha)$ for any given $\alpha$ can be calculated using the `davies` function from the `CompQuadForm` package. Such $Q(\alpha)$ include the three basic statistics.  However `davies` cannot be directly used for the four optimized statistics, since these depend on data-driven $\alpha$'s. Instead, `gatars` estimates the significance levels of the optimized statistics using *genome resampling*.
+The significance level $Q(\alpha)$ for any given $\alpha$ can be calculated using the `davies` function from the `CompQuadForm` package. Such $Q(\alpha)$ include the three basic statistics.  However because the optimized statistics depend on data-driven $\alpha$'s, `davies` significance levels cannot be used for these statistics.  `gatars` estimates the significance levels of the optimized statistics using *genome resampling*.
 
-To estimate the limiting null distribution of an optimized $Q$-statistic, we simulate  many null versions of the $Q$-statistic corresponding to a large number $K$ of simulated null genotype matrices $\tilde{G}^{(1)}, \cdots, \tilde{G}^{(K)}$.  Specifically, for each $k$,  we construct the $N \times M$ matrix $\tilde{G}^{(k)}$ by sampling one column from each *sampling set*.  Then, for the $k$-th simulated matrix $\tilde{G}^{(k)}$, we find the linear combination $\alpha^{k}$  having minimal nominal significance level $P_{\alpha^{k}}$  and store the transformed value $X_{\alpha^{k}} = - \text{log}_{10} \big( P_{\alpha^{k}} \big)$ . We repeat this procedure $K$ times and estimate the significance level of the observed $Q$ statistic to be the proportion of the $K$ transformed values $\Big\{X_{\alpha^k} \Big\}_{k = 1, \cdots, K}$ that exceed the observed transformed P-value corresponding to the observed $Q$ statistic.
+To estimate the limiting null distribution of an optimized $Q$-statistic, `gatars` simulates  many null versions of the $Q$-statistic corresponding to a large number $K$ of simulated null genotype matrices $\tilde{G}^{(1)}, \cdots, \tilde{G}^{(K)}$.  Specifically, for each $k$, construct the $N \times M$ matrix $\tilde{G}^{(k)}$ by sampling one column from each *sampling set*, described below.  Then, for the $k$-th simulated matrix $\tilde{G}^{(k)}$, find the linear combination $\alpha^{k}$  having minimal nominal significance level $P_{\alpha^{k}}$  and store the transformed value $X_{\alpha^{k}} = - \text{log}_{10} \big( P_{\alpha^{k}} \big)$ . Repeat this procedure $K$ times and estimate the significance level of the observed $Q$ statistic to be the proportion of the $K$ transformed values $\Big\{X_{\alpha^k} \Big\}_{k = 1, \cdots, K}$ that exceed the observed transformed P-value corresponding to the observed $Q$ statistic.
+
+Given user-supplied genotypes for each subject at roughly 100,000 markers located throughout the autosomal genome, `gatars` creates $M$ sampling sets, one for each target marker, with the sampling set for the $m$-th target marker containing markers all of whose minor allele frequencies (MAFs) match that of that target marker.
+`gatars` also insures that the markers in the sampling sets are independent of target markers and markers supplied by the user that are known to be trait-associated. 
 
 To perform its calculations `gatars` requires the following input from the user:
 1) The binary or quantitative phenotype data $y_n$, $n = 1, \cdots, N$, of the $N$ subjects.
@@ -45,8 +48,6 @@ To perform its calculations `gatars` requires the following input from the user:
 manuscript.
 5) The $N$ subjects' genotypes at roughly 100,000 markers located throughout the autosomal genome.
 6) The positions of any autosomal markers known to be trait-associated.
-
-
 
 [TOP](#top)
 
@@ -84,13 +85,15 @@ If your installation was successful, you should see the message
 
 A `data.frame` containing the three columns `chromosome`, `snp`, `bp`, andcontaining $L$ rows corresponding to the $M$ target markers and those used to build the sampling sets.  The $l$-th row of `bim` summarizes the $l$-th marker and corresponds to the $l$-th column of `genotype` (described below). The column labeled `chromosome` contains integers between $1$ and $22$ (other integers may be included, but only chromosomes $1$ through $22$ will be used), the `snp` column contains character strings that name the marker, and the `bp` column contains integers giving the markers' bp positions.  (Because the `gatars` data set `hotspot` (described below) is given in Build hg38/GRCh38, `bp` must also be expressed in Build hg38/GRCh38.) 
 
+## `exclusion_region`
+
+A `data.frame` with one or several rows of the three columns `chromosome`, `start`, and `end`.  Each row of `exclusion_region` reflects one contiguous genomic region known to  be trait-associated and therefore a region used by `gatars` when creating the sampling sets. The column `chromosome` is an integer between `1` and `22` identifying the autosomal chromosome containing the region, and `start` and `end` describe its starting and ending  positions (bp).  If the region consists of a single marker, then `start` and `end` are both equal  to the position of this marker.  `start` and `end` must be expressed in Build hg38/GRCh38.
+
+In addition, `gatars` provides the data set `hotspot` for your convenience. `hotspot contains the columns `chromosome`, `start`, and `end`; `chromosome` gives the  chromosome (an integer between $1$ and $22$) containing a given recombination hotspot;  `start` and `end` give the extent of the recombination hotspot (integers reflecting their Build hg38/GRCh38 bp positions).
+
 ## `genotype`
 
 An $N \times L$ matrix, whose $(n,l)$-th element records the $n$-th subject's coded genotype at the $l$-th of $L$ markers. The $l$-th column of `genotype` corresponds to the $l$-th row of `bim`.  The object `genotype` could be obtained by reading in the `.bed` file from plink.  (Here we distinguish `genotype` (the $N \times L$ matrix whose columns correspond to the $M$ target markers AND the additional $L - M$ sampling set marker candidates) from the $N \times M$ matrix $G$, described in the manuscript, containing just the $M$ target markers).
-
-## `target_markers`
-
-A character vector that is a subset of the column `bim$snp`.  This vector identifies the target markers.
 
 ## `phenotype`
 
@@ -101,11 +104,11 @@ A `data.frame` containing $N$ rows and the two columns `y` and `mu` where `y` co
 `Psi` is the $N \times N$ matrix of user-specified null correlation coefficients between pairs of subjects at any marker.  `Psi` can be estimated using known family pedigree structures and/or from the subjects' genotypes at markers independent of those in the target set in software packages such as KING (Manichaikul et al 2010).
 
 
-## `exclusion_region`
 
-A `data.frame` with one or several rows of the three columns `chromosome`, `start`, and `end`.  Each row of `exclusion_region` reflects one contiguous genomic region known to  be trait-associated and therefore a region used by `gatars` when creating the sampling sets. The column `chromosome` is an integer between `1` and `22` identifying the autosomal chromosome containing the region, and `start` and `end` describe its starting and ending  positions (bp).  If the region consists of a single marker, then `start` and `end` are both equal  to the position of this marker.  `start` and `end` must be expressed in Build hg38/GRCh38.
 
-In addition, the `gatars` package provides the data set `hotspot` for your convenience. `hotspot contains the columns `chromosome`, `start`, and `end`. `chromosome` gives the  chromosome (an integer between $1$ and $22$) containing a given recombination hotspot;  `start` and `end` give the extent of the recombination hotspot (integers reflecting their Build hg38/GRCh38 bp positions).
+## `target_markers`
+
+A character vector of length $M$ that is a subset of the column `bim$snp`.  This vector identifies the target markers.
 
 [TOP](#top)
 

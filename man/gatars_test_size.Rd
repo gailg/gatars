@@ -2,7 +2,7 @@
 % Please edit documentation in R/gatars_test_size.R
 \name{gatars_test_size}
 \alias{gatars_test_size}
-\title{Test the association between \code{MMM} prespecified genetic markers and a trait}
+\title{Genetic Association Tests for Arbitrarily Related Subjects}
 \usage{
 gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls,
   weights = NULL)
@@ -38,10 +38,10 @@ and binding together one column from each of the \code{MMM} matrices.}
 when calculating the test sizes of the optimized statistics.}
 }
 \description{
-Calculate the p-values of a family of statistics to test the association between
-a specified set of \code{MMM} markers and a binary or quantitative trait.  
-These statistics include three basic 
-statistics--the squared burden statistic \eqn{Q_B}, the linear kernel (SKAT) statistic
+Test the association between a prespecified set of genetic markers, called target markers, 
+and a binary or quantitative trait using subjects with any genealogical relationship
+by calculating the p-values of the follwoing seven statistics: the three basic
+statistics given by the squared burden \code{Q_B}, the linear kernel (SKAT) statistic
 \eqn{Q_S}, and a new trait-based kernel statistic \eqn{Q_T}--as well as an ensemble of four
 statistics \eqn{Q_BS}, \eqn{Q_BT}, \eqn{Q_ST}, \eqn{Q_BST} that optimize linear combinations
 of the three basic statistics.  See \url{http://stanford.edu/~ggong/gatars/} for more details.

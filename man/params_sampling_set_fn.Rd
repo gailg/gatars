@@ -104,7 +104,7 @@ The number of rows of \code{genotype} and
 A vector of length \code{MMM} whose \code{mmm}-th
 element is the mean of the \code{mmm}-th column column of
 \code{g_target} divided by two. The website 
-\link{http://stanford.edu/~ggong/gatars/} refers to this
+\url{http://stanford.edu/~ggong/gatars/} refers to this
 vector as \code{pi}.
 }
 \item{\code{target_markers}: } {
