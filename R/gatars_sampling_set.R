@@ -2,11 +2,11 @@
 #' 
 #' @description Testing the null hypothesis for the optimized statistics requires
 #' sampling sets which are sets of markers located throughout the autosomal
-#' genome satisfying some crucial conditions. \code{gatars_sampling_set} 
+#' genome satisfying two requirements. \code{gatars_sampling_set} 
 #' creates \code{MMM} such sampling sets,  one for 
-#' for each target marker, with the sampling set for the \code{mmm}-th target 
-#' marker containing markers all of whose minor allele frequencies match that 
-#' of the \code{mmm}-th target marker and such that markers in the sampling 
+#' for each target marker, such that (1) the sampling set for the \code{mmm}-th target 
+#' marker contains markers all of whose minor allele frequencies match that 
+#' of the \code{mmm}-th target marker and (2) markers in the sampling 
 #' sets are independent of the target markers and of any markers known to be 
 #' associated with the trait.
 #' 
@@ -14,14 +14,16 @@
 #' correspond to a marker. Assuming that markers within two consecutive hotspots 
 #' are independent of those within any other two consecutive hotspots, the recombination 
 #' hotspots divide the autosomal genome contained in the columns of \code{genotype}
-#' into independent segments.  Remove all segments containing any target markers or 
+#' into independent segments.  \code{gatars_sampling_set} removes
+#'  all segments containing any target markers or 
 #' any markers defined by the \code{exclusion_region} data set. On the markers in the 
-#' remaining segments, calculate the empirical minor allele frequencies and say that 
+#' remaining segments, \code{gatars_sampling_set} calculates the empirical 
+#' minor allele frequencies and says that 
 #' a marker's minor allele frequency  matches the minor allele frequency \code{pi[mmm]} 
 #' of the \code{mmm}-th target marker if it falls in the closed interval
 #' \code{pi[mmm] * [1 - epsilon, 1 + epsilon]}.  (If the number of markers satisfying the 
-#' matching requirement exceeds \code{1000}, \code{gatars} randomly chooses \code{1000}.)
-
+#' matching requirement exceeds \code{1000}, \code{gatars_sampling_set} 
+#' randomly chooses \code{1000}.)
 #' 
 #' @inheritParams params_sampling_set_fn
 #' 
@@ -29,7 +31,7 @@
 #' \itemize{
 #' \item{\code{params_sampling_set}: } {
 #' A list containing objects that will be useful in the calculations of 
-#' the \code{gatars_test_size} function.
+#' \code{gatars_test_size}.
 #' The result of a call to \code{params_sampling_set}.  
 #' See \code{\link{params_sampling_set_fn}}.
 #' }
@@ -45,7 +47,7 @@
 #' \item{\code{sampling_set}: }{
 #' A list of \code{MMM} matrices, one matrix for each target marker.
 #' The \code{mmm}-th matrix is the sampling set for the \code{mmm}-th
-#' target marker and has \code{NNN} rows and up to code{1000} columns, each 
+#' target marker and has \code{NNN} rows and up to \code{1000} columns, each 
 #' column containing a column from \code{genotype}.  These columns
 #' do not intersect with any of the target markers or exclusion regions
 #' and the minor allele frequencies of the columns in \code{mmm}-th sampling set match

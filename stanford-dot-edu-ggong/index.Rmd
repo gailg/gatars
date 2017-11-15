@@ -3,19 +3,19 @@
 title: "gatars version 0.2.15"
 author: ''
 output:
-  html_document:
-    css: ~/Documents/headings.css
-    fig_caption: yes
-    highlight: default
-    number_sections: yes
-    theme: readable
+  word_document:
     toc: yes
   pdf_document:
     highlight: tango
     number_sections: yes
     pandoc_args: --variable=geometry:margin=0.75in
     toc: yes
-  word_document:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
     toc: yes
 fontsize: 12pt
 ---
@@ -25,7 +25,7 @@ require(knitr)
 opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 8, tidy=FALSE)
 ```
 
-"2017-11-13 20:34:39 PST"
+"2017-11-14 14:24:53 PST"
 
 # Introduction {#intro}
 
@@ -35,11 +35,9 @@ For comments or questions, please contact Gail Gong at gailgongster@gmail.com
 
 Recall the notation from the manuscript: $G$ is the $N \times M$ genotype matrix of target markers, $y$ is the $N \times 1$ column vector of subjects’ coded trait phenotypes, and $\mu$ is the $N \times 1$ column vector of user-specified phenotype predictions. Any linear combination of the three basic statistics can be written as a quadratic form $Q(\alpha) = Z^T A(\alpha) Z$. Here $Z$ is a linear function of the two vectors $W G y$ and $W G \mu$, $W$ is a diagonal matrix whose user-specified diagonal components weight the target markers, $A(\alpha)$ is a square matrix that does not depend on $G$, and $\alpha = \big( \alpha_B, \alpha_S, \alpha_T \big)$  is a triple of coefficients that lie in the unit triangle shown in Figure 1 of the manuscript.  The limiting null distribution of $Z$ when $N$ is large is multivariate normal with mean and covariance matrix that involve the first two moments of $G$.
 
-For any given fixed $\alpha$, the `davies` function from the `CompQuadForm` package can provide the significance level for $Q(\alpha)$, and therefore for any fixed linear combination of the three basic statistics, but the optimized statistics depend on data-driven $\alpha$'s.  `gatars` estimates the significance levels of the optimized statistics using *genome resampling*.
+For any given fixed $\alpha$, the `davies` function from the `CompQuadForm` package can provide the significance level for $Q(\alpha)$, and therefore for any fixed linear combination of the three basic statistics, but the optimized statistics depend on data-driven $\alpha$'s, so the nominal P-values from `davies` do not reflect the their true significance levels.  To estimate the limiting null distribution of an optimized $Q$-statistic, `gatars` uses *genome resampling*:  Simulate  many null versions of the $Q$-statistic corresponding to a large number $K$ of simulated null genotype matrices $\tilde{G}^{(1)}, \cdots, \tilde{G}^{(K)}$.  Specifically, for each $k$, construct the $N \times M$ matrix $\tilde{G}^{(k)}$ by sampling one column from each *sampling set*, described below.  Then, for the $k$-th simulated matrix $\tilde{G}^{(k)}$, find the linear combination $\alpha^{k}$  having minimal nominal significance level $P_{\alpha^{k}}$ and store the transformed value $X_{\alpha^{k}} = - \text{log}_{10} \big( P_{\alpha^{k}} \big)$ . Repeat this procedure $K$ times and estimate the significance level of the observed $Q$-statistic to be the proportion of the $K$ transformed values $\Big\{X_{\alpha^k} \Big\}_{k = 1, \cdots, K}$ that exceed the observed transformed P-value corresponding to the observed $Q$-statistic.
 
-To estimate the limiting null distribution of an optimized $Q$-statistic, `gatars` simulates  many null versions of the $Q$-statistic corresponding to a large number $K$ of simulated null genotype matrices $\tilde{G}^{(1)}, \cdots, \tilde{G}^{(K)}$.  Specifically, for each $k$, construct the $N \times M$ matrix $\tilde{G}^{(k)}$ by sampling one column from each *sampling set*, described below.  Then, for the $k$-th simulated matrix $\tilde{G}^{(k)}$, find the linear combination $\alpha^{k}$  having minimal nominal significance level $P_{\alpha^{k}}$ (the value reported by `davies`)  and store the transformed value $X_{\alpha^{k}} = - \text{log}_{10} \big( P_{\alpha^{k}} \big)$ . Repeat this procedure $K$ times and estimate the significance level of the observed $Q$-statistic to be the proportion of the $K$ transformed values $\Big\{X_{\alpha^k} \Big\}_{k = 1, \cdots, K}$ that exceed the observed transformed P-value corresponding to the observed $Q$-statistic.
-
-To create sampling sets, `gatars` requires the $N$ subjects' genotypes at roughly 100,000 markers located throughout the autosomal genome. `gatars` chooses from these markers to create $M$ sampling sets, one for each target marker, so that the following two requirements are satisfied: (1) the sampling set for the $m$-th target marker contains markers all of whose minor allele frequencies (MAFs) match the MAF of the $m$-th target marker, and (2)  the markers in the sampling sets are independent of all target markers and all markers known to be trait-associated. 
+To create sampling sets, `gatars` requires the $N$ subjects' genotypes at roughly 100,000 markers located throughout the autosomal genome. `gatars` chooses from these markers to create $M$ sampling sets, one for each target marker, so that the following two requirements are satisfied: (1) the sampling set for the $m$-th target marker contains markers all of whose minor allele frequencies (MAFs) match the MAF of the $m$-th target marker, and (2)  the markers in the sampling sets are independent of all target markers and all markers known to be trait-associated. (A MAF "matches" $\pi_m$  if it is within $\pi_m \times \big[1 -$ `epsilon` $, 1 +$ `epsilon` $\big]$.)
 
 To perform its calculations `gatars` requires the following input from the user:
 1) The binary or quantitative phenotype data $y_n$, $n = 1, \cdots, N$, of the $N$ subjects.
@@ -213,10 +211,6 @@ list(target_markers = target_markers,
 
 Once you have your data in R, and you have checked that the column rank of your genotype matrix $G =$ `genotype_target_markers` is $M$, use the function `gatars_sampling_set`  to create your sampling sets. 
 
-## A description of how `gatars_sampling_set` builds the sampling sets
-
-Each column in `genotype` corresponds to a row in `bim`, and both correspond to a marker. `gatars_sampling_set` creates the sampling sets by first dividing the markers in `genotype` into independent segments using the recombination hotspots identified by Myers et al (2005). After removing any segment containing any target markers or markers identified by `exclusion_region`, `gatars_sampling_set` uses the remaining markers to form $M$ sampling sets, one for each of the target markers. For the $m$-th sampling set `gatars_sampling_set`  includes only those markers whose minor allele frequencies (MAFs) match the MAF $\pi_m$ of the $m$-th target marker.  A MAF "matches" $\pi_m$  if it is within $\pi_m \times \big[1 -$ `epsilon` $, 1 +$ `epsilon` $\big]$.   If in any sampling set the number of matching markers exceeds `1000` , `gatars` randomly chooses `1000`.
-
 ## The arguments of `gatars_sampling_set`
 
 The following is the function header of `gatars_sampling_set` showing which arguments are needed and in which order.
@@ -279,10 +273,6 @@ print(sampling_set)
 
 # `gatars_test_size`
 
-## A description of `gatars_test_size`
-
-
-
 ## The arguments of `gatars_test_size`
 
 The following is the function header of `gatars_test_size` showing which arguments are needed and in which order.
@@ -313,10 +303,14 @@ A vector of length equal to $M$ the length of `target_markers`.  The entries in 
 ## Example calls to `gatars_test_size`
 
 ```{r}
-
+# Calling gatars_test_size 
+start = Sys.time()
+set.seed(42)
+gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls = 100, weights = c(5, 3, 2))
+elapsed_time = Sys.time() - start
+paste("100 sim reps used", 
+      round(elapsed_time, 1), attributes(elapsed_time)$units)
 ```
-
-
 
 # All the code in one place
 

@@ -2,9 +2,12 @@
 #' 
 #' @description 
 #' Test the association between a prespecified set of genetic markers, called target markers, 
-#' and a binary or quantitative trait using subjects with any genealogical relationship
-#' by calculating the p-values of the follwoing seven statistics: the three basic
-#' statistics given by the squared burden \code{Q_B}, the linear kernel (SKAT) statistic
+#' and a binary or quantitative trait  
+#' Calculate the p-values of a family of statistics to test the association between
+#' a specified set of \code{MMM} markers and a binary or quantitative trait using subjects
+#' with any genealogical relationship.
+#' These statistics include three basic 
+#' statistics--the squared burden statistic \eqn{Q_B}, the linear kernel (SKAT) statistic
 #' \eqn{Q_S}, and a new trait-based kernel statistic \eqn{Q_T}--as well as an ensemble of four
 #' statistics \eqn{Q_BS}, \eqn{Q_BT}, \eqn{Q_ST}, \eqn{Q_BST} that optimize linear combinations
 #' of the three basic statistics.  See \url{http://stanford.edu/~ggong/gatars/} for more details.

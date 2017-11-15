@@ -50,14 +50,15 @@ at the \code{lll}-th of \code{LLL} markers.  The \code{lll}-th column of
 \code{genotype} could be obtained by reading in the \code{.bed} file from
 plink.  (Here we distinguish \code{genotype} the \code{NNN} x \code{LLL} matrix
 whose columns correspond to the \code{MMM} target markers AND the
-additional \code{LLL - MMM} sampling set marker candidates) from the \code{NNN}
+additional \code{LLL - MMM} markers that are candidates for membership
+into sampling sets) from the \code{NNN}
 x \code{MMM} matrix G, described in the manuscript, containing just the \code{MMM}
 target markers).}
 
 \item{hotspot}{\pkg{gatars} provides this data set for your convenience.
 This data.frame must contain (at least) the columns \code{chromosome},
 \code{start},  and \code{end}; \code{chromosome} gives the chromosome number
-(\code{1, ..., 22}), and \code{start}, and \code{end} give the extent of the 
+(an integer in \code{1, ..., 22}), and \code{start}, and \code{end} give the extent of the 
 recombination hotspot (integers in bp units using Build hg38/GRCH38).}
 
 \item{target_markers}{A character vector of length \code{MMM} that is a subset 
