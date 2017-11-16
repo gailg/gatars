@@ -1,0 +1,189 @@
+---
+title: "01-getting-ready-for-bim_with_target_exclusion_regions_removed_fn"
+author: ""
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-09-16 07:35:24 PDT"
+
+Last knit was `r Sys.time()`
+
+# Show me the heads of `bim` and `hot`
+
+```{r}
+library(gatars)
+#--------------- Get ready to call the function
+bim = gatars_example$bim
+epsilon_on_log_scale = 0.01
+table(bim$chromosome)
+bim_for_chromosome_21 = bim[bim$chromosome == 21, ]
+hotspot_for_chromosome_21 = hotspot[hotspot$chromosome == 21, ]
+bim_this_chromosome = bim_for_chromosome_21
+hot = hotspot_for_chromosome_21
+
+head(bim_this_chromosome, 20)
+head(hot, 50)
+```
+
+# Gail doing it by hand and head
+
+From examination, the first two rows of `bim_this_chromosome` 
+```
+## 120204         21    exm1562123 10908883
+## 120206         21    exm1562172 10921939
+```
+
+fall before the first hotspot, 
+```
+## 24848         21 13227919 13223919 13231919
+```
+so they form an **independent segment (above)**.
+
+We can skip the next several rows of hotspot 
+```
+## 24849         21 13327919 13314919 13340919
+## 24850         21 13479419 13458919 13499919
+## 24851         21 13787419 13780919 13793919
+## 24852         21 13858419 13808919 13907919
+## 24853         21 13987919 13965919 14009919
+## 24854         21 14015919 14012919 14018919
+## 24855         21 14087919 14074919 14100919
+## 24856         21 14155919 14129919 14181919
+## 24857         21 14218419 14210919 14225919
+## 24858         21 14352919 14348919 14356919
+## 24859         21 14470419 14467919 14472919
+## 24860         21 14484919 14481919 14487919
+## 24861         21 14491419 14489919 14492919
+## 24862         21 14574919 14568919 14580919
+## 24863         21 14588419 14585919 14590919
+## 24864         21 14693919 14682919 14704919
+## 24865         21 14741419 14732919 14749919
+## 24866         21 14767919 14765919 14769919
+## 24867         21 14840919 14830919 14850919
+## 24868         21 14889919 14881919 14897919
+## 24869         21 15061919 15055919 15067919
+## 24870         21 15081419 15076919 15085919
+## 24871         21 15138419 15134919 15141919
+## 24872         21 15209420 15206920 15211920
+## 24873         21 15322921 15316921 15328921
+```
+
+because they don't intersect with the next bim
+```
+## 120211         21    exm1562439 15481365
+## 120217         21    exm1562489 15561435
+```
+
+The next two rows of hotspot are
+```
+## 24874         21 15470421 15467921 15472921
+## 24875         21 15496421 15493921 15498921
+```
+I see that the next **independent segment** is this
+```
+## 120211         21    exm1562439 15481365
+```
+because it lies between the above two hotspots.
+
+The next bim that has not been put into an independent segment or hotspot is
+```
+## 120217         21    exm1562489 15561435
+```
+and I see that it is in a **hotspot**
+```
+## 24876         21 15561921 15557921 15565921
+```
+
+The next set of bim are
+```
+## 120238         21    exm1562660 16337211
+## 120243         21    exm1562701 16338313
+## 120247         21    exm1562727 16338958
+## 120251         21    exm1562746 16339348
+## 120252         21    exm1562752 16339570
+## 120258         21    exm1562783 16340408
+```
+
+and hotspots that are close are
+```
+24886         21 16297419 16294919 16299919
+24887         21 16361420 16349919 16372920
+24888         21 16378420 16375920 16380920
+24889         21 16399420 16394920 16403920
+24890         21 16458920 16454920 16462920
+```
+
+So the next **independent segment** is
+
+```
+## 120238         21    exm1562660 16337211
+## 120243         21    exm1562701 16338313
+## 120247         21    exm1562727 16338958
+## 120251         21    exm1562746 16339348
+## 120252         21    exm1562752 16339570
+## 120258         21    exm1562783 16340408
+```
+
+
+The next bim are
+```
+## 120264         21 exm-rs2823357 16914905
+## 120267         21    exm1562801 17135220
+## 120268         21    exm1562825 17177447
+## 120270         21    exm1562881 17236674
+## 120278         21    exm2272958 18741831
+## 120280         21    exm1562991 18937978
+## 120283         21    exm2261006 19126079
+## 120285         21    exm1563047 19168978
+```
+
+
+and the hotspots close by are
+```
+## 24895         21 16850420 16847920 16852920
+## 24896         21 16930920 16928920 16932920
+## 24897         21 16980420 16966920 16993920
+```
+
+so the next **independent segment** is
+```
+## 120264         21 exm-rs2823357 16914905
+```
+and then the following fall outside the set of hotspots so they
+form the final **independent segment**
+```
+## 120267         21    exm1562801 17135220
+## 120268         21    exm1562825 17177447
+## 120270         21    exm1562881 17236674
+## 120278         21    exm2272958 18741831
+## 120280         21    exm1562991 18937978
+## 120283         21    exm2261006 19126079
+## 120285         21    exm1563047 19168978
+```
+# What does `independent_segment_fn` say?
+
+```{r}
+independent_segment_fn(bim_this_chromosome[1:20, ], 21, hot[1:50, ])
+```
+

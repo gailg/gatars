@@ -106,7 +106,9 @@ A vector of length \code{MMM} whose \code{mmm}-th
 element is the mean of the \code{mmm}-th column column of
 \code{g_target} divided by two. The website 
 \url{http://stanford.edu/~ggong/gatars/} refers to this
-vector as \code{pi}.
+vector as \code{pi}. Also, the object \code{report} from 
+\code{gatars_sampling_set} refers to the \code{p_target}
+column as \code{pi}.
 }
 \item{\code{target_markers}: } {
 The same as the input \code{target_markers}.
