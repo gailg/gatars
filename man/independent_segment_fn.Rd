@@ -12,7 +12,7 @@ independent_segment_fn(bim, chromosome, hotspot)
 \item{chromosome}{An integer equal to the chromosome number (1 through 22)
 of the chromosome you want to chop up.}
 
-\item{hotspot}{The hotspot object described in \code{link{gatars_sampling_set}}.}
+\item{hotspot}{The hotspot object described in \code{\link{gatars_sampling_set}}.}
 }
 \value{
 A list of \code{data.frame}'s, one \code{data.frame} for each
@@ -27,11 +27,43 @@ and (c) using \code{hotspot} cut up the remaining \code{bim}
 into independent segments.
 }
 \examples{
+# Calling independent_segment_fn on a "real" example".  
+# I will do it on chromosome = 21 because it is the shortest chromosome
 bim = gatars_example$bim
-chromosome = 21 # I chose 21 because in our example it is the shortest
+chromosome = 21 # 
 table(bim$chromosome)
 independent_segment_fn_answer = independent_segment_fn(bim, chromosome, hotspot)
 length(independent_segment_fn_answer)
 head(independent_segment_fn_answer)
+#
+# ---------------Use bim_teeny and hot_teeny for a more useful example
+# -------------- Get ready to call the independent_segment_fn
+bim = gatars_example$bim
+bim_for_chromosome_21 = bim[bim$chromosome == 21, ]
+hot_for_chromosome_21 = hotspot[hotspot$chromosome == 21, ]
+head(bim_for_chromosome_21, 20)
+head(hot_for_chromosome_21, 50)
+bim_teeny = bim_for_chromosome_21[1:13, ]
+hot_teeny = hot_for_chromosome_21[hot_for_chromosome_21$center \%in\% c(13227919, 15561921, 16361420), ]
+row.names(bim_teeny) = NULL
+row.names(hot_teeny) = NULL
+list(bim_teeny = bim_teeny, 
+     hot_teeny = hot_teeny)
+# -------------- hot_q tells me which bim row falls in which hot row
+hot_q = do.call(rbind, lapply(1:nrow(bim_teeny), function(jjj){
+  hot_teeny$start <=  bim_teeny$bp[jjj] & bim_teeny$bp[jjj] <= hot_teeny$end
+}))
+dimnames(hot_q) = list(
+  paste0("bim_", 1:nrow(hot_q)), paste0("hot_", 1:ncol(hot_q)))
+hot_q
+# -------------- and I see that bim_teeny row 3 falls in hot_teeny row 2
+bim_teeny_rows_in_hotspot = apply(hot_q, 1, any)
+bim_teeny_rows_in_hotspot
+bim_teeny_not_in_hotspot = bim_teeny[!bim_teeny_rows_in_hotspot, ]
+list(bim_teeny_not_in_hotspot = bim_teeny_not_in_hotspot,
+     hot_teeny = hot_teeny)
+# -------------- From inspection, I see that the independent segments should be
+# -------------- 1:2, 3, 5:12, and 13
+independent_segment_fn(bim_teeny, 21, hot_teeny)
 
 }

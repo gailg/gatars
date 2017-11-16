@@ -1,0 +1,79 @@
+---
+title: "03-get-a-teeny-example-for-bim_with_target_exclusion_regions_removed_fn"
+author: ""
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-11-16 07:31:30 PST"
+
+Last knit was `r Sys.time()`
+
+# `bim_teeny` and `hot_teeny`
+
+```{r}
+library(gatars)
+#--------------- Get ready to call the function
+bim = gatars_example$bim
+bim_for_chromosome_21 = bim[bim$chromosome == 21, ]
+hot_for_chromosome_21 = hotspot[hotspot$chromosome == 21, ]
+
+head(bim_for_chromosome_21, 20)
+head(hot_for_chromosome_21, 50)
+
+bim_teeny = bim_for_chromosome_21[1:13, ]
+hot_teeny = hot_for_chromosome_21[hot_for_chromosome_21$center %in% c(13227919, 15561921, 16361420), ]
+row.names(bim_teeny) = NULL
+row.names(hot_teeny) = NULL
+list(bim_teeny = bim_teeny, 
+     hot_teeny = hot_teeny)
+```
+
+# If you fall inside a hotspot you are out.
+
+```{r}
+# hot_q tells me which bim row falls in which hot row
+hot_q = do.call(rbind, lapply(1:nrow(bim_teeny), function(jjj){
+  hot_teeny$start <=  bim_teeny$bp[jjj] & bim_teeny$bp[jjj] <= hot_teeny$end
+}))
+dimnames(hot_q) = list(
+  paste0("bim_", 1:nrow(hot_q)), paste0("hot_", 1:ncol(hot_q)))
+hot_q
+# and I see that bim_teeny row 3 falls in hot_teeny row 2
+bim_teeny_rows_in_hotspot = apply(hot_q, 1, any)
+bim_teeny_rows_in_hotspot
+bim_teeny_not_in_hotspot = bim_teeny[!bim_teeny_rows_in_hotspot, ]
+list(bim_teeny_not_in_hotspot = bim_teeny_not_in_hotspot,
+     hot_teeny = hot_teeny)
+```
+
+# Use `hot_teeny` to chop up `bim_teeny_not_in_hotspot` 
+
+I get 1:2, 3, 5:12, 13.
+
+# See what `independent_segment_fn` has to say.
+
+```{r}
+independent_segment_fn(bim_teeny, 21, hot_teeny)
+```
+

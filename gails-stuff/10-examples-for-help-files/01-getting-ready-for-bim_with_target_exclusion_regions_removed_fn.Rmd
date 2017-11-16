@@ -25,7 +25,7 @@ opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FA
 
 `r getwd()`  
 
-"2017-09-16 07:35:24 PDT"
+"2017-11-16 07:31:30 PST"
 
 Last knit was `r Sys.time()`
 
