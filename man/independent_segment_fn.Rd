@@ -21,8 +21,8 @@ indpendent segment.  Each \code{data.frame} contains one or few rows from
 }
 \description{
 (a) Subset \code{bim} to just those
-inside \code{chromosome}, (b) discard the head and tail (those bp falling 
-outside the first and last hotspots of \code{chromosome}),
+inside \code{chromosome}, (b) discard any rows of sim
+that fall inside a hotspot,
 and (c) using \code{hotspot} cut up the remaining \code{bim} 
 into independent segments.
 }
