@@ -1,4 +1,4 @@
-#' @title The parameters that run the innards of gatars_sampling_set
+#' @title The parameters that run the innards of \code{gatars_sampling_set}
 #' 
 #' @description Most of the parameters used in gatars_sampling_set are 
 #' inputs that are passed through.  \code{g_target}, \code{p_target},
