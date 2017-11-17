@@ -2,7 +2,7 @@
 % Please edit documentation in R/params_sampling_set_fn.R
 \name{params_sampling_set_fn}
 \alias{params_sampling_set_fn}
-\title{The parameters that run the innards of gatars_sampling_set}
+\title{The parameters that run the innards of \code{gatars_sampling_set}}
 \usage{
 params_sampling_set_fn(bim, epsilon, exclusion_region, genotype, hotspot,
   target_markers)

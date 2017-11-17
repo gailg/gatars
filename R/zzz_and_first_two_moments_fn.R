@@ -1,5 +1,5 @@
 #' @export
-zzz_etc_fn = function(g_target, Phi, WWW, y_1, y_2){
+zzz_and_first_two_moments_fn = function(g_target, Phi, WWW, y_1, y_2){
   z_1 = as.vector(WWW %*% t(g_target) %*% y_1)
   z_2 = as.vector(WWW %*% t(g_target) %*% y_2)
   zzz = c(z_1, z_2)

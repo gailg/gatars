@@ -1,8 +1,8 @@
 Package: gatars
 Type: Package
 Title: Genetic Association Tests for Arbitrarily Related Subjects
-Version: 0.2.15
-Date: 2017-11-10
+Version: 0.2.16
+Date: 2017-11-17
 Authors@R: as.person(c(
     "Gail Gong <gailgongster@gmail.com> [aut, cre]"))
 Description: Test the association between a specified set of M target markers and a binary or quantitative trait using subjects with any genealogical relationship.

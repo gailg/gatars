@@ -1,7 +1,7 @@
 #' @export
 basic_and_optimized_lu_fn = function(alpha_uni, g_target, Phi, theta, WWW, y_1, y_2){
   # ---------------------------------------------------- zzz etc
-  zzz_etc = zzz_etc_fn(g_target, Phi, WWW, y_1, y_2)
+  zzz_etc = zzz_and_first_two_moments_fn(g_target, Phi, WWW, y_1, y_2)
   zzz = zzz_etc$zzz
   mu_z = zzz_etc$mu_z
   V_z = zzz_etc$V_z
