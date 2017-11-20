@@ -4,8 +4,8 @@
 \alias{params_fn}
 \title{The parameters that run the innards of \code{uno_experimento_fn}}
 \usage{
-params_fn(alpha_uni_N_increments, params_sampling_set, phenotype, Psi,
-  sampling_set, N_simulated_nulls, weights = NULL)
+params_fn(params_sampling_set, phenotype, Psi, sampling_set, N_simulated_nulls,
+  weights = NULL)
 }
 \arguments{
 \item{bim}{A \code{data.frame} containing the three columns

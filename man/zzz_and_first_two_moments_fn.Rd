@@ -60,9 +60,9 @@ genotype = gatars_example$genotype
 phenotype = gatars_example$phenotype
 Psi = gatars_example$Psi
 target_markers = gatars_example$target_markers[3:5]
-#
+
 g_target = genotype[, target_markers]
-#
+
 y_1 = yyy = phenotype$y
 y_2 = mu = phenotype$mu
 

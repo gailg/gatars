@@ -73,9 +73,7 @@ gatars_test_size = function(phenotype, Psi, sampling_set, N_simulated_nulls, wei
   N_simulated_nulls = N_simulated_nulls
   params_sampling_set = sampling_set$params_sampling_set
   sampling_set = sampling_set$sampling_set
-  alpha_uni_N_increments = 10
-  params = params_fn(
-    alpha_uni_N_increments, params_sampling_set, phenotype, Psi, sampling_set, N_simulated_nulls, weights)
+  params = params_fn(params_sampling_set, phenotype, Psi, sampling_set, N_simulated_nulls, weights)
   ooo = uno_experimento_fn(params, calculate_optimized = TRUE)
   ooo
 }

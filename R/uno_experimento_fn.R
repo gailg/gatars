@@ -1,7 +1,6 @@
 #' @export
 uno_experimento_fn = function(params, calculate_optimized){
   adaptive_conf_level = params$adaptive_conf_level
-  alpha_uni = params$alpha_uni
   g_target = params$g_target
   MMM = params$MMM
   N_simulated_nulls_interval = params$N_simulated_nulls_interval
@@ -17,7 +16,7 @@ uno_experimento_fn = function(params, calculate_optimized){
   answer = if (rankMatrix(g_target) < MMM) {
     list(message = "error--g_target not full rank")
   } else {
-    bo = basic_and_optimized_lu_fn(alpha_uni, g_target, Phi, theta_init, WWW, y_1, y_2)
+    bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2)
     p_value_basic = bo$p_value_basic
     p_value_basic = bo$p_value_basic
     q_basic = bo$q_basic
@@ -28,7 +27,7 @@ uno_experimento_fn = function(params, calculate_optimized){
     x_observed
     #--------------------------------------------------- p_value_optimized
     ooo = p_value_optimized_fn(
-      adaptive_conf_level, alpha_uni, calculate_optimized, MMM, 
+      adaptive_conf_level, calculate_optimized, MMM, 
       N_simulated_nulls_interval, N_simulated_nulls_limit, Phi, sampling_set,
       test_size, theta, WWW, x_observed, y_1, y_2
     )

@@ -1,38 +1,30 @@
 #' @export
-basic_and_optimized_lu_fn = function(alpha_uni, g_target, Phi, theta, WWW, y_1, y_2){
+basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2){
   # ---------------------------------------------------- zzz etc
   zzz_etc = zzz_and_first_two_moments_fn(g_target, Phi, WWW, y_1, y_2)
   zzz = zzz_etc$zzz
   mu_z = zzz_etc$mu_z
   V_z = zzz_etc$V_z
-  # -------------------------------------------------- basic_AAA
-  basic_ones = alpha_uni[apply(alpha_uni, 1, function(row){
-    sum(row == 0) > 1
-  }), ]
+  # ------------------------------------------------------ basic
+  basic_ones = data.frame(B = c(1, 0, 0),
+                          S = c(0, 1, 0),
+                          T = c(0, 0, 1))
+  rownames(basic_ones) = c("B", "S", "T")
   MMM = ncol(g_target)
   AAA_basic = lapply(1:nrow(basic_ones), function(jjj){
     alpha = basic_ones[jjj, ]
     AAA = AAA_fn(alpha$B, alpha$S, alpha$T, MMM)
     list(alpha = alpha, AAA = AAA)
   })
-  # ------------------------------------------------ df contains 
-  # ----------------------B, S, T (the three components of alpha
-  # ----------------------- as well as  q, and (nominal) p_value
-  df = do.call(rbind, lapply(1:nrow(alpha_uni), function(jjj){
-    alpha = alpha_uni[jjj, ]
+  basic = do.call(rbind, lapply(1:nrow(basic_ones), function(jjj){
+    alpha = basic_ones[jjj, ]
     AAA = AAA_fn(alpha$B, alpha$S, alpha$T, MMM)
     davies_answer = davies_fn(zzz, mu_z, V_z, AAA)
     cbind(alpha, davies_answer)
   }))
-  head(df)
   # ------------------------- basic is a data.frame that contains 
   # ------------------------ the quadratic form q and the p-value 
   # ----------------------- of the three basic statistics B, S, T
-  basic = rbind(df[df$B == 1, ],
-                df[df$S == 1, ],
-                df[df$T == 1, ])
-  rownames(basic) =  c("B", "S", "T")
-  basic
   # ----------------------------------------------------- BS
   p_value_BS_fn = function(alpha_B){
     AAA = AAA_fn(alpha_B, 1 - alpha_B, 0, MMM)

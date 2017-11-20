@@ -1,7 +1,6 @@
 #' @export
 p_value_optimized_fn = function(
   adaptive_conf_level,
-  alpha_uni, 
   calculate_optimized,
   MMM,
   N_simulated_nulls_interval,
@@ -22,7 +21,7 @@ p_value_optimized_fn = function(
     N_simulated_nulls_required = 0
     still_looking = TRUE
     while(still_looking){
-      sss = genome_resampling_fn(alpha_uni, MMM, N_simulated_nulls_interval, optimized_names, Phi, 
+      sss = genome_resampling_fn(MMM, N_simulated_nulls_interval, optimized_names, Phi, 
                                  sampling_set, theta, WWW, y_1, y_2)
       
       simulated = sss$simulated

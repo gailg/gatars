@@ -21,7 +21,6 @@
 #' \code{.map} or \code{.bim} file from plink. 
 #' @export
 params_fn = function(
-  alpha_uni_N_increments,
   params_sampling_set,
   phenotype,
   Psi,
@@ -30,16 +29,6 @@ params_fn = function(
   weights = NULL
 ){
   adaptive_conf_level = 0.99
-  rho_uni_times_10 = 0:alpha_uni_N_increments
-  alpha_uni_zero = expand.grid(
-    B = rho_uni_times_10,
-    S = rho_uni_times_10,
-    T = rho_uni_times_10)
-  alpha_uni_zero_sum = apply(alpha_uni_zero, 1, sum)
-  alpha_uni = alpha_uni_zero[alpha_uni_zero_sum == alpha_uni_N_increments, ]
-  row.names(alpha_uni) = NULL
-  alpha_uni = alpha_uni/alpha_uni_N_increments
-  
   N_simulated_nulls_interval = N_simulated_nulls
   N_simulated_nulls_limit = N_simulated_nulls
   rho_uni = seq(0, 1, by = 0.1)
@@ -59,7 +48,6 @@ params_fn = function(
   www = t(t(www))
   list(
     adaptive_conf_level = adaptive_conf_level,
-    alpha_uni = alpha_uni,
     mu = mu,
     g_target = params_sampling_set$g_target,
     MMM = params_sampling_set$MMM,
@@ -67,7 +55,6 @@ params_fn = function(
     N_simulated_nulls_interval = N_simulated_nulls_interval,
     N_simulated_nulls_limit = N_simulated_nulls_limit,
     Phi = Phi,
-    rho_uni = rho_uni,
     sampling_set = sampling_set,
     test_size = test_size,
     theta_init = theta_init,
