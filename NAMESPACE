@@ -3,6 +3,7 @@
 S3method(print,gatars_sampling_set)
 export(AAA_fn)
 export(Phi_fn)
+export(alpha_lu_fn)
 export(basic_and_optimized_lu_fn)
 export(bim_with_target_and_exclusion_regions_removed_fn)
 export(davies_fn)

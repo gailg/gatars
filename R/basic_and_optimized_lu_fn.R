@@ -1,3 +1,6 @@
+#` @title 
+
+
 #' @export
 basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2){
   # ---------------------------------------------------- zzz etc
@@ -67,7 +70,7 @@ basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2){
   counts_lu = lu$counts
   theta = lu$par
   BST_0 = c(alpha_lu_fn(theta), p_value = lu$value)
-  possibles = rbind(BST_0, basic[, names(basic) != "q"])
+  possibles = rbind(BST_0, BS_0, BT_0, ST_0, basic[, names(basic) != "q"])
   BST =  possibles[which.min(possibles$p_value), ]
   #----------------------------------------------------- optimized
   optimized_0 = as.data.frame(rbind(BS, BT, ST, BST))

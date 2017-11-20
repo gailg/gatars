@@ -1,7 +1,7 @@
 Package: gatars
 Type: Package
 Title: Genetic Association Tests for Arbitrarily Related Subjects
-Version: 0.2.17
+Version: 0.2.18
 Date: 2017-11-20
 Authors@R: as.person(c(
     "Gail Gong <gailgongster@gmail.com> [aut, cre]"))

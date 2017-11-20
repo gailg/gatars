@@ -1,3 +1,4 @@
+#' @export
 alpha_lu_fn = function(theta){
   a1 = cos(theta[1])^2
   a2 = ( sin(theta[1]) * cos(theta[2]) )^2

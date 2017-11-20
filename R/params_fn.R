@@ -36,7 +36,7 @@ params_fn = function(
   y_2 = mu = phenotype$mu
   Phi = Phi_fn(Psi, y_1, y_2)
   MMM = params_sampling_set$MMM
-  theta_init = rep(pi/3, 3)
+  theta_init = rep(pi/3, 2)
   www_num = if(!is.null(weights)){
     weights
   } else {
