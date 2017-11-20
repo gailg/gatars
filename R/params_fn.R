@@ -31,13 +31,12 @@ params_fn = function(
   adaptive_conf_level = 0.99
   N_simulated_nulls_interval = N_simulated_nulls
   N_simulated_nulls_limit = N_simulated_nulls
-  rho_uni = seq(0, 1, by = 0.1)
   test_size = 0.01
   y_1 = yyy = phenotype$y
   y_2 = mu = phenotype$mu
   Phi = Phi_fn(Psi, y_1, y_2)
   MMM = params_sampling_set$MMM
-  theta_init = rep(pi/3, 2)
+  theta_init = rep(pi/3, 3)
   www_num = if(!is.null(weights)){
     weights
   } else {

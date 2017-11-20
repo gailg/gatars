@@ -1,4 +1,55 @@
+#' @title Call \code{davies}
+#' 
+#' @description Given the random vector (of functions of genotypes)
+#' \code{Z} with mean vector \code{mu_z} and covariance matrix \code{V_z},
+#' and given the matrix \code{AAA} calculate the p-value for the
+#' statistic \code{q = t(zzz) AAA  zzz}. 
+#' \code{davies_fn} calculates the spectral decomposition of \code{q}
+#' to obtain the eigenvalues \code{lambda} and also the 
+#' noncentrality parameter \code{delta} that are required by \code{davies}
+#' of the \code{ComquadForm} package.
+#' 
+#' @param zzz A numerical vector of length \code{(2 * MMM)}, one of the objects returned by
+#' \code{zzz_and_first_two_moments_fn}.
+#' 
+#' @param mu_z A numerical vector of length \code{(2 * MMM)}, one of the objects
+#' returned by \code{zzz_and_first_two_moments_fn}.
+#' 
+#' @param V_z A numerical matrix of dimension \code{(2 * MMM)} by \code{(2 * MMM)},
+#' one of the objects returned by \code{zzz_and_first_two_moments_fn}.
+#' 
+#' @param AAA A numerical matrix of dimension \code{(2 * MMM)} by \code{(2 * MMM)}, 
+#' the object returned by \code{AAA_fn}.
+#' 
+#' @return A one-row data.frame containing the columns \code{q} and \code{p_value}.
+#' 
+#' @examples 
+#' bim = gatars_example$bim
+#' genotype = gatars_example$genotype
+#' phenotype = gatars_example$phenotype
+#' Psi = gatars_example$Psi
+#' target_markers = gatars_example$target_markers[3:5]
+#' g_target = genotype[, target_markers]
+#' MMM = ncol(g_target)
+#' NNN = nrow(g_target)
+#' e_g_target_1 = colMeans(g_target)
+#' p_target = e_g_target_1/2
+#' e_g_target = matrix(rep(e_g_target_1, nrow(g_target)), nrow = nrow(g_target), byrow = TRUE)
+#' y_1 = yyy = phenotype$y
+#' y_2 = mu = phenotype$mu
+#' Phi = Phi_fn(Psi, y_1, y_2)
+#' www_num = rep(1, MMM)
+#' www = www_num/sum(www_num) * MMM
+#' WWW = diag(www)
+#' zzz_etc = zzz_and_first_two_moments_fn(g_target, Phi, WWW, y_1, y_2)
+#' zzz = zzz_etc$zzz
+#' mu_z = zzz_etc$mu_z
+#' V_z = zzz_etc$V_z
+#' AAA = AAA_fn(1, 0, 0, MMM)
+#' davies_fn(zzz, mu_z, V_z, AAA)
+#' 
 #' @import CompQuadForm
+#' 
 #' @export
 davies_fn = function(zzz, mu_z, V_z, AAA){
   qqq = as.vector(t(zzz) %*% AAA %*% zzz)
