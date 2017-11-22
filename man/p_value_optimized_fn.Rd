@@ -46,6 +46,42 @@ do not intersect with any of the target markers or exclusion regions
 and the minor allele frequencies of the columns in \code{mmm}-th sampling set match
 the minor allele frequency of the \code{mmm}-th target marker. One of the objects
 returned by \code{gatars_sampling_set}.}
+
+\item{theta}{A vector of length \code{2} that is the initial value of the
+reparametrization of alpha when I am finding
+minimum p-value in the full triangle \code{(alpha_B, alpha_S, alpha_T)}}
+
+\item{WWW}{A diagonal (numerical) matrix of dimension \code{MMM} by \code{MMM}
+with the diagonals equal to the \code{weights}.  (The user will specify
+\code{weights} in her call to \code{gatars_test_size}.)}
+
+\item{x_observed}{A named numerical vector containing the x-values of the
+observed optimized statistics \code{BS}, \code{BT}, \code{ST} and \code{BST}.}
+
+\item{y_1}{A numerical vector of length \code{NNN} equal to what is referred
+to in the manuscript as \code{y}, the vector of subjects' coded trait 
+phenotypes.}
+
+\item{y_2}{A numerical vector of length \code{NNN} equal to what is referred
+to in the manuscript as \code{mu}, the vector of user-specified phenotype
+predictions.}
+}
+\value{
+A list containing the following objects
+\itemize{
+\item{\code{N_simulated_nulls_required}: } {
+A positive integer equal to the number of simulated nulls used to calculate the
+p_value_optimized.
+}
+\item{\code{p_value_optimized}: } {
+A named numerical vector containing the p-values of the optimized statistics.
+}
+\item{\code{so_far_so_good}: } {
+A logical equal to \code{TRUE} if all \code{N_simulated_nulls_required} replications
+of the simulated nulls successfully obtained a simulated genotype matrix
+of full rank (before 1000 bad tries).
+}
+}
 }
 \description{
 At its most basic level, \code{p_value_optimized_fn} generates a 
@@ -68,4 +104,55 @@ whether it is safe to abort.
 the very large number and internally sets 
 \code{N_simulated_nulls_interval} equal to \code{N_simulated_nulls_limit}
 equal to \code{N_simulated_nulls}.
+}
+\examples{
+library(Matrix)
+bim = gatars_example$bim
+genotype = gatars_example$genotype
+phenotype = gatars_example$phenotype
+Psi = gatars_example$Psi
+target_markers = gatars_example$target_markers[3:5]
+g_target = genotype[, target_markers]
+MMM = ncol(g_target)
+NNN = nrow(g_target)
+e_g_target_1 = colMeans(g_target)
+p_target = e_g_target_1/2
+e_g_target = matrix(rep(e_g_target_1, nrow(g_target)), nrow = nrow(g_target), byrow = TRUE)
+y_1 = yyy = phenotype$y
+y_2 = mu = phenotype$mu
+Phi = Phi_fn(Psi, y_1, y_2)
+www_num = rep(1, MMM)
+www = www_num/sum(www_num) * MMM
+WWW = diag(www)
+zzz_etc = zzz_and_first_two_moments_fn(g_target, Phi, WWW, y_1, y_2)
+zzz = zzz_etc$zzz
+mu_z = zzz_etc$mu_z
+V_z = zzz_etc$V_z
+AAA = AAA_fn(1, 0, 0, MMM)
+theta_init = rep(pi/3, 2)
+bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2)
+bo$xxx
+bo$theta
+theta = bo$theta
+x_observed = bo$xxx
+adaptive_conf_level = 0.01
+calculate_optimized = TRUE
+epsilon = 0.01
+exclusion_region = NULL
+sampling_set = gatars_sampling_set(
+  bim, epsilon, exclusion_region,
+  genotype, hotspot, target_markers)
+print(sampling_set)
+sampling_set = sampling_set$sampling_set
+str(sampling_set)
+set.seed(1)
+N_simulated_nulls = 100
+N_simulated_nulls_interval = N_simulated_nulls
+N_simulated_nulls_limit = N_simulated_nulls
+ooo = p_value_optimized_fn(
+  adaptive_conf_level, calculate_optimized, MMM, 
+  N_simulated_nulls_interval, N_simulated_nulls_limit, Phi, sampling_set,
+  theta, WWW, x_observed, y_1, y_2
+)
+ooo
 }

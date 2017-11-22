@@ -1,0 +1,175 @@
+---
+title: "16-rejuvenate_successes_fn"
+author: ""
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-11-20 15:50:11 PST"
+
+I now using gatars v-0.2.17
+
+Last knit was `r Sys.time()`
+
+```{r}
+library(gatars)
+library(Matrix)
+bim = gatars_example$bim
+genotype = gatars_example$genotype
+phenotype = gatars_example$phenotype
+Psi = gatars_example$Psi
+target_markers = gatars_example$target_markers[3:5]
+g_target = genotype[, target_markers]
+MMM = ncol(g_target)
+NNN = nrow(g_target)
+e_g_target_1 = colMeans(g_target)
+p_target = e_g_target_1/2
+e_g_target = matrix(rep(e_g_target_1, nrow(g_target)), nrow = nrow(g_target), byrow = TRUE)
+y_1 = yyy = phenotype$y
+y_2 = mu = phenotype$mu
+Phi = Phi_fn(Psi, y_1, y_2)
+www_num = rep(1, MMM)
+www = www_num/sum(www_num) * MMM
+WWW = diag(www)
+zzz_etc = zzz_and_first_two_moments_fn(g_target, Phi, WWW, y_1, y_2)
+zzz = zzz_etc$zzz
+mu_z = zzz_etc$mu_z
+V_z = zzz_etc$V_z
+AAA = AAA_fn(1, 0, 0, MMM)
+theta_init = rep(pi/3, 2)
+bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2)
+bo$xxx
+bo$theta
+theta = bo$theta
+x_observed = bo$xxx
+adaptive_conf_level = 0.01
+calculate_optimized = TRUE
+test_size = 0.01
+epsilon = 0.01
+exclusion_region = NULL
+sampling_set = gatars_sampling_set(
+  bim, epsilon, exclusion_region,
+  genotype, hotspot, target_markers)
+print(sampling_set)
+sampling_set = sampling_set$sampling_set
+str(sampling_set)
+set.seed(1)
+N_simulated_nulls_limit = 100
+N_simulated_nulls_interval = 20
+optimized_names = names(x_observed)
+
+successes = rep(0, length(x_observed))
+names(successes) = names(x_observed)
+N_simulated_nulls_required = 0
+still_looking = TRUE
+# inside a while loop that continues until still_looking is set to FALSE
+sss = genome_resampling_fn(MMM, N_simulated_nulls_interval, optimized_names, Phi, 
+                           sampling_set, theta, WWW, y_1, y_2)
+simulated = sss$simulated
+simulated
+x_observed
+x_observed["BST"] < simulated$BST
+so_far_so_good = sss$so_far_so_good
+
+uuu = rejuvenate_successes_fn(adaptive_conf_level, N_simulated_nulls_limit, N_simulated_nulls_required,
+                              optimized_names, simulated, so_far_so_good, successes, test_size, x_observed)
+uuu
+N_simulated_nulls_required = uuu$N_simulated_nulls_required
+successes = uuu$successes
+still_looking = uuu$still_looking
+```
+
+
+# inside `rejuvenate_successes_fn
+
+
+
+```{r}
+    more = unlist(sapply(optimized_names, function(this){
+      sum(simulated[[this]] > x_observed[[this]])
+    }, simplify = FALSE))
+    successes = successes + more
+    N_simulated_nulls_required = N_simulated_nulls_required + nrow(simulated)
+    inside_ambiguous =  lapply(successes, function(xxx){
+      ci = prop.test(xxx,
+                     N_simulated_nulls_required,
+                     conf.level = adaptive_conf_level)$conf.int
+    })
+    inside_ambiguous
+    ambiguous = any(sapply(successes, function(xxx){
+      ci = prop.test(xxx,
+                     N_simulated_nulls_required,
+                     conf.level = adaptive_conf_level)$conf.int
+      ci[1] <= .10
+    }))
+    still_looking = ambiguous && N_simulated_nulls_required < N_simulated_nulls_limit
+```
+
+```
+# rejuvenate_successes_fn = function(
+#   adaptive_conf_level,
+#   N_simulated_nulls_limit,
+#   N_simulated_nulls_required,
+#   optimized_names,
+#   simulated,
+#   so_far_so_good,
+#   successes,
+#   test_size,
+#   x_observed
+# ){
+  if(so_far_so_good){
+    more = unlist(sapply(optimized_names, function(this){
+      sum(simulated[[this]] > x_observed[[this]])
+    }, simplify = FALSE))
+    successes = successes + more
+    N_simulated_nulls_required = N_simulated_nulls_required + nrow(simulated)
+    ambiguous = any(sapply(successes, function(xxx){
+      ci = prop.test(xxx,
+                     N_simulated_nulls_required,
+                     conf.level = adaptive_conf_level)$conf.int
+      ci[1] <= .10
+    }))
+    still_looking = ambiguous && N_simulated_nulls_required < N_simulated_nulls_limit
+  } else { # prepare to jetison
+    still_looking = FALSE
+  }
+  list(
+    N_simulated_nulls_required = N_simulated_nulls_required,
+    successes = successes,
+    still_looking = still_looking)
+# }
+```
+`p_value_optimized_fn` estimates the p-values of the optimized statistics.  At its most basic level, this function generates a "large number" of simulated null statistics to compare to the observed. The p-value is the proportion of these simulated nulls that exceed the observed.  The user can specify how big to make "a large number". For the simulations, I added another level of control:  If after generating a moderate number of simulated nulls, it becomes obvious that the observed of all four optimized statistics is not going to be significant, there is no longer any need to continue to the big number that might be needed if at least one of the significance levels were close to the desired significance level.
+
+To specify "a very large number", use `N_simulated_nulls_limit`.
+To allow `p_value_optimized_fn` to abort when it becomes obvious that all four optimized statistics will not be significant,
+use `N_simulated_nulls_interval` to specify a moderate number of simulated nulls to calculate to get an idea of the significance level of each statistic.
+`gatars_test_size` allows the user to set `N_simulated_nulls` to be the very large number and then sets
+`N_simulated_nulls_interval = N_simulated_nulls_limit = N_simulated_nulls`.
+
+
+v-0.2.19
+I removed test_size from
+p_value_optimized_fn
+rejuvenate_successes_fn
+uno_experimento_fn
