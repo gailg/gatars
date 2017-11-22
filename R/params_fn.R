@@ -31,7 +31,6 @@ params_fn = function(
   adaptive_conf_level = 0.99
   N_simulated_nulls_interval = N_simulated_nulls
   N_simulated_nulls_limit = N_simulated_nulls
-  test_size = 0.01
   y_1 = yyy = phenotype$y
   y_2 = mu = phenotype$mu
   Phi = Phi_fn(Psi, y_1, y_2)
@@ -55,7 +54,6 @@ params_fn = function(
     N_simulated_nulls_limit = N_simulated_nulls_limit,
     Phi = Phi,
     sampling_set = sampling_set,
-    test_size = test_size,
     theta_init = theta_init,
     WWW = WWW,
     www = www,

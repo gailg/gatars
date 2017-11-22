@@ -100,7 +100,6 @@
 #' x_observed = bo$xxx
 #' adaptive_conf_level = 0.01
 #' calculate_optimized = TRUE
-#' test_size = 0.01
 #' epsilon = 0.01
 #' exclusion_region = NULL
 #' sampling_set = gatars_sampling_set(

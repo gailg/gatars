@@ -7,7 +7,6 @@ rejuvenate_successes_fn = function(
   simulated,
   so_far_so_good,
   successes,
-  test_size,
   x_observed
 ){
   if(so_far_so_good){

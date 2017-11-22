@@ -11,7 +11,6 @@ uno_experimento_fn = function(params, calculate_optimized){
   y_2 = params$mu
   Phi = params$Phi
   sampling_set = params$sampling_set
-  test_size = params$test_size
   theta_init = params$theta_init
   answer = if (rankMatrix(g_target) < MMM) {
     list(message = "error--g_target not full rank")
@@ -29,7 +28,7 @@ uno_experimento_fn = function(params, calculate_optimized){
     ooo = p_value_optimized_fn(
       adaptive_conf_level, calculate_optimized, MMM, 
       N_simulated_nulls_interval, N_simulated_nulls_limit, Phi, sampling_set,
-      test_size, theta, WWW, x_observed, y_1, y_2
+      theta, WWW, x_observed, y_1, y_2
     )
     so_far_so_good = ooo$so_far_so_good
     N_simulated_nulls_required = ooo$N_simulated_nulls_required
