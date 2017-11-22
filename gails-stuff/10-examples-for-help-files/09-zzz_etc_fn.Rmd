@@ -1,0 +1,95 @@
+---
+title: "07-basic_and_optimized_lu_fn"
+author: ""
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-11-17 09:07:47 PST"
+
+Last knit was `r Sys.time()`
+
+
+# Calculate $Z$ and its first two moments.
+
+In the manuscript, the first two moments are denoted $E_0(Z)$ and $Cov_0(Z)$ and are given by equation (8).
+
+In `gatars, the first two moments are denoted `mu_z` and `V_z`.
+
+
+```{r}
+library(gatars)
+# Preparing the data
+bim = gatars_example$bim
+genotype = gatars_example$genotype
+phenotype = gatars_example$phenotype
+Psi = gatars_example$Psi
+target_markers = gatars_example$target_markers[3:5]
+
+g_target = genotype[, target_markers]
+
+y_1 = yyy = phenotype$y
+y_2 = mu = phenotype$mu
+
+Phi = Phi_fn(Psi, y_1, y_2)
+Phi
+MMM = length(target_markers)
+WWW =  diag(rep(1, MMM))
+
+zzz_etc = zzz_and_first_two_moments_fn(g_target, Phi, WWW, y_1, y_2)
+zzz_etc
+str(zzz_etc)
+```
+
+
+`z_etc_fn` should be renamed `z_and_first_two_moments_fn`
+
+In the notation of the web site, 
+
+`g_target` is the genotype matrix $G$ in the manuscript.
+
+`y_1` is `phenotype$y` or $y$ the $N \times 1$ column vector of subjects' coded trait phenotypes.      
+
+`y_2` is `phenotype$mu`or $\mu$ the $N \times 1$ column vector of user-specified phenotype predictions.   
+
+`WWW` is $W$ the diagonal matrix whose user-specifed diagonal components weight the target markers.     
+
+`Phi` `Phi_{k_1, k_2} = y_{k_1} Psi y_k_2`.  In the manuscript, equation 8,  `V_z = kronecker(Phi, W_VG_W)`.
+
+```
+Phi_fn = function(Psi, y_1, y_2){
+  Phi_11 = t(y_1) %*% Psi %*% y_1
+  Phi_12 = t(y_1) %*% Psi %*% y_2
+  Phi_22 = t(y_2) %*% Psi %*% y_2
+  Phi = matrix(c(Phi_11, Phi_12, Phi_12, Phi_22), nrow = 2)
+  Phi
+}
+```
+
+Returns:
+`zzz =` $Z$ where `zzz = c(z_1, z_2)` and `z_1 = ` $W G y$ and `z_2 = ` $W G \mu$      
+`mu_z` where `mu_z_1 = ` $W E(G) y$ and `mu_z_2 =` $W E(G) \mu$ (see equation 8 of the manuscript).     
+`V_z` the covariance matrix of `zzz`. `V_z = kronecker(Phi, W_VG_W)` (see equation 8 of the manuscript).
+
+
+

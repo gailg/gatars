@@ -1,0 +1,218 @@
+---
+title: "11-davies_fn"
+author: ""
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-11-20 07:58:11 PST"
+
+I now using gatars v-0.2.17
+
+Last knit was `r Sys.time()`
+
+```{r}
+library(gatars)
+# Preparing the data
+bim = gatars_example$bim
+genotype = gatars_example$genotype
+phenotype = gatars_example$phenotype
+Psi = gatars_example$Psi
+target_markers = gatars_example$target_markers[3:5]
+
+# Call gatars_sampling_set to create sampling_set
+sampling_set = gatars_sampling_set(
+  bim, epsilon = 0.01, exclusion_region = NULL,
+  genotype, hotspot, target_markers)
+print(sampling_set)
+
+# Call gatars_test_size using an N_simulated_nulls which is way too small
+N_simulated_nulls = 10
+library(Matrix)
+gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls)
+```
+
+# inside `gatars_test_size`
+```{r}
+params_sampling_set = sampling_set$params_sampling_set
+sampling_set = sampling_set$sampling_set
+alpha_uni_N_increments = 10
+weights = NULL
+params = params_fn(
+    params_sampling_set, phenotype, Psi, sampling_set, N_simulated_nulls, weights)
+```
+
+
+```{r}
+ooo = uno_experimento_fn(params, calculate_optimized = TRUE)
+ooo
+```
+
+# inside `uno_experimento_fn`
+
+```{r}
+calculate_optimized = TRUE
+adaptive_conf_level = params$adaptive_conf_level
+alpha_uni = params$alpha_uni
+g_target = params$g_target
+MMM = params$MMM
+N_simulated_nulls_interval = params$N_simulated_nulls_interval
+N_simulated_nulls_limit = params$N_simulated_nulls_limit
+theta_init = params$theta_init
+WWW = params$WWW
+y_1 = params$yyy
+y_2 = params$mu
+Phi = params$Phi
+sampling_set = params$sampling_set
+test_size = params$test_size
+theta_init = params$theta_init
+bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2)
+bo
+```
+
+
+# inside `basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2){`
+```{r}
+# ---------------------------------------------------- zzz etc
+zzz_etc = zzz_and_first_two_moments_fn(g_target, Phi, WWW, y_1, y_2)
+zzz = zzz_etc$zzz
+mu_z = zzz_etc$mu_z
+V_z = zzz_etc$V_z
+# ------------------------------------------------------ basic
+basic_ones = data.frame(B = c(1, 0, 0),
+                        S = c(0, 1, 0),
+                        T = c(0, 0, 1))
+rownames(basic_ones) = c("B", "S", "T")
+MMM = ncol(g_target)
+AAA_basic = lapply(1:nrow(basic_ones), function(jjj){
+  alpha = basic_ones[jjj, ]
+  AAA = AAA_fn(alpha$B, alpha$S, alpha$T, MMM)
+  list(alpha = alpha, AAA = AAA)
+})
+basic = do.call(rbind, lapply(1:nrow(basic_ones), function(jjj){
+  alpha = basic_ones[jjj, ]
+  AAA = AAA_fn(alpha$B, alpha$S, alpha$T, MMM)
+  davies_answer = davies_fn(zzz, mu_z, V_z, AAA)
+  cbind(alpha, davies_answer)
+}))
+# ------------------------- basic is a data.frame that contains 
+# ------------------------ the quadratic form q and the p-value 
+# ----------------------- of the three basic statistics B, S, T
+# ----------------------------------------------------- BS
+jjj = 1
+alpha = basic_ones[jjj, ]
+AAA = AAA_fn(alpha$B, alpha$S, alpha$T, MMM)
+davies_answer = davies_fn(zzz, mu_z, V_z, AAA)
+cbind(alpha, davies_answer)
+alpha
+str(alpha$B)
+AAA
+
+library(CompQuadForm)
+```
+
+
+`AAA_fn` calculates $A_{\alpha}$ in equation (7) in the manuscript
+
+`alpha_B`, `alpha_S`, and `alpha_T` are real numbers in the closed interval
+`[0, 1], and they add to `1`.
+
+`MMM` is an integer equal to the length of `target_markers`.     
+
+`AAA_fn` returns a matrix of dimension `(2 * MMM)` by `(2 * MMM)`.
+
+```
+AAA_fn = function(alpha_B, alpha_S, alpha_T, MMM){
+  III = diag(rep(1, MMM))
+  JJJ = matrix(rep(1, MMM * MMM), nrow = MMM)
+  A_1 = alpha_B * JJJ + (alpha_S + alpha_T) * III
+  A_2 = -(alpha_B * JJJ + alpha_S * III)
+  A_3 = alpha_B * JJJ + (alpha_S - alpha_T) * III
+  AAA = rbind(cbind(A_1, A_2),
+              cbind(A_2, A_3))
+  AAA
+}
+```
+
+`davies_fn` calculates the spectral decomposition of $Q = Z^T A Z$ to obtain
+the eigenvalues $\lambda_j, j = 1, \cdots, J$ and noncentrality parameter
+$\delta$ that are required by `davies` in the `CompquadForm` package.
+
+```
+#' @import CompQuadForm
+#' @export
+davies_fn = function(zzz, mu_z, V_z, AAA){
+  qqq = as.vector(t(zzz) %*% AAA %*% zzz)
+  sss = square_root_matrix_fn(V_z)
+  V_z_one_half = sss$A_one_half
+  V_z_minus_one_half = sss$A_minus_one_half
+  z_tilde = V_z_minus_one_half %*% zzz
+  mu_z_tilde =  V_z_minus_one_half %*% mu_z
+  V_z_tilde = V_z_minus_one_half %*% V_z %*% V_z_minus_one_half
+  A_tilde = V_z_one_half %*% AAA %*% V_z_one_half
+  # ------------------------------------------------- breve, lambda, delta
+  eigen_A_tilde = eigen(A_tilde)
+  UUU = Re(t(eigen_A_tilde$vectors))
+  lambda = Re(eigen_A_tilde$values)
+  Lambda = diag(lambda)
+  z_breve = UUU %*% z_tilde
+  mu_z_breve = UUU %*% mu_z_tilde
+  delta = mu_z_breve^2
+  q_spectral_decomp = sum(lambda * z_breve^2)
+  # ----------------------------------------------- p_value
+  p_value = davies(q = qqq, lambda = lambda, delta = delta,
+                   lim = 50000, acc = 0.00005)$Qq
+  data.frame(q = qqq, p_value)
+}
+```
+
+
+
+I copied the following from 
+`/Volumes/lacie/aaa/packages/gritsr2/gails-stuff/b-examples/02-v-9010/a-docum/`
+`05-2015-10-18-unified-kernel-statistcs-add-other-optimizations.Rmd`
+
+# `davies_fn`
+
+Given the $J$ dimensional random vector (of functions of genotypes) $Z \sim N \big( \mu_Z, V_Z \big)$ and the matrix $A$, 
+the p-value for the statistic $Q = Z^T A Z$ can be gotten from `davies_fn(zzz, mu_z, V_z, AAA)`
+
+**This function performs the following calculations**
+
+$\tilde{Z} = V_{Z}^{-1/2} Z \sim N \big( \mu_{\tilde{Z}} = V_{Z}^{-1/2} \mu_Z, I \big)$.
+
+$Q = Z^T A Z = Z^T V^{-1/2} V^{1/2} A V^{1/2} V^{-1/2} Z = \tilde{Z}^T \tilde{A} \tilde{Z}$
+
+$\tilde{A} = V^{1/2} A V^{1/2}$
+
+$\tilde{A} = U^T \Lambda U$. The spectral decomposition of $\tilde{A}$, so $\Lambda$ is a diagonal matrix containing the eigenvalues of $\tilde{A}$, and $U^T U = U U^T = I$.
+
+$Q = \tilde{Z}^T \tilde{A} \tilde{Z} = \tilde{Z}^T U^T \Lambda U \tilde{Z} = X^T \Lambda X$
+
+$X = U \tilde{Z} \sim N \big( \mu_X = U \mu_{\tilde{Z}}, U I U^T = I)$
+
+$Q = X^T \Lambda X = \sum_{j = 1}^J \lambda_j X_j^2$ is a sum of independent $\chi^2$ random variables with noncentrality parameters $\mu_X^2$.
+
+The R package `CompQuadForm` provides the function `davies` which computes $P(Q > q)$ where $Q = \sum_{j = 1}^J \lambda_j X_j + \sigma X_0$ where $X_j$ are independent randomvariables having a non-central $\chi^2$ distribution with $n_j$ degrees of freedom and noncentrality parameter $\delta_j^2$, and $X_0$ having a standard normal distribution.
+
+In our case, the degrees of freedom is $n_j = 1$, and the noncentrality parameter is $\delta_j^2 = \mu_X^2$.

@@ -1,0 +1,229 @@
+---
+title: "14-p_value_optimized_fn"
+author: ""
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-11-20 15:50:11 PST"
+
+I now using gatars v-0.2.17
+
+Last knit was `r Sys.time()`
+
+```{r}
+library(gatars)
+library(Matrix)
+bim = gatars_example$bim
+genotype = gatars_example$genotype
+phenotype = gatars_example$phenotype
+Psi = gatars_example$Psi
+target_markers = gatars_example$target_markers[3:5]
+g_target = genotype[, target_markers]
+MMM = ncol(g_target)
+NNN = nrow(g_target)
+e_g_target_1 = colMeans(g_target)
+p_target = e_g_target_1/2
+e_g_target = matrix(rep(e_g_target_1, nrow(g_target)), nrow = nrow(g_target), byrow = TRUE)
+y_1 = yyy = phenotype$y
+y_2 = mu = phenotype$mu
+Phi = Phi_fn(Psi, y_1, y_2)
+www_num = rep(1, MMM)
+www = www_num/sum(www_num) * MMM
+WWW = diag(www)
+zzz_etc = zzz_and_first_two_moments_fn(g_target, Phi, WWW, y_1, y_2)
+zzz = zzz_etc$zzz
+mu_z = zzz_etc$mu_z
+V_z = zzz_etc$V_z
+AAA = AAA_fn(1, 0, 0, MMM)
+theta_init = rep(pi/3, 2)
+bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2)
+bo$xxx
+bo$theta
+theta = bo$theta
+x_observed = bo$xxx
+adaptive_conf_level = 0.01
+calculate_optimized = TRUE
+test_size = 0.01
+epsilon = 0.01
+exclusion_region = NULL
+sampling_set = gatars_sampling_set(
+  bim, epsilon, exclusion_region,
+  genotype, hotspot, target_markers)
+print(sampling_set)
+sampling_set = sampling_set$sampling_set
+str(sampling_set)
+set.seed(1)
+N_simulated_nulls = 100
+N_simulated_nulls_interval = N_simulated_nulls
+N_simulated_nulls_limit = N_simulated_nulls
+ooo = p_value_optimized_fn(
+  adaptive_conf_level, calculate_optimized, MMM, 
+  N_simulated_nulls_interval, N_simulated_nulls_limit, Phi, sampling_set,
+  test_size, theta, WWW, x_observed, y_1, y_2
+)
+ooo
+```
+
+Accumulate a matrix with `N_simulated_nulls_interval` rows and a column for each of the optimized statistics.
+Each row contains the optimized statistics for one simulated genotype matrix.
+The reason this function looks so complicated is there are two `while` loops.
+The inside loop generates a `genotype_sim` and then checks to see if it has full rank.
+If not it tries again; there is a limit of 1000 tries.
+The outside loop accumulates `N_simulated_nulls_interval` good tries.
+
+`so_far_so_good` is a logical equal to `TRUE` if the number of bad tries never exceeded 1000 in all 
+`N_simulated_nulls_interval` loops.
+
+```{r}
+optimized_names = names(x_observed)
+N_simulated_nulls_interval = 7
+sss = genome_resampling_fn(MMM, N_simulated_nulls_interval, optimized_names, Phi, 
+                                 sampling_set, theta, WWW, y_1, y_2)
+sss
+str(sss)
+```
+
+# inside `p_value_optimized_fn`
+
+```{r}
+#' @export
+p_value_optimized_fn = function(
+  adaptive_conf_level,
+  calculate_optimized,
+  MMM,
+  N_simulated_nulls_interval,
+  N_simulated_nulls_limit,
+  Phi,
+  sampling_set,
+  test_size,
+  theta,
+  WWW,
+  x_observed,
+  y_1,
+  y_2
+){
+  optimized_names = names(x_observed)
+  if(calculate_optimized){
+    successes = rep(0, length(x_observed))
+    names(successes) = names(x_observed)
+    N_simulated_nulls_required = 0
+    still_looking = TRUE
+    while(still_looking){
+      sss = genome_resampling_fn(MMM, N_simulated_nulls_interval, optimized_names, Phi, 
+                                 sampling_set, theta, WWW, y_1, y_2)
+      
+      simulated = sss$simulated
+      so_far_so_good = sss$so_far_so_good
+      uuu = rejuvenate_successes_fn(adaptive_conf_level, N_simulated_nulls_limit, N_simulated_nulls_required,
+                                    optimized_names, simulated, so_far_so_good, successes, test_size, x_observed)
+      N_simulated_nulls_required = uuu$N_simulated_nulls_required
+      successes = uuu$successes
+      still_looking = uuu$still_looking
+    }
+    p_value = if(so_far_so_good){
+      successes / N_simulated_nulls_required
+    } else {
+      list(message = "could not obtain full-rank genotype_sim matrices")
+    }
+  } else {
+    so_far_so_good = TRUE
+    N_simulated_nulls_required = 0
+    p_value = sapply(optimized_names, function(dummy) -1)
+  }
+  list(
+    so_far_so_good = so_far_so_good,
+    N_simulated_nulls_required = N_simulated_nulls_required,
+    p_value_optimized = p_value)
+}
+```
+
+# inside `genome_resampling`
+
+```{r}
+set.seed(1)
+genotype_sim = do.call(cbind, lapply(sampling_set, function(this_snp){
+  this_snp[, sample(1:ncol(this_snp), 1)]
+}))
+rankMatrix(genotype_sim)
+bo = basic_and_optimized_lu_fn(genotype_sim, Phi, theta, WWW, y_1, y_2)
+one_row_in_simulated = bo$xxx
+one_row_in_simulated
+```
+
+
+
+```{r}
+# genome_resampling_fn = function(
+#   MMM,
+#   N_simulated_nulls_interval,
+#   optimized_names,
+#   Phi,
+#   sampling_set,
+#   theta, 
+#   WWW,
+#   y_1,
+#   y_2
+# ){
+  simulated = data.frame(rep(NA, N_simulated_nulls_interval), 
+                         rep(NA, N_simulated_nulls_interval), 
+                         rep(NA, N_simulated_nulls_interval), 
+                         rep(NA, N_simulated_nulls_interval))
+  names(simulated) = optimized_names
+  so_far_so_good = TRUE
+  n_sim = 1
+  while(so_far_so_good & n_sim <= N_simulated_nulls_interval){
+    still_looking_for_genotype_sim = TRUE
+    N_bad_genotype_sim = 0
+    while(still_looking_for_genotype_sim){
+      genotype_sim = do.call(cbind, lapply(sampling_set, function(this_snp){
+        this_snp[, sample(1:ncol(this_snp), 1)]
+      }))
+      if(rankMatrix(genotype_sim) == MMM) {
+        good_genotype_sim = TRUE
+        still_looking_for_genotype_sim = FALSE
+      } else {
+        print("genotype_sim not full rank")
+        N_bad_genotype_sim = N_bad_genotype_sim + 1
+        if(N_bad_genotype_sim > 1000) {
+          good_genotype_sim = FALSE
+          still_looking_for_genotype_sim = FALSE
+        }
+      }
+    }
+    if(good_genotype_sim){
+      bo = basic_and_optimized_lu_fn(genotype_sim, Phi, theta, WWW, y_1, y_2)
+      one_row_in_simulated = bo$xxx
+      simulated[n_sim, ] = one_row_in_simulated
+      n_sim = n_sim + 1
+    } else {
+      so_far_so_good = FALSE
+    }
+  }
+  list(
+    simulated = simulated,
+    so_far_so_good = so_far_so_good
+  )
+}
+```
+

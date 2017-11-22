@@ -35,7 +35,8 @@
 #' head(bim_for_chromosome_21, 20)
 #' head(hot_for_chromosome_21, 50)
 #' bim_teeny = bim_for_chromosome_21[1:13, ]
-#' hot_teeny = hot_for_chromosome_21[hot_for_chromosome_21$center %in% c(13227919, 15561921, 16361420), ]
+#' hot_teeny = hot_for_chromosome_21[
+#'     hot_for_chromosome_21$center %in% c(13227919, 15561921, 16361420), ]
 #' row.names(bim_teeny) = NULL
 #' row.names(hot_teeny) = NULL
 #' list(bim_teeny = bim_teeny, 

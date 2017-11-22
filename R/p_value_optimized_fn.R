@@ -1,3 +1,5 @@
+#' @title Estimate the p-values of the optimized statistics
+#' 
 #' @export
 p_value_optimized_fn = function(
   adaptive_conf_level,
