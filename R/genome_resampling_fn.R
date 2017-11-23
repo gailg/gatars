@@ -98,7 +98,6 @@
 #' bo$theta
 #' theta = bo$theta
 #' x_observed = bo$xxx
-#' adaptive_conf_level = 0.01
 #' calculate_optimized = TRUE
 #' epsilon = 0.01
 #' exclusion_region = NULL

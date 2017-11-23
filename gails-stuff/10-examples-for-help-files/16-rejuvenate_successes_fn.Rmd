@@ -92,7 +92,7 @@ x_observed["BST"] < simulated$BST
 so_far_so_good = sss$so_far_so_good
 
 uuu = rejuvenate_successes_fn(adaptive_conf_level, N_simulated_nulls_limit, N_simulated_nulls_required,
-                              optimized_names, simulated, so_far_so_good, successes, test_size, x_observed)
+                              optimized_names, simulated, so_far_so_good, successes, x_observed)
 uuu
 N_simulated_nulls_required = uuu$N_simulated_nulls_required
 successes = uuu$successes
@@ -167,9 +167,4 @@ use `N_simulated_nulls_interval` to specify a moderate number of simulated nulls
 `gatars_test_size` allows the user to set `N_simulated_nulls` to be the very large number and then sets
 `N_simulated_nulls_interval = N_simulated_nulls_limit = N_simulated_nulls`.
 
-
-v-0.2.19
-I removed test_size from
-p_value_optimized_fn
-rejuvenate_successes_fn
-uno_experimento_fn
+The innards of `p_value_optimized_fn` contains a `while` loop that calls `genome_resampling_fn` to obtain  the matrix `simulated` that contains `N_simulated_nulls_interval` replications of simulated nulls.  `rejuvenate_successess_fn` counts for each statistic the number of successes and returns updated (rejuvenated) numbers for `successes` and N_simulated_nulls_required.  After exciting the `while` loop the p-value is calculated to be `successes` divided by `N_simulated_nulls_required`.

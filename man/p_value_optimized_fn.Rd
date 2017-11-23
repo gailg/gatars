@@ -9,14 +9,14 @@ p_value_optimized_fn(adaptive_conf_level, calculate_optimized, MMM,
   WWW, x_observed, y_1, y_2)
 }
 \arguments{
-\item{adaptive_conf_level}{params_fn sets this real number to 0.99.  This if the 
+\item{adaptive_conf_level}{\code{params_fn} sets this real number to 0.99.  This if the 
 level of confidence used to to decide if the number of simulated nulls obtained
 so far will not be significant.}
 
-\item{calculate_optimized}{A logical.  Set this equal to \code{TRUE} if genome 
-resampling is desired.  I set \code{calculate_optimized} to \code{FALSE} when
-calculating the power in the simulations where I used simulations rather than
-genome resampling to obtain simulated nulls.}
+\item{calculate_optimized}{A logical.  Set this to \code{TRUE} if genome 
+resampling is desired (when analyzing real data),   and to \code{FALSE} when
+calculating the power in the simulations where simulations rather than
+genome resampling can be used to obtain simulated nulls.}
 
 \item{MMM}{A positive integer equal to the length of \code{target_markers}
 in \code{gatars_sampling_set}}
@@ -87,19 +87,17 @@ of full rank (before 1000 bad tries).
 At its most basic level, \code{p_value_optimized_fn} generates a 
 "large number" of simulated null statistics to compare to the observed.
 The p-value is the proportion of these simulated nulls that exceed the observed.
-The user can specify how big to make "a large number".  For the simulations, I 
-added another level of control:  If after generating a moderate number of
+The user can specify "the large number".  For the simulations, I 
+added another little bit of functionality:  If after generating a moderate number of
 simulated nulls, it becomes obvious that the observed of all four optimized
 statistics is not going to be significant, there is no longer any need to
-continue to the big number that might be needed if at least one of the 
-significance levels reported by the moderate number of simulated nulls is close
-to the desired significance level.
+continue to the big number that might be needed to determine if an observed statistic
+was close to significant.
 
-To specify "a large number, use \code{N_simulated_nulls_limit}.
+To specify "the large number, use \code{N_simulated_nulls_limit}.
 To allow \code{p_value_optimized_fn} to abort when it becomes obvious that the 
 four optimized statistics will not be significant, use
-\code{N_simulated_nulls_interval} to specify a moderate number on which to judge
-whether it is safe to abort.
+\code{N_simulated_nulls_interval} to specify the moderate number.
 \code{gatars_test_size} allows the user to set \code{N_simulated_nulls} to be
 the very large number and internally sets 
 \code{N_simulated_nulls_interval} equal to \code{N_simulated_nulls_limit}
