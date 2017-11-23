@@ -73,7 +73,27 @@ gatars_test_size = function(phenotype, Psi, sampling_set, N_simulated_nulls, wei
   N_simulated_nulls = N_simulated_nulls
   params_sampling_set = sampling_set$params_sampling_set
   sampling_set = sampling_set$sampling_set
-  params = params_fn(params_sampling_set, phenotype, Psi, sampling_set, N_simulated_nulls, weights)
-  ooo = uno_experimento_fn(params, calculate_optimized = TRUE)
+  adaptive_conf_level = 0.99
+  calculate_optimized = TRUE
+  g_target = params_sampling_set$g_target
+  N_simulated_nulls_interval = N_simulated_nulls
+  N_simulated_nulls_limit = N_simulated_nulls
+  y_1 = yyy = phenotype$y
+  y_2 = mu = phenotype$mu
+  Phi = Phi_fn(Psi, y_1, y_2)
+  MMM = params_sampling_set$MMM
+  theta_init = rep(pi/3, 2)
+  www_num = if(!is.null(weights)){
+    weights
+  } else {
+    rep(1, MMM)
+  }
+  www = www_num/sum(www_num) * MMM
+  WWW = diag(www)
+  www = t(t(www))
+  ooo = uno_experimento_fn(
+    adaptive_conf_level, calculate_optimized, g_target, MMM, 
+    N_simulated_nulls_interval, N_simulated_nulls_limit, 
+    Phi, sampling_set, theta_init, WWW, y_1, y_2)
   ooo
 }

@@ -1,17 +1,8 @@
 #' @export
-uno_experimento_fn = function(params, calculate_optimized){
-  adaptive_conf_level = params$adaptive_conf_level
-  g_target = params$g_target
-  MMM = params$MMM
-  N_simulated_nulls_interval = params$N_simulated_nulls_interval
-  N_simulated_nulls_limit = params$N_simulated_nulls_limit
-  theta_init = params$theta_init
-  WWW = params$WWW
-  y_1 = params$yyy
-  y_2 = params$mu
-  Phi = params$Phi
-  sampling_set = params$sampling_set
-  theta_init = params$theta_init
+uno_experimento_fn = function(
+  adaptive_conf_level, calculate_optimized, g_target, MMM, 
+  N_simulated_nulls_interval, N_simulated_nulls_limit, Phi, sampling_set, theta_init, WWW, y_1, y_2
+  ){
   answer = if (rankMatrix(g_target) < MMM) {
     list(message = "error--g_target not full rank")
   } else {
