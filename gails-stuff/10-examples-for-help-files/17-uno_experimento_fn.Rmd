@@ -1,0 +1,110 @@
+---
+title: "17-uno_experimento_fn"
+author: ""
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-11-22 21:38:11 PST"
+
+I now using gatars v-0.2.17
+
+Last knit was `r Sys.time()`
+
+```{r}
+library(gatars)
+library(Matrix)
+bim = gatars_example$bim
+genotype = gatars_example$genotype
+phenotype = gatars_example$phenotype
+Psi = gatars_example$Psi
+target_markers = gatars_example$target_markers[3:5]
+epsilon = 0.01
+exclusion_region = NULL
+sampling_set = gatars_sampling_set(
+  bim, epsilon, exclusion_region,
+  genotype, hotspot, target_markers)
+print(sampling_set)
+sampling_set = sampling_set$sampling_set
+adaptive_conf_level = 0.99
+calculate_optimized = TRUE
+g_target = genotype[, target_markers]
+MMM = ncol(g_target)
+N_simulated_nulls_interval = 20
+N_simulated_nulls_limit = 100
+y_1 = yyy = phenotype$y
+y_2 = mu = phenotype$mu
+Phi = Phi_fn(Psi, y_1, y_2)
+theta_init = rep(pi/3, 2)
+www_num = rep(1, MMM)
+www = www_num/sum(www_num) * MMM
+WWW = diag(www)
+ooo = uno_experimento_fn(
+  adaptive_conf_level, calculate_optimized, g_target, MMM, 
+  N_simulated_nulls_interval, N_simulated_nulls_limit, 
+  Phi, sampling_set, theta_init, WWW, y_1, y_2)
+ooo
+```
+
+Inside `uno_experimento_fn`
+
+`uno_experimento_fn` begins by calling `basic_and_optimized_lu_fn` to obtain the p-values of the basic statistics (`bo$p_value_basic`) and `x_observed` (`bo$xxx), and then calls `p_value_optimized_fn` to obtain the p-values of the optimized statistics (`pvo$p_value_optimized`).
+
+```{r}
+
+  # answer = if (rankMatrix(g_target) < MMM) {
+  #   list(message = "error--g_target not full rank")
+  # } else {
+    bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2)
+    p_value_basic = bo$p_value_basic
+    q_basic = bo$q_basic
+    q_optimized = bo$q_optimized
+    qqq = c(q_basic, q_optimized)
+    theta = bo$theta
+    x_observed = bo$xxx
+    x_observed
+    #--------------------------------------------------- p_value_optimized
+    ooo = p_value_optimized_fn(
+      adaptive_conf_level, calculate_optimized, MMM, 
+      N_simulated_nulls_interval, N_simulated_nulls_limit, Phi, sampling_set,
+      theta, WWW, x_observed, y_1, y_2
+    )
+    so_far_so_good = ooo$so_far_so_good
+    N_simulated_nulls_required = ooo$N_simulated_nulls_required
+    p_value_optimized = ooo$p_value_optimized
+    #-------------------------------------------------------------- output
+    if(so_far_so_good){
+      p_value = c(p_value_basic, p_value_optimized)
+      list(
+        N_simulated_nulls_required = N_simulated_nulls_required,
+        p_value = p_value,
+        q = qqq,
+        x = x_observed)
+    } else {
+      list(message = "could not obtain full-rank g_target_sim matrices")
+    }
+#   }
+#   answer
+# }
+```
+

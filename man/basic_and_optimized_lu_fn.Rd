@@ -60,7 +60,7 @@ A named numerical vector containing the optimized statistics \code{Q_BS},
 A vector of length \code{2} containing the value of \code{theta} that optimizing
 \code{BST}.
 }
-\item{\code{xxx}: }{
+\item{\code{x_observed}: }{
 A named numerical vector containing the transformed values of the nominal p-values
 of the optimized statistics \code{BS}, \code{BT}, \code{ST}, and \code{BST}. It is this
 vector that will be compared with the simulated results to determine the true 

@@ -59,7 +59,7 @@
 #' A vector of length \code{2} containing the value of \code{theta} that optimizing
 #' \code{BST}.
 #' }
-#' \item{\code{xxx}: }{
+#' \item{\code{x_observed}: }{
 #' A named numerical vector containing the transformed values of the nominal p-values
 #' of the optimized statistics \code{BS}, \code{BT}, \code{ST}, and \code{BST}. It is this
 #' vector that will be compared with the simulated results to determine the true 
@@ -171,7 +171,7 @@ basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2){
     AAA = AAA_fn(optimized_0[kkk, "B"], optimized_0[kkk, "S"], optimized_0[kkk, "T"], MMM)
     as.vector(t(zzz) %*% AAA %*% zzz)
   }))
-  xxx = x = unlist(lapply(optimized_0$p_value, q_alice_fn))
+  x_observed = x = unlist(lapply(optimized_0$p_value, q_alice_fn))
   optimized = cbind(optimized_0, q, x)[, c("B", "S", "T", "q", "p_value", "x")]
   rownames(optimized) =  c("BS", "BT", "ST", "BST")
   optimized
@@ -188,7 +188,7 @@ basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2){
   names(q_optimized) = rownames(optimized)
   q_optimized
   
-  names(xxx) = rownames(optimized)
+  names(x_observed) = rownames(optimized)
   list(
     #AAA_basic = AAA_basic,
     basic = basic,
@@ -197,5 +197,5 @@ basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2){
     q_basic = q_basic,
     q_optimized = q_optimized,
     theta = theta,
-    xxx = xxx)
+    x_observed = x_observed)
 }
