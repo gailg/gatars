@@ -6,7 +6,8 @@
 \title{Chop out those independent segments of bim that contain 
 target markers or exclusion regions}
 \usage{
-bim_with_target_and_exclusion_regions_removed_fn(params_sampling_set)
+bim_with_target_and_exclusion_regions_removed_fn(bim, exclusion_region, hotspot,
+  target_markers)
 }
 \arguments{
 \item{params_sampling_set, }{and in particular the objects \code{bim},
@@ -82,14 +83,11 @@ list(independent_segment_containing_first_target_marker =
        independent_segment_containing_second_target_marker,
      inside_a_hotspot = inside_a_hotspot,
      bim_baby = bim_baby)
-#--------------- a fake params_sampling_set
-params_sampling_set = list(
-  bim = bim_baby,
-  exclusion_region = NULL,
-  hotspot = hotspot,
-  target_markers = target_markers)
+#--------------- 
+bim = bim_baby
+exclusion_region = NULL
 #--------------- the answer from bim_with... should be the same as throw_some_in
-bim_with_target_and_exclusion_regions_removed_fn(params_sampling_set)
-
+bim_with_target_and_exclusion_regions_removed_fn(
+    bim, exclusion_region, hotspot, target_markers)
 
 }

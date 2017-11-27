@@ -74,16 +74,16 @@ gatars_sampling_set = function(
   hotspot,
   target_markers
 ){
-  params_sampling_set = params_sampling_set_fn(
+  sss = sampling_set_fn(
     bim,
     epsilon,
     exclusion_region,
     genotype,
     hotspot,
     target_markers
-    )
-  sss = sampling_set_fn(params_sampling_set)
-  answer = list(params_sampling_set = params_sampling_set,
+  )
+  answer = list(g_target = sss$g_target,
+                MMM = sss$MMM,
                 report = sss$report,
                 sampling_set = sss$sampling_set)
   class(answer) = c("gatars_sampling_set", class(answer))

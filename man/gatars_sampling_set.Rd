@@ -7,63 +7,6 @@
 gatars_sampling_set(bim, epsilon, exclusion_region, genotype, hotspot,
   target_markers)
 }
-\arguments{
-\item{bim}{A \code{data.frame} containing the three columns
-\code{chromosome}, \code{snp}, \code{bp}, and containing \code{LLL} rows 
-corresponding to the \code{MMM} target markers and those used to build
-the sampling sets. The \code{lll}-th row of \code{bim} summarizes the 
-\code{lll}-th marker and corresponds to the \code{lll}-th column of 
-\code{genotype} (described below).  The column labeled \code{chromosome} 
-contains integers between \code{1} and \code{22} (other integers may be 
-included, but only chromosomes \code{1} through \code{22} will be used),
-the \code{snp} column contains character strings that name the marker,
-and the \code{bp} column contains integers giving the markers' bp
-positions.  Because the \code{gatars} dat set \code{hotspot} (described
-below) is given in Build hg38/GRCh38, \code{bp} must also be expressed in
-Build hg38/GRCh38.) The object \code{bim} could be the 
-\code{.map} or \code{.bim} file from plink.}
-
-\item{epsilon}{A positive small real number used to determine if a marker
-can be included in a sampling set.
-When creating the \code{mmm}-th sampling set for a target marker with 
-minor allele frequency \code{pi[mmm]} only those markers whose minor allele 
-frequencies fall
-within the interval \code{pi[mmm] * [1 - epsilon, 1 + epsilon]}
-can be included in the sampling set. In our simulations, we set
-\code{epsilon} equal to 0.01.}
-
-\item{exclusion_region}{A \code{data.frame} with one or several rows of the three
-columns \code{chromosome}, \code{start}, and \code{end}.  Each row of
-\code{exclusion_region} reflects one contiguous genomic region known to be
-trait-associated and therefore a region used by \code{gatars} when creating the
-sampling sets.  The column \code{chromosome} is an integer between \code{1} and
-\code{22} identifying the autosomal choromosome containing the region, and
-\code{start} and \code{end} describe its starting and ending positions \code{bp}.
-If the region consists of a single marker, then \code{start} and \code{end}
-are both equal to the position of this marker.  \code{start} and \code{end}
-must be expressed in Build hg38/GRCh38.}
-
-\item{genotype}{A matrix with \code{NNN} rows and \code{LLL} columns, whose 
-\code{(nnn,lll)}-th element records the \code{nnn}-th subject's coded genotype
-at the \code{lll}-th of \code{LLL} markers.  The \code{lll}-th column of 
-\code{genotype} corresponds to the \code{lll}-th row of \code{bim}.  The object
-\code{genotype} could be obtained by reading in the \code{.bed} file from
-plink.  (Here we distinguish \code{genotype} the \code{NNN} x \code{LLL} matrix
-whose columns correspond to the \code{MMM} target markers AND the
-additional \code{LLL - MMM} markers that are candidates for membership
-into sampling sets) from the \code{NNN}
-x \code{MMM} matrix G, described in the manuscript, containing just the \code{MMM}
-target markers).}
-
-\item{hotspot}{\pkg{gatars} provides this data set for your convenience.
-This data.frame must contain (at least) the columns \code{chromosome},
-\code{start},  and \code{end}; \code{chromosome} gives the chromosome number
-(an integer in \code{1, ..., 22}), and \code{start}, and \code{end} give the extent of the 
-recombination hotspot (integers in bp units using Build hg38/GRCH38).}
-
-\item{target_markers}{A character vector of length \code{MMM} that is a subset 
-of the column \code{bim$snp}. This vector identifies the target markers.}
-}
 \value{
 A list containing the following objects
 \itemize{

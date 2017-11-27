@@ -4,7 +4,8 @@
 \alias{sampling_set_fn}
 \title{Create sampling sets}
 \usage{
-sampling_set_fn(params_sampling_set)
+sampling_set_fn(bim, epsilon, exclusion_region, genotype, hotspot,
+  target_markers)
 }
 \arguments{
 \item{params_sampling_set}{and in particular the objects 
@@ -46,15 +47,13 @@ epsilon = 0.01
 exclusion_region = gatars_example$exclusion_region
 genotype = gatars_example$genotype
 target_markers = gatars_example$target_markers[3:5]
-params_sampling_set = params_sampling_set_fn(
-  bim, epsilon, exclusion_region,
-  genotype, hotspot, target_markers)
-names(params_sampling_set)
+
 # If any of your sampling sets exceed 1000 in number
 # sampling_sets_fn will randomly choose 1000.
 # If you wish to replicate your results, set a seed
 # set.seed(1)
-sampling_set = sampling_set_fn(params_sampling_set)
+sampling_set = sampling_set_fn(
+  bim, epsilon, exclusion_region, genotype, hotspot, target_markers)
 names(sampling_set)
 sampling_set$report
 str(sampling_set$sampling_set)

@@ -72,32 +72,28 @@
 #'        independent_segment_containing_second_target_marker,
 #'      inside_a_hotspot = inside_a_hotspot,
 #'      bim_baby = bim_baby)
-#' #--------------- a fake params_sampling_set
-#' params_sampling_set = list(
-#'   bim = bim_baby,
-#'   exclusion_region = NULL,
-#'   hotspot = hotspot,
-#'   target_markers = target_markers)
+#' #--------------- 
+#' bim = bim_baby
+#' exclusion_region = NULL
 #' #--------------- the answer from bim_with... should be the same as throw_some_in
-#' bim_with_target_and_exclusion_regions_removed_fn(params_sampling_set)
-#' 
+#' bim_with_target_and_exclusion_regions_removed_fn(
+#'     bim, exclusion_region, hotspot, target_markers)
 #' 
 #' @export
-bim_with_target_and_exclusion_regions_removed_fn = function(params_sampling_set){
-  bim = params_sampling_set$bim
-  hotspot = params_sampling_set$hotspot
-  target_markers = params_sampling_set$target_markers
+bim_with_target_and_exclusion_regions_removed_fn = function(
+  bim, exclusion_region, hotspot, target_markers
+){
   target_bim = bim[bim$snp %in% target_markers, ]
   target_part = with(target_bim, data.frame(chromosome, start = bp, end = bp))
-  exclusion_region = rbind(params_sampling_set$exclusion_region, target_part)
-  exclusion_chromosome = unique(exclusion_region$chromosome)
+  eexclusion_region_and_target_part = rbind(exclusion_region, target_part)
+  exclusion_chromosome = unique(eexclusion_region_and_target_part$chromosome)
   chromosomes_with_target_and_exlusion_regions_removed = lapply(1:22, function(chromosome){  
     answer = if(chromosome %in% exclusion_chromosome){
       segments_0 = independent_segment_fn(bim, chromosome, hotspot)
       if( is.null(segments_0) ) {
         NULL
       } else {
-        eee = exclusion_region[exclusion_region$chromosome == chromosome, ]
+        eee = eexclusion_region_and_target_part[eexclusion_region_and_target_part$chromosome == chromosome, ]
         intersect_with_genotype_q = sapply(segments_0, function(this){
           any(unlist(lapply(1:nrow(eee), function(kkk){
             any(eee[kkk, ]$start : eee[kkk, ]$end %in% this$bp)
@@ -112,5 +108,3 @@ bim_with_target_and_exclusion_regions_removed_fn = function(params_sampling_set)
   })
   do.call(rbind, chromosomes_with_target_and_exlusion_regions_removed)
 }
-
-# "2016-10-19 12:35:20 PDT" handles exclusion_region

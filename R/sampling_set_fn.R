@@ -37,32 +37,37 @@
 #' exclusion_region = gatars_example$exclusion_region
 #' genotype = gatars_example$genotype
 #' target_markers = gatars_example$target_markers[3:5]
-#' params_sampling_set = params_sampling_set_fn(
-#'   bim, epsilon, exclusion_region,
-#'   genotype, hotspot, target_markers)
-#' names(params_sampling_set)
+#' 
 #' # If any of your sampling sets exceed 1000 in number
 #' # sampling_sets_fn will randomly choose 1000.
 #' # If you wish to replicate your results, set a seed
 #' # set.seed(1)
-#' sampling_set = sampling_set_fn(params_sampling_set)
+#' sampling_set = sampling_set_fn(
+#'   bim, epsilon, exclusion_region, genotype, hotspot, target_markers)
 #' names(sampling_set)
 #' sampling_set$report
 #' str(sampling_set$sampling_set)
 #' 
 #' @export
-sampling_set_fn = function(params_sampling_set){
-  genotype = params_sampling_set$genotype
-  MMM = params_sampling_set$MMM
-  epsilon = params_sampling_set$epsilon
+sampling_set_fn = function(
+  bim,
+  epsilon,
+  exclusion_region,
+  genotype,
+  hotspot,
+  target_markers
+){
+  g_target = genotype[, target_markers]
+  MMM = ncol(g_target)
   # p_target are the mafs of the target snps and the mafs we want to match
-  p_target = params_sampling_set$p_target
+  e_g_target_1 = colMeans(g_target)
+  p_target = e_g_target_1/2
   # Remove from bim and genotype the regions specified by exclusion_region
   # The working files are then bim_with_target_and_exclusion_region_removed
   # and genotype_with_stuff_removed.
   # p_sim is the maf genotype_with_stuff_removed
   bim_with_target_and_exclusion_regions_removed = 
-    bim_with_target_and_exclusion_regions_removed_fn(params_sampling_set)
+    bim_with_target_and_exclusion_regions_removed_fn(bim, exclusion_region, hotspot, target_markers)
   genotype_with_stuff_removed = genotype[, bim_with_target_and_exclusion_regions_removed$snp]
   p_sim = unname(colMeans(genotype_with_stuff_removed)/2)
   # For sampling_set I march through each mmm = 1, ...M, 
@@ -95,6 +100,8 @@ sampling_set_fn = function(params_sampling_set){
   rownames(report) = NULL
   report
   answer = list(
+    g_target = g_target,
+    MMM = MMM,
     report = report,
     sampling_set = sampling_set)
   answer

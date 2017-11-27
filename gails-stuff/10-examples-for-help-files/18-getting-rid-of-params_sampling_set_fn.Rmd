@@ -1,0 +1,223 @@
+---
+title: "17-uno_experimento_fn"
+author: ""
+output:
+  html_document:
+    css: ~/Documents/headings.css
+    fig_caption: yes
+    highlight: default
+    number_sections: yes
+    theme: readable
+    toc: yes
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    pandoc_args: --variable=geometry:margin=0.75in
+    toc: no
+fontsize: 10pt
+---
+<A NAME="top"> </A>
+
+```{r global_options, include=FALSE}
+require(knitr)
+opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 10, fig.width = 8, tidy=FALSE)
+```
+
+`r getwd()`  
+
+"2017-11-22 21:38:11 PST"
+
+I now using gatars v-0.2.17
+
+Last knit was `r Sys.time()`
+
+```{r}
+library(gatars)
+# Preparing the data
+bim = gatars_example$bim
+exclusion_region = gatars_example$exclusion_region
+genotype = gatars_example$genotype
+phenotype = gatars_example$phenotype
+Psi = gatars_example$Psi
+target_markers = gatars_example$target_markers[3:5]
+
+# figure to illustrate Psi
+NNN = nrow(phenotype)
+first_ten = 1:10
+last_ten = NNN - (9:0)
+matrix_image_fn(Psi[c(first_ten, last_ten), c(first_ten, last_ten)],
+                main = "First and last 10 rows and columns of Psi")
+
+# Checking the rank of the genotype_target_markers matrix
+library(Matrix)
+genotype_target_markers = genotype[, target_markers]
+list(target_markers = target_markers,
+     rank = as.numeric(rankMatrix( genotype_target_markers)))
+
+# Example calls to gatars_sampling_set
+set.seed(42)
+epsilon = 0.01
+exclusion_region = NULL
+sampling_set = gatars_sampling_set_larry(
+  bim,
+  epsilon,
+  exclusion_region,
+  genotype,
+  hotspot,
+  target_markers
+)
+print(sampling_set)
+
+N_simulated_nulls = 10
+gatars_test_size_larry(phenotype, Psi, sampling_set, N_simulated_nulls, weights = NULL)
+
+
+```
+
+```{r}
+gatars_sampling_set_larry = function(
+  bim,
+  epsilon,
+  exclusion_region,
+  genotype,
+  hotspot,
+  target_markers
+){
+  sss = sampling_set_fn_larry(
+    bim,
+    epsilon,
+    exclusion_region,
+    genotype,
+    hotspot,
+    target_markers
+    )
+  answer = list(g_target = sss$g_target,
+                MMM = sss$MMM,
+                report = sss$report,
+                sampling_set = sss$sampling_set)
+  class(answer) = c("gatars_sampling_set", class(answer))
+  answer
+}
+```
+
+
+```{r}
+sampling_set_fn_larry = function(
+  bim,
+  epsilon,
+  exclusion_region,
+  genotype,
+  hotspot,
+  target_markers
+  ){
+  g_target = genotype[, target_markers]
+  MMM = ncol(g_target)
+  # p_target are the mafs of the target snps and the mafs we want to match
+  e_g_target_1 = colMeans(g_target)
+  p_target = e_g_target_1/2
+  # Remove from bim and genotype the regions specified by exclusion_region
+  # The working files are then bim_with_target_and_exclusion_region_removed
+  # and genotype_with_stuff_removed.
+  # p_sim is the maf genotype_with_stuff_removed
+  bim_with_target_and_exclusion_regions_removed = 
+    bim_with_target_and_exclusion_regions_removed_fn_larry(bim, exclusion_region, hotspot, target_markers)
+  genotype_with_stuff_removed = genotype[, bim_with_target_and_exclusion_regions_removed$snp]
+  p_sim = unname(colMeans(genotype_with_stuff_removed)/2)
+  # For sampling_set I march through each mmm = 1, ...M, 
+  # for each mmm, I find the good_ones, the columns of genotype_with_stuff_removed
+  # whose mafs match.  
+  # I use epsilon to parametrize the matching.
+  # Notice that if I get more than 1000 good ones, I sample to get at most 1000.
+  sampling_set = lapply(1:MMM, function(mmm){
+    p_this = p_target[mmm]
+    lower = p_this * (1 - epsilon)
+    upper = p_this * (1 + epsilon)
+    good_ones_q = (lower < p_sim & p_sim < upper)
+    good_ones = which(good_ones_q)
+    N_good_ones = length(good_ones)
+    if(N_good_ones > 1000){
+      good_ones = sort(sample(good_ones, 1000))
+    }
+    answer =  genotype_with_stuff_removed[, good_ones, drop = FALSE]
+    answer
+  })
+  # report tells me how many good ones I got in each sampling set.
+  report = do.call(rbind, lapply(1:MMM, function(mmm){
+    this_genotype = sampling_set[[mmm]]
+    p_sim = unname(colMeans(this_genotype)/2)
+    data.frame(min = round(min(p_sim), 5),
+               pi = round(p_target[mmm], 5),
+               max = round(max(p_sim), 5),
+               set_size = ncol(this_genotype))
+  }))
+  rownames(report) = NULL
+  report
+  answer = list(
+    g_target = g_target,
+    MMM = MMM,
+    report = report,
+    sampling_set = sampling_set)
+  answer
+}
+```
+
+```{r}
+bim_with_target_and_exclusion_regions_removed_fn_larry = function(
+  bim, exclusion_region, hotspot, target_markers
+  ){
+  target_bim = bim[bim$snp %in% target_markers, ]
+  target_part = with(target_bim, data.frame(chromosome, start = bp, end = bp))
+  eexclusion_region_and_target_part = rbind(exclusion_region, target_part)
+  exclusion_chromosome = unique(eexclusion_region_and_target_part$chromosome)
+  chromosomes_with_target_and_exlusion_regions_removed = lapply(1:22, function(chromosome){  
+    answer = if(chromosome %in% exclusion_chromosome){
+      segments_0 = independent_segment_fn(bim, chromosome, hotspot)
+      if( is.null(segments_0) ) {
+        NULL
+      } else {
+        eee = eexclusion_region_and_target_part[eexclusion_region_and_target_part$chromosome == chromosome, ]
+        intersect_with_genotype_q = sapply(segments_0, function(this){
+          any(unlist(lapply(1:nrow(eee), function(kkk){
+            any(eee[kkk, ]$start : eee[kkk, ]$end %in% this$bp)
+          })))
+        })
+        do.call(rbind, segments_0[!intersect_with_genotype_q])
+      }
+    } else {
+      bim[bim$chromosome == chromosome, ]
+    }
+    answer
+  })
+  do.call(rbind, chromosomes_with_target_and_exlusion_regions_removed)
+}
+```
+
+```{r}
+gatars_test_size_larry = function(phenotype, Psi, sampling_set, N_simulated_nulls, weights = NULL){
+  g_target = sampling_set$g_target
+  MMM = sampling_set$MMM
+  sampling_set = sampling_set$sampling_set
+  adaptive_conf_level = 0.99
+  calculate_optimized = TRUE
+  N_simulated_nulls_interval = N_simulated_nulls
+  N_simulated_nulls_limit = N_simulated_nulls
+  y_1 = yyy = phenotype$y
+  y_2 = mu = phenotype$mu
+  Phi = Phi_fn(Psi, y_1, y_2)
+  theta_init = rep(pi/3, 2)
+  www_num = if(!is.null(weights)){
+    weights
+  } else {
+    rep(1, MMM)
+  }
+  www = www_num/sum(www_num) * MMM
+  WWW = diag(www)
+  www = t(t(www))
+  ooo = uno_experimento_fn(
+    adaptive_conf_level, calculate_optimized, g_target, MMM, 
+    N_simulated_nulls_interval, N_simulated_nulls_limit, 
+    Phi, sampling_set, theta_init, WWW, y_1, y_2)
+  ooo
+}
+```
+
