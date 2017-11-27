@@ -59,7 +59,7 @@
 #' 
 #' @param theta A vector of length \code{2} that is the initial value of the
 #' reparametrization of alpha when I am finding
-#' minimum p-value in the full triangle \code{(alpha_B, alpha_S, alpha_T)}
+#' minimum p-value in the full triangle \code{(alpha_B, alpha_S, alpha_T)}.
 #' 
 #' @param WWW A diagonal (numerical) matrix of dimension \code{MMM} by \code{MMM}
 #' with the diagonals equal to the \code{weights}.  (The user will specify

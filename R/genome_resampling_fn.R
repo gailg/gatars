@@ -155,7 +155,7 @@ genome_resampling_fn = function(
     }
     if(good_genotype_sim){
       bo = basic_and_optimized_lu_fn(genotype_sim, Phi, theta, WWW, y_1, y_2)
-      one_row_in_simulated = bo$xxx
+      one_row_in_simulated = bo$x_observed
       simulated[n_sim, ] = one_row_in_simulated
       n_sim = n_sim + 1
     } else {

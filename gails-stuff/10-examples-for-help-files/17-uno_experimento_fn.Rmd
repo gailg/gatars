@@ -66,6 +66,12 @@ ooo = uno_experimento_fn(
 ooo
 ```
 
+
+```{r}
+str(g_target)
+
+```
+
 Inside `uno_experimento_fn`
 
 `uno_experimento_fn` begins by calling `basic_and_optimized_lu_fn` to obtain the p-values of the basic statistics (`bo$p_value_basic`) and `x_observed` (`bo$xxx), and then calls `p_value_optimized_fn` to obtain the p-values of the optimized statistics (`pvo$p_value_optimized`).

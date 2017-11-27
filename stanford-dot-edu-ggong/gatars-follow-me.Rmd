@@ -31,8 +31,6 @@ opts_chunk$set(eval = TRUE, echo = TRUE, fig.height = 5, fig.width = 8, tidy=FAL
 
 For comments or questions, please contact Gail Gong at gailgongster@gmail.com
 
-To download the RStudio source file for this webpage, click here: [gatars-follow-me.Rmd](gatars-follow-me.Rmd)
-
 `gatars` ("Genetic Association Tests for Arbitrarily Related Subjects") tests the association between a specified set of genetic markers, called target markers, and a binary or quantitative trait using subjects with any genealogical relationship by calculating the P-values of the following seven statistics: the three basic statistics given by the squared burden $Q_B$, the SKAT $Q_S$ and the trait-based $Q_T$, and their four optimized linear combinations $Q_{BS}$, $Q_{BT}$, $Q_{ST}$, $Q_{BST}$.
 
 Recall the notation from the manuscript: $G$ is the $N \times M$ genotype matrix of target markers, $y$ is the $N \times 1$ column vector of subjects’ coded trait phenotypes, and $\mu$ is the $N \times 1$ column vector of user-specified phenotype predictions. Any linear combination of the three basic statistics can be written as a quadratic form $Q(\alpha) = Z^T A(\alpha) Z$. Here $Z$ is a linear function of the two vectors $W G y$ and $W G \mu$, $W$ is a diagonal matrix whose user-specified diagonal components weight the target markers, $A(\alpha)$ is a square matrix that does not depend on $G$, and $\alpha = \big( \alpha_B, \alpha_S, \alpha_T \big)$  is a triple of coefficients that lie in the unit triangle shown in Figure 1 of the manuscript.  The limiting null distribution of $Z$ when $N$ is large is multivariate normal with mean and covariance matrix that involve the first two moments of $G$.
