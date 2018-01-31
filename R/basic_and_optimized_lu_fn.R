@@ -115,7 +115,12 @@ basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2){
   basic = do.call(rbind, lapply(1:nrow(basic_ones), function(jjj){
     alpha = basic_ones[jjj, ]
     AAA = AAA_fn(alpha$B, alpha$S, alpha$T, MMM)
-    davies_answer = davies_fn(zzz, mu_z, V_z, AAA)
+    one_sided = if(jjj <= 2){
+      TRUE
+    } else {
+      FALSE
+    }
+    davies_answer = davies_fn(zzz, mu_z, V_z, AAA, one_sided)
     cbind(alpha, davies_answer)
   }))
   # ------------------------- basic is a data.frame that contains 
@@ -124,7 +129,7 @@ basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2){
   # ----------------------------------------------------- BS
   p_value_BS_fn = function(alpha_B){
     AAA = AAA_fn(alpha_B, 1 - alpha_B, 0, MMM)
-    davies_fn(zzz, mu_z, V_z, AAA)$p_value
+    davies_fn(zzz, mu_z, V_z, AAA, one_sided = TRUE)$p_value
   }
   ooo = optimize(p_value_BS_fn, interval = c(0, 1))
   alpha_B = ooo$minimum
@@ -134,7 +139,7 @@ basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2){
   # ----------------------------------------------------- BT
   p_value_BT_fn = function(alpha_B){
     AAA = AAA_fn(alpha_B, 0, 1 - alpha_B, MMM)
-    davies_fn(zzz, mu_z, V_z, AAA)$p_value
+    davies_fn(zzz, mu_z, V_z, AAA, one_sided = FALSE)$p_value
   }
   ooo = optimize(p_value_BT_fn, interval = c(0, 1))
   alpha_B = ooo$minimum
@@ -144,7 +149,7 @@ basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2){
   #------------------------------------------------------ ST
   p_value_ST_fn = function(alpha_S){
     AAA = AAA_fn(0, alpha_S, 1 - alpha_S, MMM)
-    davies_fn(zzz, mu_z, V_z, AAA)$p_value
+    davies_fn(zzz, mu_z, V_z, AAA, one_sided = FALSE)$p_value
   }
   ooo = optimize(p_value_ST_fn, interval = c(0, 1))
   alpha_S = ooo$min
@@ -152,13 +157,13 @@ basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2){
   possibles = rbind(ST_0, basic[c("S", "T"), names(basic) != "q"])
   ST =  possibles[which.min(possibles$p_value), ]
   # ----------------------------------------------------- BST
-  p_value_fn = function(theta){
+  p_value_BST_fn = function(theta){
     alpha = alpha_lu_fn(theta)
     AAA = AAA_fn(alpha[1], alpha[2], alpha[3], MMM)
-    davies_fn(zzz, mu_z, V_z, AAA)$p_value
+    davies_fn(zzz, mu_z, V_z, AAA, one_sided = FALSE)$p_value
   }
   lu = optim(
-    theta, p_value_fn,
+    theta, p_value_BST_fn,
     method = "L-BFGS-B", lower = rep(0, 3), upper = rep(pi/2, 2))
   counts_lu = lu$counts
   theta = lu$par

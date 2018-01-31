@@ -19,7 +19,9 @@
 #' one of the objects returned by \code{zzz_and_first_two_moments_fn}.
 #' 
 #' @param AAA A numerical matrix of dimension \code{(2 * MMM)} by \code{(2 * MMM)}, 
-#' the object returned by \code{AAA_fn}.
+#' the object returned by \code{AAA_fn}
+#' @param one_sided A logical equal to TRUE unless the statistic involves the 
+#' trait statistic.
 #' 
 #' @return A one-row data.frame containing the columns \code{q} and \code{p_value}.
 #' 
@@ -46,12 +48,12 @@
 #' mu_z = zzz_etc$mu_z
 #' V_z = zzz_etc$V_z
 #' AAA = AAA_fn(1, 0, 0, MMM)
-#' davies_fn(zzz, mu_z, V_z, AAA)
+#' davies_fn(zzz, mu_z, V_z, AAA, one_sided = TRUE)
 #' 
 #' @import CompQuadForm
 #' 
 #' @export
-davies_fn = function(zzz, mu_z, V_z, AAA){
+davies_fn = function(zzz, mu_z, V_z, AAA, one_sided){
   qqq = as.vector(t(zzz) %*% AAA %*% zzz)
   sss = square_root_matrix_fn(V_z)
   V_z_one_half = sss$A_one_half
@@ -70,7 +72,15 @@ davies_fn = function(zzz, mu_z, V_z, AAA){
   delta = mu_z_breve^2
   q_spectral_decomp = sum(lambda * z_breve^2)
   # ----------------------------------------------- p_value
-  p_value = davies(q = qqq, lambda = lambda, delta = delta,
-                   lim = 50000, acc = 0.00005)$Qq
+  absolute_qqq = abs(qqq)
+  right_tail = davies(absolute_qqq, lambda = lambda, delta = delta,
+                      lim = 50000, acc = 0.00005)$Qq
+  p_value = if(one_sided){
+    right_tail
+  } else {
+    left_tail = davies(- absolute_qqq, lambda = lambda, delta = delta,
+                       lim = 50000, acc = 0.00005)$Qq
+    right_tail + 1 - left_tail
+  }
   data.frame(q = qqq, p_value)
 }

@@ -1,11 +1,11 @@
 Package: gatars
 Type: Package
 Title: Genetic Association Tests for Arbitrarily Related Subjects
-Version: 0.2.23
-Date: 2017-11-27
+Version: 0.2.24
+Date: 2018-01-31
 Authors@R: as.person(c(
     "Gail Gong <gailgongster@gmail.com> [aut, cre]"))
-Description: Test the association between a specified set of M target markers and a binary or quantitative trait using subjects with any genealogical relationship.
+Description: Test the association between a specified set of M target markers and a binary or quantitative trait using subjects with any genealogical relationship. Use two-sided tests for the trait statistics and statistics containing the trait statistic.
 License: GPL-3
 LazyData: TRUE
 RoxygenNote: 6.0.1

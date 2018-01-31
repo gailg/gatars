@@ -1,6 +1,6 @@
 
 ---
-title: "gatars version 0.2.23"
+title: "gatars version 0.2.24"
 author: ''
 output:
   html_document:
@@ -316,7 +316,7 @@ paste("100 sim reps used",
 
 # All the code in one place
 
-```{r eval = TRUE}
+```{r eval = TRUE, warning = FALSE}
 library(gatars)
 # Preparing the data
 bim = gatars_example$bim

@@ -4,7 +4,7 @@
 \alias{davies_fn}
 \title{Call \code{davies}}
 \usage{
-davies_fn(zzz, mu_z, V_z, AAA)
+davies_fn(zzz, mu_z, V_z, AAA, one_sided)
 }
 \arguments{
 \item{zzz}{A numerical vector of length \code{(2 * MMM)}, one of the objects returned by
@@ -17,7 +17,10 @@ returned by \code{zzz_and_first_two_moments_fn}.}
 one of the objects returned by \code{zzz_and_first_two_moments_fn}.}
 
 \item{AAA}{A numerical matrix of dimension \code{(2 * MMM)} by \code{(2 * MMM)}, 
-the object returned by \code{AAA_fn}.}
+the object returned by \code{AAA_fn}}
+
+\item{one_sided}{A logical equal to TRUE unless the statistic involves the 
+trait statistic.}
 }
 \value{
 A one-row data.frame containing the columns \code{q} and \code{p_value}.
@@ -55,6 +58,6 @@ zzz = zzz_etc$zzz
 mu_z = zzz_etc$mu_z
 V_z = zzz_etc$V_z
 AAA = AAA_fn(1, 0, 0, MMM)
-davies_fn(zzz, mu_z, V_z, AAA)
+davies_fn(zzz, mu_z, V_z, AAA, one_sided = TRUE)
 
 }
