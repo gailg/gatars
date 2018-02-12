@@ -60,7 +60,7 @@ davies_fn = function(zzz, mu_z, V_z, AAA, one_sided){
   V_z_minus_one_half = sss$A_minus_one_half
   z_tilde = V_z_minus_one_half %*% zzz
   mu_z_tilde =  V_z_minus_one_half %*% mu_z
-  V_z_tilde = V_z_minus_one_half %*% V_z %*% V_z_minus_one_half
+
   A_tilde = V_z_one_half %*% AAA %*% V_z_one_half
   # ------------------------------------------------- breve, lambda, delta
   eigen_A_tilde = eigen(A_tilde)
