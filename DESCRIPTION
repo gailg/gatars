@@ -10,3 +10,6 @@ License: GPL-3
 LazyData: TRUE
 RoxygenNote: 6.0.1
 Imports: CompQuadForm, ggplot2, Matrix
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
+
