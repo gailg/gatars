@@ -33,6 +33,9 @@
 #' to in the manuscript as \code{mu}, the vector of user-specified phenotype
 #' predictions. 
 #' 
+#' @param statistics A character vector reflecting which optimized statistics you
+#' would like \code{uno_experimento_fn} to compute.
+#' 
 #' @return A list that contains the following objects
 #' \itemize{
 #' \item{\code{basic}: }{

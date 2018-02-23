@@ -64,6 +64,10 @@
 #' to in the manuscript as \code{mu}, the vector of user-specified phenotype
 #' predictions. 
 #' 
+#' @param statistics A character vector with default value
+#' \code{c("BS", "BT", "ST", "BST")} reflecting which optimized statistics you
+#' would like \code{uno_experimento_fn} to compute.
+#' 
 #' @return A list containing
 #' \itemize{
 #' \item{\code{N_simulated_nulls_required}: } {

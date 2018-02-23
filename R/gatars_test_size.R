@@ -41,6 +41,10 @@
 #' @param N_simulated_nulls An integer equal to the number of simulated genotype matrices to generate
 #' when estimating the test sizes of the optimized statistics.
 #' 
+#' @param statistics A character vector with default value
+#' \code{c("BS", "BT", "ST", "BST")} reflecting which optimized statistics you
+#' would like \code{uno_experimento_fn} to compute.
+#' 
 #' @param weights A vector of length \code{MMM} equal to the length of \code{target_markers} which
 #' is an input of \code{gatars_sampling_set}. The entries in \code{weights} are non-negative real
 #' numbers.  The size of \code{weights[mmm]} reflects the importance of the \code{mmm}-th target

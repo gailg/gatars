@@ -39,6 +39,10 @@ and binding together one column from each of the \code{MMM} matrices.}
 \item{N_simulated_nulls}{An integer equal to the number of simulated genotype matrices to generate
 when estimating the test sizes of the optimized statistics.}
 
+\item{statistics}{A character vector with default value
+\code{c("BS", "BT", "ST", "BST")} reflecting which optimized statistics you
+would like \code{uno_experimento_fn} to compute.}
+
 \item{weights}{A vector of length \code{MMM} equal to the length of \code{target_markers} which
 is an input of \code{gatars_sampling_set}. The entries in \code{weights} are non-negative real
 numbers.  The size of \code{weights[mmm]} reflects the importance of the \code{mmm}-th target

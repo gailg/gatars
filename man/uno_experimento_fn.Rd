@@ -65,6 +65,10 @@ phenotypes.}
 \item{y_2}{A numerical vector of length \code{NNN} equal to what is referred
 to in the manuscript as \code{mu}, the vector of user-specified phenotype
 predictions.}
+
+\item{statistics}{A character vector with default value
+\code{c("BS", "BT", "ST", "BST")} reflecting which optimized statistics you
+would like \code{uno_experimento_fn} to compute.}
 }
 \value{
 A list containing
