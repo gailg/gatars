@@ -4,8 +4,8 @@
 \alias{gatars_test_size}
 \title{Genetic Association Tests for Arbitrarily Related Subjects}
 \usage{
-gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls, statistics,
-  weights = NULL)
+gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls,
+  statistics = c("BS", "BT", "ST", "BST"), weights = NULL)
 }
 \arguments{
 \item{phenotype}{A data.frame containing \code{NNN} rows and at least the two columns
@@ -105,7 +105,6 @@ print(sampling_set)
 
 # Call gatars_test_size using an N_simulated_nulls which is way too small
 N_simulated_nulls = 10
-statistics = NULL
-gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls, statistics)
+gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls)
 
 }

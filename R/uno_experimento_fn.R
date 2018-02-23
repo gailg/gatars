@@ -111,24 +111,19 @@
 #' www_num = rep(1, MMM)
 #' www = www_num/sum(www_num) * MMM
 #' WWW = diag(www)
-#' statistics = NULL
 #' ooo = uno_experimento_fn(
 #'   adaptive_conf_level, calculate_optimized, g_target, MMM, 
 #'   N_simulated_nulls_interval, N_simulated_nulls_limit, 
-#'   Phi, sampling_set, theta_init, WWW, y_1, y_2, statistics)
+#'   Phi, sampling_set, theta_init, WWW, y_1, y_2)
 #' ooo
 #' 
 #' @export
 uno_experimento_fn = function(
   adaptive_conf_level, calculate_optimized, g_target, MMM, 
   N_simulated_nulls_interval, N_simulated_nulls_limit, Phi, 
-  sampling_set, theta_init, WWW, y_1, y_2, statistics
+  sampling_set, theta_init, WWW, y_1, y_2, 
+  statistics = c("BS", "BT", "ST", "BST")
   ){
-  statistics = if(is.null(statistics)){
-    c("BS", "BT", "ST", "BST")
-  } else {
-    statistics
-  }
   answer = if (rankMatrix(g_target) < MMM) {
     list(message = "error--g_target not full rank")
   } else {

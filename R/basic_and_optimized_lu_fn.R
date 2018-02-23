@@ -90,7 +90,7 @@
 #' V_z = zzz_etc$V_z
 #' AAA = AAA_fn(1, 0, 0, MMM)
 #' theta_init = rep(pi/3, 2)
-#' statistics = NULL
+#' statistics = c("BS", "BT", "ST", "BST")
 #' bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2, statistics)
 #' bo$optimized
 
@@ -128,7 +128,7 @@ basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2, statis
   # ------------------------ the quadratic form q and the p-value 
   # ----------------------- of the three basic statistics B, S, T
   # ----------------------------------------------------- BS
-  BS = if(is.null(statistics) || "BS" %in% statistics){
+  BS = if("BS" %in% statistics){
     p_value_BS_fn = function(alpha_B){
       AAA = AAA_fn(alpha_B, 1 - alpha_B, 0, MMM)
       davies_fn(zzz, mu_z, V_z, AAA, one_sided = TRUE)$p_value
@@ -144,7 +144,7 @@ basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2, statis
     NULL
   }
   # ----------------------------------------------------- BT
-  BT = if(is.null(statistics) || "BT" %in% statistics){
+  BT = if("BT" %in% statistics){
     p_value_BT_fn = function(alpha_B){
       AAA = AAA_fn(alpha_B, 0, 1 - alpha_B, MMM)
       davies_fn(zzz, mu_z, V_z, AAA, one_sided = FALSE)$p_value
@@ -160,7 +160,7 @@ basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2, statis
     NULL
   }
   #------------------------------------------------------ ST
-  ST = if(is.null(statistics) || "ST" %in% statistics){
+  ST = if("ST" %in% statistics){
     p_value_ST_fn = function(alpha_S){
       AAA = AAA_fn(0, alpha_S, 1 - alpha_S, MMM)
       davies_fn(zzz, mu_z, V_z, AAA, one_sided = FALSE)$p_value
@@ -176,7 +176,7 @@ basic_and_optimized_lu_fn = function(g_target, Phi, theta, WWW, y_1, y_2, statis
     NULL
   }
   # ----------------------------------------------------- BST
-  BST = if(is.null(statistics) || "BST" %in% statistics){
+  BST = if("BST" %in% statistics){
     p_value_BST_fn = function(theta){
       alpha = alpha_lu_fn(theta)
       AAA = AAA_fn(alpha[1], alpha[2], alpha[3], MMM)

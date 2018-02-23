@@ -100,7 +100,7 @@ mu_z = zzz_etc$mu_z
 V_z = zzz_etc$V_z
 AAA = AAA_fn(1, 0, 0, MMM)
 theta_init = rep(pi/3, 2)
-statistics = NULL
+statistics = c("BS", "BT", "ST", "BST")
 bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2, statistics)
 bo$optimized
 }

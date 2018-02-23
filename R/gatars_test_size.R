@@ -69,7 +69,8 @@
 #' @examples 
 #' 
 #' @export
-gatars_test_size = function(phenotype, Psi, sampling_set, N_simulated_nulls, statistics, weights = NULL){
+gatars_test_size = function(phenotype, Psi, sampling_set, N_simulated_nulls, 
+                            statistics = c("BS", "BT", "ST", "BST"), weights = NULL){
   g_target = sampling_set$g_target
   MMM = sampling_set$MMM
   sampling_set = sampling_set$sampling_set

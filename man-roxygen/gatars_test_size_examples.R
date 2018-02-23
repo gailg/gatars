@@ -29,5 +29,4 @@
 #' 
 #' # Call gatars_test_size using an N_simulated_nulls which is way too small
 #' N_simulated_nulls = 10
-#' statistics = NULL
-#' gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls, statistics)
+#' gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls)
