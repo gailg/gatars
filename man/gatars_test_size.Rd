@@ -4,7 +4,7 @@
 \alias{gatars_test_size}
 \title{Genetic Association Tests for Arbitrarily Related Subjects}
 \usage{
-gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls,
+gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls, statistics,
   weights = NULL)
 }
 \arguments{
@@ -105,6 +105,7 @@ print(sampling_set)
 
 # Call gatars_test_size using an N_simulated_nulls which is way too small
 N_simulated_nulls = 10
-gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls)
+statistics = NULL
+gatars_test_size(phenotype, Psi, sampling_set, N_simulated_nulls, statistics)
 
 }

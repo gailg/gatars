@@ -74,7 +74,8 @@
 #' V_z = zzz_etc$V_z
 #' AAA = AAA_fn(1, 0, 0, MMM)
 #' theta_init = rep(pi/3, 2)
-#' bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2)
+#' statistics = NULL
+#' bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2, statistics)
 #' bo$xxx
 #' bo$theta
 #' theta = bo$theta
@@ -100,7 +101,7 @@
 #' still_looking = TRUE
 #' # inside a while loop that continues until still_looking is set to FALSE
 #' sss = genome_resampling_fn(MMM, N_simulated_nulls_interval, optimized_names, Phi, 
-#'                           sampling_set, theta, WWW, y_1, y_2)
+#'                           sampling_set, theta, WWW, y_1, y_2, statistics)
 #' simulated = sss$simulated
 #' simulated
 #' x_observed

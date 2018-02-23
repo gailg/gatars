@@ -93,7 +93,8 @@
 #' V_z = zzz_etc$V_z
 #' AAA = AAA_fn(1, 0, 0, MMM)
 #' theta_init = rep(pi/3, 2)
-#' bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2)
+#' statistics = NULL
+#' bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2, statistics)
 #' bo$xxx
 #' bo$theta
 #' theta = bo$theta
@@ -111,7 +112,7 @@
 #' N_simulated_nulls_interval = 7
 #' optimized_names = names(x_observed)
 #' sss = genome_resampling_fn(MMM, N_simulated_nulls_interval, optimized_names, Phi, 
-#'                            sampling_set, theta, WWW, y_1, y_2)
+#'                            sampling_set, theta, WWW, y_1, y_2, statistics)
 #' sss
 #' str(sss)
 #' 
@@ -125,12 +126,11 @@ genome_resampling_fn = function(
   theta, 
   WWW,
   y_1,
-  y_2
+  y_2,
+  statistics
 ){
-  simulated = data.frame(rep(NA, N_simulated_nulls_interval), 
-                         rep(NA, N_simulated_nulls_interval), 
-                         rep(NA, N_simulated_nulls_interval), 
-                         rep(NA, N_simulated_nulls_interval))
+  simulated = data.frame(
+    matrix(NA, nrow = N_simulated_nulls_interval, ncol = length(statistics)))
   names(simulated) = optimized_names
   so_far_so_good = TRUE
   n_sim = 1
@@ -154,7 +154,7 @@ genome_resampling_fn = function(
       }
     }
     if(good_genotype_sim){
-      bo = basic_and_optimized_lu_fn(genotype_sim, Phi, theta, WWW, y_1, y_2)
+      bo = basic_and_optimized_lu_fn(genotype_sim, Phi, theta, WWW, y_1, y_2, statistics)
       one_row_in_simulated = bo$x_observed
       simulated[n_sim, ] = one_row_in_simulated
       n_sim = n_sim + 1

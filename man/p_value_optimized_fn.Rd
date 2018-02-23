@@ -6,7 +6,7 @@
 \usage{
 p_value_optimized_fn(adaptive_conf_level, calculate_optimized, MMM,
   N_simulated_nulls_interval, N_simulated_nulls_limit, Phi, sampling_set, theta,
-  WWW, x_observed, y_1, y_2)
+  WWW, x_observed, y_1, y_2, statistics)
 }
 \arguments{
 \item{adaptive_conf_level}{\code{params_fn} sets this real number to 0.99.  This if the 
@@ -128,7 +128,8 @@ mu_z = zzz_etc$mu_z
 V_z = zzz_etc$V_z
 AAA = AAA_fn(1, 0, 0, MMM)
 theta_init = rep(pi/3, 2)
-bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2)
+statistics = NULL
+bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2, statistics)
 bo$xxx
 bo$theta
 theta = bo$theta
@@ -150,7 +151,7 @@ N_simulated_nulls_limit = N_simulated_nulls
 ooo = p_value_optimized_fn(
   adaptive_conf_level, calculate_optimized, MMM, 
   N_simulated_nulls_interval, N_simulated_nulls_limit, Phi, sampling_set,
-  theta, WWW, x_observed, y_1, y_2
+  theta, WWW, x_observed, y_1, y_2, statistics
 )
 ooo
 }

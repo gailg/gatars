@@ -69,7 +69,7 @@
 #' @examples 
 #' 
 #' @export
-gatars_test_size = function(phenotype, Psi, sampling_set, N_simulated_nulls, weights = NULL){
+gatars_test_size = function(phenotype, Psi, sampling_set, N_simulated_nulls, statistics, weights = NULL){
   g_target = sampling_set$g_target
   MMM = sampling_set$MMM
   sampling_set = sampling_set$sampling_set
@@ -92,6 +92,6 @@ gatars_test_size = function(phenotype, Psi, sampling_set, N_simulated_nulls, wei
   ooo = uno_experimento_fn(
     adaptive_conf_level, calculate_optimized, g_target, MMM, 
     N_simulated_nulls_interval, N_simulated_nulls_limit, 
-    Phi, sampling_set, theta_init, WWW, y_1, y_2)
+    Phi, sampling_set, theta_init, WWW, y_1, y_2, statistics)
   ooo
 }

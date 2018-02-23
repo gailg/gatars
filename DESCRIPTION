@@ -1,8 +1,8 @@
 Package: gatars
 Type: Package
 Title: Genetic Association Tests for Arbitrarily Related Subjects
-Version: 0.2.25
-Date: 2018-02-12
+Version: 0.2.26
+Date: 2018-02-22
 Authors@R: as.person(c(
     "Gail Gong <gailgongster@gmail.com> [aut, cre]"))
 Description: Test the association between a specified set of M target markers and a binary or quantitative trait using subjects with any genealogical relationship. Use two-sided tests for the trait statistics and statistics containing the trait statistic. Speed-up in square_root_matrix_fn.
@@ -11,5 +11,5 @@ LazyData: TRUE
 RoxygenNote: 6.0.1
 Imports: CompQuadForm, ggplot2, Matrix
 Suggests: knitr, rmarkdown
-VignetteBuilder: knitr
+
 

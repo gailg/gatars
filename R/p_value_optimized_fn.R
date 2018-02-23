@@ -117,7 +117,8 @@
 #' V_z = zzz_etc$V_z
 #' AAA = AAA_fn(1, 0, 0, MMM)
 #' theta_init = rep(pi/3, 2)
-#' bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2)
+#' statistics = NULL
+#' bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2, statistics)
 #' bo$xxx
 #' bo$theta
 #' theta = bo$theta
@@ -139,7 +140,7 @@
 #' ooo = p_value_optimized_fn(
 #'   adaptive_conf_level, calculate_optimized, MMM, 
 #'   N_simulated_nulls_interval, N_simulated_nulls_limit, Phi, sampling_set,
-#'   theta, WWW, x_observed, y_1, y_2
+#'   theta, WWW, x_observed, y_1, y_2, statistics
 #' )
 #' ooo
 #' @export
@@ -155,7 +156,8 @@ p_value_optimized_fn = function(
   WWW,
   x_observed,
   y_1,
-  y_2
+  y_2, 
+  statistics
 ){
   optimized_names = names(x_observed)
   if(calculate_optimized){
@@ -176,7 +178,7 @@ p_value_optimized_fn = function(
     # or until N_simulated_nulls_required exceeds N_simulated_nulls_limit
     while(still_looking){
       sss = genome_resampling_fn(MMM, N_simulated_nulls_interval, optimized_names, Phi, 
-                                 sampling_set, theta, WWW, y_1, y_2)
+                                 sampling_set, theta, WWW, y_1, y_2, statistics)
       
       simulated = sss$simulated
       so_far_so_good = sss$so_far_so_good

@@ -6,7 +6,7 @@
 \usage{
 uno_experimento_fn(adaptive_conf_level, calculate_optimized, g_target, MMM,
   N_simulated_nulls_interval, N_simulated_nulls_limit, Phi, sampling_set,
-  theta_init, WWW, y_1, y_2)
+  theta_init, WWW, y_1, y_2, statistics)
 }
 \arguments{
 \item{adaptive_conf_level}{\code{params_fn} sets this real number to 0.99.
@@ -122,10 +122,11 @@ theta_init = rep(pi/3, 2)
 www_num = rep(1, MMM)
 www = www_num/sum(www_num) * MMM
 WWW = diag(www)
+statistics = NULL
 ooo = uno_experimento_fn(
   adaptive_conf_level, calculate_optimized, g_target, MMM, 
   N_simulated_nulls_interval, N_simulated_nulls_limit, 
-  Phi, sampling_set, theta_init, WWW, y_1, y_2)
+  Phi, sampling_set, theta_init, WWW, y_1, y_2, statistics)
 ooo
 
 }

@@ -5,7 +5,7 @@
 \title{Simulate null observations of the optimized statistics}
 \usage{
 genome_resampling_fn(MMM, N_simulated_nulls_interval, optimized_names, Phi,
-  sampling_set, theta, WWW, y_1, y_2)
+  sampling_set, theta, WWW, y_1, y_2, statistics)
 }
 \arguments{
 \item{MMM}{A positive integer equal to the length of \code{target_markers}
@@ -103,7 +103,8 @@ mu_z = zzz_etc$mu_z
 V_z = zzz_etc$V_z
 AAA = AAA_fn(1, 0, 0, MMM)
 theta_init = rep(pi/3, 2)
-bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2)
+statistics = NULL
+bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2, statistics)
 bo$xxx
 bo$theta
 theta = bo$theta
@@ -121,7 +122,7 @@ set.seed(1)
 N_simulated_nulls_interval = 7
 optimized_names = names(x_observed)
 sss = genome_resampling_fn(MMM, N_simulated_nulls_interval, optimized_names, Phi, 
-                           sampling_set, theta, WWW, y_1, y_2)
+                           sampling_set, theta, WWW, y_1, y_2, statistics)
 sss
 str(sss)
 

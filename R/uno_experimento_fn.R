@@ -111,22 +111,28 @@
 #' www_num = rep(1, MMM)
 #' www = www_num/sum(www_num) * MMM
 #' WWW = diag(www)
+#' statistics = NULL
 #' ooo = uno_experimento_fn(
 #'   adaptive_conf_level, calculate_optimized, g_target, MMM, 
 #'   N_simulated_nulls_interval, N_simulated_nulls_limit, 
-#'   Phi, sampling_set, theta_init, WWW, y_1, y_2)
+#'   Phi, sampling_set, theta_init, WWW, y_1, y_2, statistics)
 #' ooo
 #' 
 #' @export
 uno_experimento_fn = function(
   adaptive_conf_level, calculate_optimized, g_target, MMM, 
   N_simulated_nulls_interval, N_simulated_nulls_limit, Phi, 
-  sampling_set, theta_init, WWW, y_1, y_2
+  sampling_set, theta_init, WWW, y_1, y_2, statistics
   ){
+  statistics = if(is.null(statistics)){
+    c("BS", "BT", "ST", "BST")
+  } else {
+    statistics
+  }
   answer = if (rankMatrix(g_target) < MMM) {
     list(message = "error--g_target not full rank")
   } else {
-    bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2)
+    bo = basic_and_optimized_lu_fn(g_target, Phi, theta_init, WWW, y_1, y_2, statistics)
     p_value_basic = bo$p_value_basic
     p_value_basic = bo$p_value_basic
     q_basic = bo$q_basic
@@ -139,7 +145,7 @@ uno_experimento_fn = function(
     ooo = p_value_optimized_fn(
       adaptive_conf_level, calculate_optimized, MMM, 
       N_simulated_nulls_interval, N_simulated_nulls_limit, Phi, sampling_set,
-      theta, WWW, x_observed, y_1, y_2
+      theta, WWW, x_observed, y_1, y_2, statistics
     )
     so_far_so_good = ooo$so_far_so_good
     N_simulated_nulls_required = ooo$N_simulated_nulls_required
